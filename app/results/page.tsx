@@ -1,10 +1,20 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 
-function formatGermanDate(iso?: string | null) {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleDateString("de-DE", { day: "numeric", month: "short", year: "numeric" });
+function parseDate(iso?: string) {
+  if (!iso) return null;
+  const d = new Date(iso + "T00:00:00");
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function formatDate(iso: string) {
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString("de-DE", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 type Listing = {
@@ -12,40 +22,69 @@ type Listing = {
   title: string;
   city: string;
   price: number;
-  distanceMin: number;
   availableFrom: string;
   availableTo: string;
 };
 
-const MOCK: Listing[] = [
-  { id: "duesseldorf-01", title: "Helles Zimmer nahe Uniklinik", city: "Düsseldorf", price: 590, distanceMin: 12, availableFrom: "2026-01-01", availableTo: "2026-03-31" },
-  { id: "mannheim-01", title: "2-Zi. Wohnung – ideal fürs PJ", city: "Mannheim", price: 780, distanceMin: 9, availableFrom: "2026-02-01", availableTo: "2026-04-30" },
-  { id: "erlangen-01", title: "WG-Zimmer, ruhig & zentral", city: "Erlangen", price: 520, distanceMin: 15, availableFrom: "2026-01-15", availableTo: "2026-04-15" },
-  { id: "koeln-01", title: "Studio-Apartment, ÖPNV top", city: "Köln", price: 830, distanceMin: 18, availableFrom: "2026-03-01", availableTo: "2026-05-31" },
-  { id: "muenchen-01", title: "Kompakt & modern, Nähe Klinik", city: "München", price: 980, distanceMin: 14, availableFrom: "2026-01-01", availableTo: "2026-06-30" },
-  { id: "hamburg-01", title: "Zimmer in Med-WG, gute Lage", city: "Hamburg", price: 640, distanceMin: 11, availableFrom: "2026-02-15", availableTo: "2026-05-15" },
+const LISTINGS: Listing[] = [
+  {
+    id: "mannheim-1",
+    title: "2-Zi-Wohnung nahe Uniklinik",
+    city: "Mannheim",
+    price: 780,
+    availableFrom: "2026-02-01",
+    availableTo: "2026-04-30",
+  },
+  {
+    id: "erlangen-1",
+    title: "WG-Zimmer ruhig & zentral",
+    city: "Erlangen",
+    price: 520,
+    availableFrom: "2026-01-15",
+    availableTo: "2026-04-15",
+  },
+  {
+    id: "koeln-1",
+    title: "Studio-Apartment mit ÖPNV",
+    city: "Köln",
+    price: 830,
+    availableFrom: "2026-03-01",
+    availableTo: "2026-05-31",
+  },
 ];
 
-export default function ResultsPage({
+type SP = Record<string, string | string[] | undefined>;
+
+export default async function ResultsPage({
   searchParams,
 }: {
-  searchParams: { city?: string; from?: string; to?: string };
+  searchParams: SP | Promise<SP>;
 }) {
-  const city = (searchParams.city || "").trim();
-  const from = searchParams.from || "";
-  const to = searchParams.to || "";
+  const sp = await Promise.resolve(searchParams);
 
-  const filtered = MOCK.filter((l) => {
-    const cityOk = !city || l.city.toLowerCase().includes(city.toLowerCase());
-    // simple demo logic: ignore date filtering for now
-    return cityOk;
+  const city =
+    (Array.isArray(sp.city) ? sp.city[0] : sp.city || "").trim();
+  const from =
+    (Array.isArray(sp.from) ? sp.from[0] : sp.from || "").trim();
+  const to =
+    (Array.isArray(sp.to) ? sp.to[0] : sp.to || "").trim();
+
+  const fromDate = parseDate(from);
+  const toDate = parseDate(to);
+
+  const filtered = LISTINGS.filter((l) => {
+    const cityOk =
+      !city || l.city.toLowerCase().includes(city.toLowerCase());
+
+    const aFrom = parseDate(l.availableFrom);
+    const aTo = parseDate(l.availableTo);
+
+    const dateOk =
+      (!fromDate || (aFrom && aFrom <= fromDate)) &&
+      (!toDate || (aTo && aTo >= toDate));
+
+    return cityOk && dateOk;
   });
-
-  const headerCity = city ? `Treffer in ${city}` : "Treffer";
-  const dateLine =
-    from || to
-      ? `${from ? formatGermanDate(from) : "—"} – ${to ? formatGermanDate(to) : "—"}`
-      : "";
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -61,39 +100,41 @@ export default function ResultsPage({
       </header>
 
       <section className="mx-auto max-w-5xl px-4 py-6">
-        <h1 className="text-2xl font-semibold tracking-tight">{headerCity}</h1>
-        {dateLine ? <p className="text-sm text-slate-600 mt-1">{dateLine}</p> : null}
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {city ? `Treffer in ${city}` : "Treffer"}
+        </h1>
+
+        <p className="mt-2 text-sm text-slate-600">
+          Zeitraum: {from || "—"} – {to || "—"}
+        </p>
+
+        {/* Debug – kannst du später löschen */}
+        <p className="mt-2 text-xs text-slate-500">
+          Debug: city="{city || "-"}", from="{from || "-"}", to="{to || "-"}"
+        </p>
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {filtered.map((l) => (
-            <Link
+            <div
               key={l.id}
-              href={`/listing/${l.id}`}
-              className="block rounded-2xl border bg-white p-4 hover:shadow-sm transition"
+              className="rounded-2xl border bg-white p-4"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="text-sm text-slate-500">{l.city}</div>
-                  <div className="text-base font-semibold">{l.title}</div>
-                  <div className="mt-2 text-sm text-slate-600">
-                    {l.distanceMin} Min zur Klinik · verfügbar {formatGermanDate(l.availableFrom)} –{" "}
-                    {formatGermanDate(l.availableTo)}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-base font-semibold">{l.price} €</div>
-                  <div className="text-xs text-slate-500">pro Monat</div>
-                </div>
+              <div className="text-sm text-slate-500">{l.city}</div>
+              <div className="font-semibold">{l.title}</div>
+              <div className="mt-2 text-sm text-slate-600">
+                verfügbar {formatDate(l.availableFrom)} –{" "}
+                {formatDate(l.availableTo)}
               </div>
-            </Link>
+              <div className="mt-2 font-semibold">{l.price} € / Monat</div>
+            </div>
           ))}
         </div>
 
-        {filtered.length === 0 ? (
+        {filtered.length === 0 && (
           <p className="mt-6 text-sm text-slate-600">
-            Keine Treffer. Versuch eine andere Stadt.
+            Keine Treffer für diesen Zeitraum.
           </p>
-        ) : null}
+        )}
       </section>
     </main>
   );
