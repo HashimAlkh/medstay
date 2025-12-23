@@ -1,6 +1,9 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
+import SortSelect from "./SortSelect";
+
+type SortKey = "price_asc" | "price_desc";
 
 function parseDate(iso?: string) {
   if (!iso) return null;
@@ -62,28 +65,35 @@ export default async function ResultsPage({
 }) {
   const sp = await Promise.resolve(searchParams);
 
-  const city =
-    (Array.isArray(sp.city) ? sp.city[0] : sp.city || "").trim();
-  const from =
-    (Array.isArray(sp.from) ? sp.from[0] : sp.from || "").trim();
-  const to =
-    (Array.isArray(sp.to) ? sp.to[0] : sp.to || "").trim();
+  const city = (Array.isArray(sp.city) ? sp.city[0] : sp.city || "").trim();
+  const from = (Array.isArray(sp.from) ? sp.from[0] : sp.from || "").trim();
+  const to = (Array.isArray(sp.to) ? sp.to[0] : sp.to || "").trim();
+
+  const sort = ((Array.isArray(sp.sort) ? sp.sort[0] : sp.sort) ||
+    "price_asc") as SortKey;
 
   const fromDate = parseDate(from);
   const toDate = parseDate(to);
 
+  // 1) Filtern
   const filtered = LISTINGS.filter((l) => {
-    const cityOk =
-      !city || l.city.toLowerCase().includes(city.toLowerCase());
+    const cityOk = !city || l.city.toLowerCase().includes(city.toLowerCase());
 
     const aFrom = parseDate(l.availableFrom);
     const aTo = parseDate(l.availableTo);
 
+    // Treffer nur wenn Inserat den gesuchten Zeitraum vollständig ABDECKT
     const dateOk =
       (!fromDate || (aFrom && aFrom <= fromDate)) &&
       (!toDate || (aTo && aTo >= toDate));
 
     return cityOk && dateOk;
+  });
+
+  // 2) Sortieren
+  const sorted = [...filtered].sort((a, b) => {
+    if (sort === "price_desc") return b.price - a.price;
+    return a.price - b.price; // price_asc
   });
 
   return (
@@ -108,17 +118,17 @@ export default async function ResultsPage({
           Zeitraum: {from || "—"} – {to || "—"}
         </p>
 
-        {/* Debug – kannst du später löschen */}
         <p className="mt-2 text-xs text-slate-500">
-          Debug: city="{city || "-"}", from="{from || "-"}", to="{to || "-"}"
+          Debug: city="{city || "-"}", from="{from || "-"}", to="{to || "-"}",
+          sort="{sort}"
         </p>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {filtered.map((l) => (
-            <div
-              key={l.id}
-              className="rounded-2xl border bg-white p-4"
-            >
+        {/* Sort UI */}
+        <SortSelect city={city} from={from} to={to} sort={sort} />
+
+        <div className="grid gap-4 md:grid-cols-2">
+          {sorted.map((l) => (
+            <div key={l.id} className="rounded-2xl border bg-white p-4">
               <div className="text-sm text-slate-500">{l.city}</div>
               <div className="font-semibold">{l.title}</div>
               <div className="mt-2 text-sm text-slate-600">
@@ -130,7 +140,7 @@ export default async function ResultsPage({
           ))}
         </div>
 
-        {filtered.length === 0 && (
+        {sorted.length === 0 && (
           <p className="mt-6 text-sm text-slate-600">
             Keine Treffer für diesen Zeitraum.
           </p>
