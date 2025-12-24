@@ -1,4 +1,25 @@
-export default function ListingCTA() {
+type ListingCTAProps = {
+  listingId?: string;
+  city?: string;
+  from?: string; // YYYY-MM-DD
+  to?: string;   // YYYY-MM-DD
+};
+
+function formatGermanDate(iso?: string) {
+  if (!iso) return "__.__.____";
+  const [y, m, d] = iso.split("-");
+  if (!y || !m || !d) return "__.__.____";
+  return `${d}.${m}.${y}`;
+}
+
+export default function ListingCTA({ listingId, city, from, to }: ListingCTAProps) {
+  const msg = `Hallo, ich interessiere mich für das Inserat (${listingId ?? "—"})${
+    city ? ` in ${city}` : ""
+  }.
+Zeitraum: ${formatGermanDate(from)} bis ${formatGermanDate(to)}.
+Ich bin: PJ / Famulatur / Pflegepraktikum.
+Viele Grüße`;
+
   return (
     <div className="listing-cta rounded-2xl border bg-white p-5 h-fit">
       <div className="text-sm text-slate-500">Preis</div>
@@ -31,10 +52,10 @@ export default function ListingCTA() {
 
         <textarea
           name="Nachricht"
-          placeholder="Kurze Nachricht (z. B. Zeitraum, PJ/Famulatur)"
-          rows={5}
+          rows={6}
           className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
+          defaultValue={msg}
         />
 
         <button
@@ -44,9 +65,7 @@ export default function ListingCTA() {
           Kontakt anfragen
         </button>
 
-        <p className="text-xs text-slate-500">
-          (MVP) Anfrage wird per E-Mail versendet.
-        </p>
+        <p className="text-xs text-slate-500">(MVP) Anfrage wird per E-Mail versendet.</p>
       </form>
     </div>
   );

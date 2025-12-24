@@ -1,11 +1,21 @@
 import Link from "next/link";
 import ListingCTA from "../../../app/components/ListingCTA";
 
-export default function ListingPage({
+type SP = Record<string, string | string[] | undefined>;
+
+export default async function ListingPage({
   params,
+  searchParams,
 }: {
   params: { id: string };
+  searchParams: SP | Promise<SP>;
 }) {
+  const sp = await Promise.resolve(searchParams);
+
+  const city = (Array.isArray(sp.city) ? sp.city[0] : sp.city || "").trim();
+  const from = (Array.isArray(sp.from) ? sp.from[0] : sp.from || "").trim();
+  const to = (Array.isArray(sp.to) ? sp.to[0] : sp.to || "").trim();
+
   return (
     <main className="min-h-screen bg-slate-50">
       <header className="w-full border-b bg-white">
@@ -28,12 +38,10 @@ export default function ListingPage({
         </h1>
 
         <div className="mt-6 grid gap-4 md:grid-cols-[2fr,1fr]">
-          {/* Links: Details */}
           <div className="rounded-2xl border bg-white p-5">
             <div className="h-44 rounded-xl bg-slate-100 mb-4 flex items-center justify-center text-slate-500 text-sm">
               Bild-Platzhalter
             </div>
-
             <h2 className="text-lg font-semibold">Details</h2>
             <ul className="mt-3 space-y-2 text-sm text-slate-700">
               <li>• Nähe zur Klinik (Demo)</li>
@@ -43,8 +51,7 @@ export default function ListingPage({
             </ul>
           </div>
 
-          {/* Rechts: CTA */}
-          <ListingCTA />
+          <ListingCTA listingId={params.id} city={city} from={from} to={to} />
         </div>
       </section>
     </main>
