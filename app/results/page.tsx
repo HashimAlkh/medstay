@@ -2,12 +2,13 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import SortSelect from "./SortSelect";
+import ListingCard from "../../app/components/ListingCard";
 
 type SortKey = "price_asc" | "price_desc";
 
 function parseDate(iso?: string) {
   if (!iso) return null;
-  const d = new Date(iso + "T00:00:00");
+  const d = new Date(iso + "T00:00:00");  
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
@@ -118,6 +119,7 @@ export default async function ResultsPage({
           Zeitraum: {from || "—"} – {to || "—"}
         </p>
 
+        {/* Debug – später löschen */}
         <p className="mt-2 text-xs text-slate-500">
           Debug: city="{city || "-"}", from="{from || "-"}", to="{to || "-"}",
           sort="{sort}"
@@ -126,22 +128,23 @@ export default async function ResultsPage({
         {/* Sort UI */}
         <SortSelect city={city} from={from} to={to} sort={sort} />
 
+        {/* Cards */}
         <div className="grid gap-4 md:grid-cols-2">
-  {sorted.map((l) => (
-    <Link
-      key={l.id}
-      href={`/listing/${l.id}`}
-      className="block rounded-2xl border bg-white p-4 hover:shadow-sm transition"
-    >
-      <div className="text-sm text-slate-500">{l.city}</div>
-      <div className="font-semibold">{l.title}</div>
-      <div className="mt-2 text-sm text-slate-600">
-        verfügbar {formatDate(l.availableFrom)} – {formatDate(l.availableTo)}
-      </div>
-      <div className="mt-2 font-semibold">{l.price} € / Monat</div>
-    </Link>
-  ))}
-</div>
+          {sorted.map((l) => (
+            <ListingCard
+              key={l.id}
+              id={l.id}
+              title={l.title}
+              city={l.city}
+              price={l.price}
+              availableFrom={formatDate(l.availableFrom)}
+              availableTo={formatDate(l.availableTo)}
+              href={`/listing/${l.id}?city=${encodeURIComponent(
+                city
+              )}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`}
+            />
+          ))}
+        </div>
 
         {sorted.length === 0 && (
           <p className="mt-6 text-sm text-slate-600">
