@@ -1,22 +1,11 @@
 import Link from "next/link";
+import SiteHeader from "./components/SiteHeader";
 
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-slate-50 flex flex-col">
       {/* Header */}
-      <header className="w-full border-b bg-white">
-        <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold tracking-tight">
-            med<span className="text-blue-600">stay</span>
-          </Link>
-          <Link
-            href="/results"
-            className="text-sm text-slate-600 hover:text-black"
-          >
-            Inserate ansehen
-          </Link>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Hero + Suche */}
       <section className="bg-white border-b">

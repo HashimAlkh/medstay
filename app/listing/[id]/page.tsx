@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ListingCTA from "../../../app/components/ListingCTA";
+import SiteHeader from "../../components/SiteHeader";
 
 type SP = Record<string, string | string[] | undefined>;
 
@@ -18,19 +19,7 @@ export default async function ListingPage({
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <header className="w-full border-b bg-white">
-        <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold tracking-tight">
-            med<span className="text-blue-600">stay</span>
-          </Link>
-          <Link
-            href="/results"
-            className="text-sm text-slate-600 hover:text-black"
-          >
-            Zurück zu Treffern
-          </Link>
-        </div>
-      </header>
+      <SiteHeader rightLink={{ href: "/results", label: "Zurück zu Treffern" }} />
 
       <section className="mx-auto max-w-5xl px-4 py-8">
         <h1 className="text-2xl font-semibold tracking-tight">
