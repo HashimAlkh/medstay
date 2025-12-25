@@ -30,6 +30,16 @@ export default async function PreviewPage({
   const description = pick(sp, "description");
   const email = pick(sp, "email");
 
+  const qs = new URLSearchParams({
+  title,
+  city,
+  price,
+  from,
+  to,
+  description,
+  email,
+}).toString();
+
   return (
     <main className="min-h-screen bg-slate-50">
       <SiteHeader rightLink={{ href: "/create-listing/form", label: "Zurück" }} />
@@ -69,12 +79,12 @@ export default async function PreviewPage({
             (MVP) Zahlung & Veröffentlichung hängen wir als nächsten Schritt dran.
           </p>
 
-          <button
-            type="button"
-            className="mt-5 w-full rounded-xl bg-blue-600 text-white py-3 text-sm font-medium hover:bg-blue-700"
-          >
-            Zur Bezahlung (19 €)
-          </button>
+          <Link
+  href={`/create-listing/pay?${qs}`}
+  className="mt-5 block w-full text-center rounded-xl bg-blue-600 text-white py-3 text-sm font-medium hover:bg-blue-700"
+>
+  Zur Bezahlung (19 €)
+</Link>
 
           <div className="mt-4 text-center">
             <Link
