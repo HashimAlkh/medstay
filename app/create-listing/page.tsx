@@ -63,12 +63,12 @@ export default function CreateListingPage() {
             einmalig · 30 Tage sichtbar
           </div>
 
-          <button
-            type="button"
-            className="mt-6 w-full rounded-xl bg-blue-600 text-white py-3 text-sm font-medium hover:bg-blue-700"
-          >
-            Inserat erstellen (19 €)
-          </button>
+          <Link
+  href="/create-listing/form"
+  className="mt-6 block w-full text-center rounded-xl bg-blue-600 text-white py-3 text-sm font-medium hover:bg-blue-700"
+>
+  Inserat erstellen (19 €)
+</Link>
 
           <p className="mt-3 text-xs text-slate-500">
             Bezahlung und Inseratserstellung folgen im nächsten Schritt.
