@@ -1,7 +1,30 @@
 import Link from "next/link";
 import SiteHeader from "../../components/SiteHeader";
+import { supabaseAdmin } from "../../lib/supabaseAdmin";
 
-export default function SuccessPage() {
+type SP = Record<string, string | string[] | undefined>;
+
+function pick(sp: SP, key: string) {
+  const v = sp[key];
+  return (Array.isArray(v) ? v[0] : v || "").toString().trim();
+}
+
+export default async function SuccessPage({
+  searchParams,
+}: {
+  searchParams: SP | Promise<SP>;
+}) {
+  const sp = await Promise.resolve(searchParams);
+  const draftId = pick(sp, "draft");
+
+  if (draftId) {
+    // In MVP markieren wir "submitted" – später "paid" via Stripe webhook
+    await supabaseAdmin
+      .from("listing_drafts")
+      .update({ status: "submitted" })
+      .eq("id", draftId);
+  }
+
   return (
     <main className="min-h-screen bg-slate-50">
       <SiteHeader rightLink={{ href: "/", label: "Startseite" }} />
@@ -34,6 +57,10 @@ export default function SuccessPage() {
           >
             Weiteres Inserat einstellen
           </Link>
+
+          {draftId && (
+            <p className="mt-4 text-xs text-slate-500">Draft-ID: {draftId}</p>
+          )}
         </div>
       </section>
     </main>
