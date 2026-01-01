@@ -27,7 +27,7 @@ export default async function ListingPage({
         </h1>
 
         <div className="mt-6 grid gap-4 md:grid-cols-[2fr,1fr]">
-          <div className="rounded-2xl border bg-white p-5">
+          <div className="ms-card">
             <div className="h-44 rounded-xl bg-slate-100 mb-4 flex items-center justify-center text-slate-500 text-sm">
               Bild-Platzhalter
             </div>

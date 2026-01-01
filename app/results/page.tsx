@@ -38,6 +38,40 @@ type ListingRow = {
   status: string;
 };
 
+const META_BY_ID: Record<
+  string,
+  {
+    distanceKm?: number;
+    housingType?: string;
+    furnished?: boolean;
+    wifi?: boolean;
+    imageUrl?: string | null;
+  }
+> = {
+  // Beispiel-IDs: passe sie an deine echten IDs an, wenn sie anders sind
+  "mannheim-1": {
+    distanceKm: 0.8,
+    housingType: "2-Zi-Wohnung",
+    furnished: true,
+    wifi: true,
+    imageUrl: null,
+  },
+  "erlangen-1": {
+    distanceKm: 1.2,
+    housingType: "WG-Zimmer",
+    furnished: true,
+    wifi: true,
+    imageUrl: null,
+  },
+  "koeln-1": {
+    distanceKm: 2.4,
+    housingType: "Studio",
+    furnished: false,
+    wifi: true,
+    imageUrl: null,
+  },
+};
+
 export default async function ResultsPage({
   searchParams,
 }: {
@@ -115,22 +149,31 @@ export default async function ResultsPage({
           </div>
         )}
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {sorted.map((l) => (
-            <ListingCard
-              key={l.id}
-              id={l.id}
-              title={l.title}
-              city={l.city}
-              price={l.price}
-              availableFrom={formatDate(l.available_from)}
-              availableTo={formatDate(l.available_to)}
-              href={`/listing/${l.id}?city=${encodeURIComponent(city)}&from=${encodeURIComponent(
-                from
-              )}&to=${encodeURIComponent(to)}`}
-            />
-          ))}
-        </div>
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  {sorted.map((l) => {
+  const meta = META_BY_ID[l.id] || {};
+
+  return (
+    <ListingCard
+      key={l.id}
+      id={l.id}
+      title={l.title}
+      city={l.city}
+      price={l.price}
+      availableFrom={formatDate(l.available_from)}
+      availableTo={formatDate(l.available_to)}
+      href={`/listing/${l.id}?city=${encodeURIComponent(city)}&from=${encodeURIComponent(
+        from
+      )}&to=${encodeURIComponent(to)}`}
+      distanceKm={meta.distanceKm ?? null}
+      housingType={meta.housingType ?? null}
+      furnished={meta.furnished ?? null}
+      wifi={meta.wifi ?? null}
+      imageUrl={meta.imageUrl ?? null}
+    />
+  );
+})}
+</div>
 
         {sorted.length === 0 && (
           <p className="mt-6 text-sm text-slate-600">Keine Treffer für diesen Zeitraum.</p>
