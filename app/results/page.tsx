@@ -2,14 +2,20 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import SortSelect from "./SortSelect";
-import ListingCard from "../../app/components/ListingCard";
-import SiteHeader from "../components/SiteHeader";
+import ListingCard from "@/app/components/ListingCard";
+import { supabaseAdmin } from "../lib/supabaseAdmin";
 
 type SortKey = "price_asc" | "price_desc";
+type SP = Record<string, string | string[] | undefined>;
+
+function pick(sp: SP, key: string) {
+  const v = sp[key];
+  return (Array.isArray(v) ? v[0] : v || "").toString().trim();
+}
 
 function parseDate(iso?: string) {
   if (!iso) return null;
-  const d = new Date(iso + "T00:00:00");  
+  const d = new Date(iso + "T00:00:00");
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
@@ -22,43 +28,15 @@ function formatDate(iso: string) {
   });
 }
 
-type Listing = {
+type ListingRow = {
   id: string;
   title: string;
   city: string;
   price: number;
-  availableFrom: string;
-  availableTo: string;
+  available_from: string;
+  available_to: string;
+  status: string;
 };
-
-const LISTINGS: Listing[] = [
-  {
-    id: "mannheim-1",
-    title: "2-Zi-Wohnung nahe Uniklinik",
-    city: "Mannheim",
-    price: 780,
-    availableFrom: "2026-02-01",
-    availableTo: "2026-04-30",
-  },
-  {
-    id: "erlangen-1",
-    title: "WG-Zimmer ruhig & zentral",
-    city: "Erlangen",
-    price: 520,
-    availableFrom: "2026-01-15",
-    availableTo: "2026-04-15",
-  },
-  {
-    id: "koeln-1",
-    title: "Studio-Apartment mit ÖPNV",
-    city: "Köln",
-    price: 830,
-    availableFrom: "2026-03-01",
-    availableTo: "2026-05-31",
-  },
-];
-
-type SP = Record<string, string | string[] | undefined>;
 
 export default async function ResultsPage({
   searchParams,
@@ -67,24 +45,31 @@ export default async function ResultsPage({
 }) {
   const sp = await Promise.resolve(searchParams);
 
-  const city = (Array.isArray(sp.city) ? sp.city[0] : sp.city || "").trim();
-  const from = (Array.isArray(sp.from) ? sp.from[0] : sp.from || "").trim();
-  const to = (Array.isArray(sp.to) ? sp.to[0] : sp.to || "").trim();
+  const city = pick(sp, "city");
+  const from = pick(sp, "from");
+  const to = pick(sp, "to");
 
-  const sort = ((Array.isArray(sp.sort) ? sp.sort[0] : sp.sort) ||
-    "price_asc") as SortKey;
+  const sort = (pick(sp, "sort") || "price_asc") as SortKey;
 
   const fromDate = parseDate(from);
   const toDate = parseDate(to);
 
-  // 1) Filtern
-  const filtered = LISTINGS.filter((l) => {
+  // 1) Published Inserate aus Supabase laden
+  const { data, error } = await supabaseAdmin
+    .from("listing_drafts")
+    .select("id,title,city,price,available_from,available_to,status")
+    .eq("status", "published");
+
+  const rows: ListingRow[] = (data || []) as any;
+
+  // 2) Filtern (Stadt + Zeitraum)
+  const filtered = rows.filter((l) => {
     const cityOk = !city || l.city.toLowerCase().includes(city.toLowerCase());
 
-    const aFrom = parseDate(l.availableFrom);
-    const aTo = parseDate(l.availableTo);
+    const aFrom = parseDate(l.available_from);
+    const aTo = parseDate(l.available_to);
 
-    // Treffer nur wenn Inserat den gesuchten Zeitraum vollständig ABDECKT
+    // Inserat muss den gewünschten Zeitraum ABDECKEN
     const dateOk =
       (!fromDate || (aFrom && aFrom <= fromDate)) &&
       (!toDate || (aTo && aTo >= toDate));
@@ -92,15 +77,24 @@ export default async function ResultsPage({
     return cityOk && dateOk;
   });
 
-  // 2) Sortieren
+  // 3) Sortieren
   const sorted = [...filtered].sort((a, b) => {
     if (sort === "price_desc") return b.price - a.price;
-    return a.price - b.price; // price_asc
+    return a.price - b.price;
   });
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <SiteHeader rightLink={{ href: "/", label: "Neue Suche" }} />
+      <header className="w-full border-b bg-white">
+        <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
+          <Link href="/" className="text-xl font-bold tracking-tight">
+            med<span className="text-blue-600">stay</span>
+          </Link>
+          <Link href="/" className="text-sm text-slate-600 hover:text-black">
+            Neue Suche
+          </Link>
+        </div>
+      </header>
 
       <section className="mx-auto max-w-5xl px-4 py-6">
         <h1 className="text-2xl font-semibold tracking-tight">
@@ -111,17 +105,17 @@ export default async function ResultsPage({
           Zeitraum: {from || "—"} – {to || "—"}
         </p>
 
-        {/* Debug – später löschen */}
-        <p className="mt-2 text-xs text-slate-500">
-          Debug: city="{city || "-"}", from="{from || "-"}", to="{to || "-"}",
-          sort="{sort}"
-        </p>
-
         {/* Sort UI */}
         <SortSelect city={city} from={from} to={to} sort={sort} />
 
-        {/* Cards */}
-        <div className="grid gap-4 md:grid-cols-2">
+        {/* Optional Debug bei Fehler */}
+        {error && (
+          <div className="mt-4 rounded-2xl border bg-white p-4 text-sm text-red-600">
+            Fehler beim Laden: {error.message}
+          </div>
+        )}
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
           {sorted.map((l) => (
             <ListingCard
               key={l.id}
@@ -129,19 +123,17 @@ export default async function ResultsPage({
               title={l.title}
               city={l.city}
               price={l.price}
-              availableFrom={formatDate(l.availableFrom)}
-              availableTo={formatDate(l.availableTo)}
-              href={`/listing/${l.id}?city=${encodeURIComponent(
-                city
-              )}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`}
+              availableFrom={formatDate(l.available_from)}
+              availableTo={formatDate(l.available_to)}
+              href={`/listing/${l.id}?city=${encodeURIComponent(city)}&from=${encodeURIComponent(
+                from
+              )}&to=${encodeURIComponent(to)}`}
             />
           ))}
         </div>
 
         {sorted.length === 0 && (
-          <p className="mt-6 text-sm text-slate-600">
-            Keine Treffer für diesen Zeitraum.
-          </p>
+          <p className="mt-6 text-sm text-slate-600">Keine Treffer für diesen Zeitraum.</p>
         )}
       </section>
     </main>
