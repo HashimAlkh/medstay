@@ -92,6 +92,70 @@ export default function CreateListingFormPage() {
             </div>
           </div>
 
+          {/* Zusatzinfos (MVP): Entfernung, Wohnungstyp, Möblierung */}
+<div className="mt-4 grid gap-3 sm:grid-cols-2">
+  <div>
+  <div className="ms-label mb-1">Wohnungstyp</div>
+  <select name="housing_type" className="ms-select w-full" required>
+    <option value="">Bitte wählen</option>
+    <option value="apartment">Ganze Wohnung</option>
+    <option value="room">Zimmer</option>
+  </select>
+</div>
+
+  <div>
+    <div className="ms-label mb-1">Entfernung zur Klinik/Uni (km)</div>
+    <input
+      name="distance_km"
+      className="ms-input"
+      inputMode="decimal"
+      placeholder="z. B. 1,2"
+    />
+  </div>
+</div>
+
+<div className="mt-3">
+  <div className="ms-label mb-1">Möblierung</div>
+  <select name="furnished" className="ms-select w-full">
+    <option value="">Bitte wählen</option>
+    <option value="yes">möbliert</option>
+    <option value="partial">teilmöbliert</option>
+    <option value="no">unmöbliert</option>
+  </select>
+</div>
+
+{/* Ausstattung */}
+<div className="mt-4">
+  <div className="ms-label mb-2">Ausstattung</div>
+
+  <div className="grid gap-2 sm:grid-cols-2">
+    <label className="flex items-center gap-2 text-sm text-slate-700">
+      <input type="checkbox" name="wifi" className="h-4 w-4" />
+      WLAN
+    </label>
+
+    <label className="flex items-center gap-2 text-sm text-slate-700">
+      <input type="checkbox" name="kitchen" className="h-4 w-4" />
+      Küche
+    </label>
+
+    <label className="flex items-center gap-2 text-sm text-slate-700">
+      <input type="checkbox" name="washing_machine" className="h-4 w-4" />
+      Waschmaschine
+    </label>
+
+    <label className="flex items-center gap-2 text-sm text-slate-700">
+      <input type="checkbox" name="elevator" className="h-4 w-4" />
+      Aufzug
+    </label>
+
+    <label className="flex items-center gap-2 text-sm text-slate-700">
+      <input type="checkbox" name="basement" className="h-4 w-4" />
+      Keller
+    </label>
+  </div>
+</div>
+
           <div>
             <label className="block text-sm font-medium text-slate-700">
               Kurzbeschreibung

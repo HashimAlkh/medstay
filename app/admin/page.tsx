@@ -57,13 +57,13 @@ export default async function AdminPage({
   // submitted & published laden (damit du auch zurücknehmen kannst)
   const { data: submitted } = await supabaseAdmin
     .from("listing_drafts")
-    .select("id,title,city,price,available_from,available_to,email,status,created_at")
+    .select("id,title,city,price,available_from,available_to,email,status,created_at,housing_type,distance_km,furnished,wifi,kitchen,washing_machine,elevator,basement,image_url")
     .eq("status", "submitted")
     .order("created_at", { ascending: false });
 
   const { data: published } = await supabaseAdmin
     .from("listing_drafts")
-    .select("id,title,city,price,available_from,available_to,email,status,created_at")
+    .select("id,title,city,price,available_from,available_to,email,status,created_at,housing_type,distance_km,furnished,wifi,kitchen,washing_machine,elevator,basement,image_url")
     .eq("status", "published")
     .order("created_at", { ascending: false });
 

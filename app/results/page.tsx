@@ -91,7 +91,7 @@ export default async function ResultsPage({
   // 1) Published Inserate aus Supabase laden
   const { data, error } = await supabaseAdmin
     .from("listing_drafts")
-    .select("id,title,city,price,available_from,available_to,status")
+    .select("id,title,city,price,available_from,available_to,email,status,created_at,housing_type,distance_km,furnished,wifi,kitchen,washing_machine,elevator,basement,image_url")
     .eq("status", "published");
 
   const rows: ListingRow[] = (data || []) as any;
