@@ -9,6 +9,7 @@ import {
   furnishedLabel,
 } from "@/app/lib/listingView";
 import { submitDraft } from "./actions";
+import { LISTING_FEE_EUR } from "@/app/lib/pricing";
 
 type SP = Record<string, string | string[] | undefined>;
 
@@ -31,6 +32,7 @@ export default async function PreviewPage({
   const sp = await Promise.resolve(searchParams);
   const draftId = pick(sp, "draft");
   const submitted = pick(sp, "submitted") === "1";
+  const paid = pick(sp, "paid") === "1";
 
   if (!draftId) {
     return (
@@ -64,7 +66,7 @@ export default async function PreviewPage({
   const { data: draft, error } = await supabaseAdmin
     .from("listing_drafts")
     .select(
-      "id,title,city,price,available_from,available_to,description,email,status,created_at,housing_type,distance_km,furnished,wifi,kitchen,washing_machine,elevator,basement,image_url"
+      "id,title,city,price,available_from,available_to,description,email,status,created_at,housing_type,distance_km,furnished,wifi,kitchen,washing_machine,elevator,basement,image_url,status,paid_at,payment_status"
     )
     .eq("id", draftId)
     .single();
@@ -219,34 +221,55 @@ export default async function PreviewPage({
             </div>
 
             <div className="mt-5">
-              {draft.status === "draft" ? (
-                <form action={submitDraft} className="space-y-2">
-                  <input type="hidden" name="draft_id" value={draft.id} />
-                  <button
-                    type="submit"
-                    className="w-full rounded-xl bg-blue-600 text-white py-2.5 text-sm font-medium hover:bg-blue-700"
-                  >
-                    Inserat einreichen
-                  </button>
-                  <p className="text-xs text-slate-500">
-                    Nach dem Einreichen prüfst du es im Admin-Dashboard und
-                    veröffentlichst es.
-                  </p>
-                </form>
-              ) : (
-                <div className="rounded-xl border bg-slate-50 p-3 text-sm text-slate-700">
-                  Status:{" "}
-                  <span className="font-medium">{draft.status}</span>
-                </div>
-              )}
+  {draft.status === "draft" ? (
+    draft.paid_at && draft.payment_status === "paid" ? (
+      <form action={submitDraft} className="space-y-2">
+        <input type="hidden" name="draft_id" value={draft.id} />
+        <button
+          type="submit"
+          className="w-full rounded-xl bg-blue-600 text-white py-2.5 text-sm font-medium hover:bg-blue-700"
+        >
+          Inserat einreichen
+        </button>
+        <p className="text-xs text-slate-500">
+          Nach dem Einreichen prüfen wir dein Inserat und schalten es frei.
+        </p>
+      </form>
+    ) : (
+      <div className="space-y-2">
+        <Link
+          href={`/pay?draft=${encodeURIComponent(draft.id)}`}
+          className="block w-full text-center rounded-xl bg-blue-600 text-white py-2.5 text-sm font-medium hover:bg-blue-700"
+        >
+          Kostenpflichtig einreichen ({LISTING_FEE_EUR} €)
+        </Link>
+        <p className="text-xs text-slate-500">
+          Dein Inserat wird erst nach Zahlung eingereicht und anschließend geprüft.
+        </p>
+      </div>
+    )
+  ) : (
+    <div className="rounded-xl border bg-slate-50 p-3 text-sm text-slate-700">
+      Status: <span className="font-medium">{draft.status}</span>
+    </div>
+  )}
 
-              {submitted ? (
-                <div className="mt-3 rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-800 text-center">
-  Danke! Dein Inserat wurde eingereicht ✅  <br/>
-  Wir prüfen es kurz und schalten es anschließend frei.
+  {submitted ? (
+    <div className="mt-3 rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-800">
+      Danke! Dein Inserat wurde eingereicht ✅
+      <br />
+      Wir prüfen es kurz und schalten es anschließend frei.
+    </div>
+  ) : null}
+  {paid ? (
+  <div className="mt-3 rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-800">
+    Zahlung erfasst ✅
+    <br />
+    Du kannst dein Inserat jetzt einreichen.
+  </div>
+) : null}
 </div>
-              ) : null}
-            </div>
+          
           </div>
         </div>
       </section>
