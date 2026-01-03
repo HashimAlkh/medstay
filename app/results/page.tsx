@@ -94,8 +94,8 @@ export default async function ResultsPage({
     .select("id,title,city,price,available_from,available_to,email,status,created_at,housing_type,distance_km,furnished,wifi,kitchen,washing_machine,elevator,basement,image_url")
     .eq("status", "published");
 
-  const rows: ListingRow[] = (data || []) as any;
-
+  const rows = (data ?? []) as ListingRow[];
+  
   // 2) Filtern (Stadt + Zeitraum)
   const filtered = rows.filter((l) => {
     const cityOk = !city || l.city.toLowerCase().includes(city.toLowerCase());

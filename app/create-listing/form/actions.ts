@@ -1,43 +1,36 @@
 "use server";
 
-import { supabaseAdmin } from "@/app/lib/supabaseAdmin";
+import { createClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 
-function toBool(v: FormDataEntryValue | null) {
-  if (v === null) return null;
-  const s = String(v).trim().toLowerCase();
-  if (s === "true") return true;
-  if (s === "false") return false;
-  return null;
-}
-
-function toNumberOrNull(raw: FormDataEntryValue | null) {
-  const s = String(raw ?? "").trim();
-  if (!s) return null;
-  const n = Number(s.replace(",", "."));
-  return Number.isFinite(n) ? n : null;
-}
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function createDraft(formData: FormData) {
   const title = String(formData.get("title") || "").trim();
   const city = String(formData.get("city") || "").trim();
-  const price = Number(String(formData.get("price") || "0").replace(",", "."));
-  const available_from = String(formData.get("from") || "").trim();
-  const available_to = String(formData.get("to") || "").trim();
+  const price = Number(formData.get("price") || 0);
+  const available_from = String(formData.get("from") || "");
+  const available_to = String(formData.get("to") || "");
   const description = String(formData.get("description") || "").trim();
   const email = String(formData.get("email") || "").trim();
 
-  const housing_type = String(formData.get("housing_type") || "").trim() || null; // "apartment" | "room"
-  const distance_km = toNumberOrNull(formData.get("distance_km"));
+  const housing_type = String(formData.get("housing_type") || "").trim() || null;
+  const furnished = String(formData.get("furnished") || "").trim() || null;
 
-  const furnished = toBool(formData.get("furnished")); // true/false/null
+  // "1,2" -> 1.2
+  const distanceRaw = String(formData.get("distance_km") || "").trim();
+  const distance_km = distanceRaw ? Number(distanceRaw.replace(",", ".")) : null;
+
   const wifi = formData.get("wifi") === "on";
   const kitchen = formData.get("kitchen") === "on";
   const washing_machine = formData.get("washing_machine") === "on";
   const elevator = formData.get("elevator") === "on";
   const basement = formData.get("basement") === "on";
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from("listing_drafts")
     .insert([
       {
@@ -49,15 +42,14 @@ export async function createDraft(formData: FormData) {
         description,
         email,
         housing_type,
-        distance_km,
         furnished,
+        distance_km,
         wifi,
         kitchen,
         washing_machine,
         elevator,
         basement,
         status: "draft",
-        payment_status: "unpaid",
       },
     ])
     .select("id")
