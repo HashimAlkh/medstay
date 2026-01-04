@@ -222,37 +222,17 @@ export default async function PreviewPage({
 
             <div className="mt-5">
   {draft.status === "draft" ? (
-    draft.paid_at && draft.payment_status === "paid" ? (
-      <form action={submitDraft} className="space-y-2">
-        <input type="hidden" name="draft_id" value={draft.id} />
-        <button
-          type="submit"
-          className="w-full rounded-xl bg-blue-600 text-white py-2.5 text-sm font-medium hover:bg-blue-700"
-        >
-          Inserat einreichen
-        </button>
-        <p className="text-xs text-slate-500">
-          Nach dem Einreichen prüfen wir dein Inserat und schalten es frei.
-        </p>
-      </form>
-    ) : (
-      <div className="space-y-2">
-        <Link
-          href={`/pay?draft=${encodeURIComponent(draft.id)}`}
-          className="block w-full text-center rounded-xl bg-blue-600 text-white py-2.5 text-sm font-medium hover:bg-blue-700"
-        >
-          Kostenpflichtig einreichen ({LISTING_FEE_EUR} €)
-        </Link>
-        <p className="text-xs text-slate-500">
-          Dein Inserat wird erst nach Zahlung eingereicht und anschließend geprüft.
-        </p>
-      </div>
-    )
-  ) : (
-    <div className="rounded-xl border bg-slate-50 p-3 text-sm text-slate-700">
-      Status: <span className="font-medium">{draft.status}</span>
-    </div>
-  )}
+  <Link
+    href={`/pay?draft=${encodeURIComponent(draft.id)}`}
+    className="block w-full text-center rounded-xl bg-blue-600 text-white py-2.5 text-sm font-medium hover:bg-blue-700"
+  >
+    Kostenpflichtig einreichen ({LISTING_FEE_EUR} €)
+  </Link>
+) : (
+  <div className="rounded-xl border bg-slate-50 p-3 text-sm text-slate-700">
+    Status: <span className="font-medium">{draft.status}</span>
+  </div>
+)}
 
   {submitted ? (
     <div className="mt-3 rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-800">
@@ -261,13 +241,14 @@ export default async function PreviewPage({
       Wir prüfen es kurz und schalten es anschließend frei.
     </div>
   ) : null}
+
   {paid ? (
-  <div className="mt-3 rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-800">
-    Zahlung erfasst ✅
-    <br />
-    Du kannst dein Inserat jetzt einreichen.
-  </div>
-) : null}
+    <div className="mt-3 rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-800">
+      Zahlung erfasst ✅
+      <br />
+      Du kannst dein Inserat jetzt einreichen.
+    </div>
+  ) : null}
 </div>
           
           </div>
