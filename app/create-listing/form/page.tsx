@@ -13,7 +13,7 @@ export default function CreateListingFormPage() {
 
         <p className="mt-2 text-slate-600">
           Tragen Sie die wichtigsten Informationen ein. Im nächsten Schritt sehen Sie
-          eine Vorschau und gehen dann zur Bezahlung (19 €).
+          eine Vorschau und gehen dann zur Bezahlung (29 €).
         </p>
 
         <div className="mt-6">

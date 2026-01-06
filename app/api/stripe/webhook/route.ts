@@ -1,58 +1,56 @@
-// app/api/stripe/webhook/route.ts
-import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { stripe } from "@/app/lib/stripe";
+import { headers } from "next/headers";
 import { supabaseAdmin } from "@/app/lib/supabaseAdmin";
 
-export const dynamic = "force-dynamic";
+export const runtime = "nodejs"; // wichtig: Stripe Webhook braucht Node runtime
 
-export async function POST(request: Request) {
-  const sig = request.headers.get("stripe-signature");
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  // apiVersion absichtlich weggelassen (TS-Fehler bei dir)
+});
+
+export async function POST(req: Request) {
+  const sig = (await headers()).get("stripe-signature");
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!sig || !webhookSecret) {
-    return NextResponse.json({ error: "Missing Stripe signature or webhook secret" }, { status: 400 });
+    return new Response("Missing signature or webhook secret", { status: 400 });
   }
 
-  const body = await request.text();
+  const body = await req.text();
 
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
-  } catch (err: any) {
-    return NextResponse.json({ error: `Webhook signature verification failed: ${err?.message}` }, { status: 400 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Webhook signature verification failed";
+    return new Response(msg, { status: 400 });
   }
 
   try {
+    // Wir reagieren NUR auf checkout.session.completed
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
+      const draftId = session.metadata?.draft_id;
 
-      const draftId =
-        session.metadata?.draft_id ||
-        session.client_reference_id ||
-        null;
+      // nur wenn wirklich bezahlt
+      const paid = session.payment_status === "paid";
 
-      if (!draftId) {
-        // kein Draft zuordenbar → trotzdem 200 zurückgeben, damit Stripe nicht spam-retry macht
-        return NextResponse.json({ ok: true, warning: "No draft_id on session" });
+      if (draftId && paid) {
+        // idempotent: mehrfaches Event ist egal
+        await supabaseAdmin
+          .from("listing_drafts")
+          .update({
+            payment_status: "paid",
+            paid_at: new Date().toISOString(),
+          })
+          .eq("id", draftId)
+          .neq("payment_status", "paid");
       }
-
-      // idempotent: nur setzen, wenn noch nicht paid
-      const { error } = await supabaseAdmin
-        .from("listing_drafts")
-        .update({
-          payment_status: "paid",
-          paid_at: new Date().toISOString(),
-          stripe_session_id: session.id,
-        })
-        .eq("id", draftId);
-
-      if (error) throw error;
     }
 
-    return NextResponse.json({ ok: true });
-  } catch (e: any) {
-    // Stripe wird retryen, wenn du 500 gibst – das ist okay, aber nur bei echten Fehlern
-    return NextResponse.json({ error: e?.message || "Webhook handler failed" }, { status: 500 });
+    return new Response("ok", { status: 200 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Webhook handler error";
+    return new Response(msg, { status: 500 });
   }
 }

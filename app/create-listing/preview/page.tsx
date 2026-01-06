@@ -8,7 +8,6 @@ import {
   distanceLabelKm,
   furnishedLabel,
 } from "@/app/lib/listingView";
-import { submitDraft } from "./actions";
 import { LISTING_FEE_EUR } from "@/app/lib/pricing";
 
 type SP = Record<string, string | string[] | undefined>;

@@ -35,42 +35,44 @@ type ListingRow = {
   price: number;
   available_from: string;
   available_to: string;
-  status: string;
+
+  distance_km: number | null;
+  housing_type: string | null;
+  furnished: string | null; // "yes" | "partial" | "no" | null
+  wifi: boolean | null;
+  image_url: string | null;
 };
 
-const META_BY_ID: Record<
-  string,
-  {
-    distanceKm?: number;
-    housingType?: string;
-    furnished?: boolean;
-    wifi?: boolean;
-    imageUrl?: string | null;
-  }
-> = {
-  // Beispiel-IDs: passe sie an deine echten IDs an, wenn sie anders sind
-  "mannheim-1": {
-    distanceKm: 0.8,
-    housingType: "2-Zi-Wohnung",
-    furnished: true,
-    wifi: true,
-    imageUrl: null,
-  },
-  "erlangen-1": {
-    distanceKm: 1.2,
-    housingType: "WG-Zimmer",
-    furnished: true,
-    wifi: true,
-    imageUrl: null,
-  },
-  "koeln-1": {
-    distanceKm: 2.4,
-    housingType: "Studio",
-    furnished: false,
-    wifi: true,
-    imageUrl: null,
-  },
-};
+function isListingRow(x: unknown): x is ListingRow {
+  const o = x as Record<string, unknown>;
+  return (
+    !!o &&
+    typeof o === "object" &&
+    typeof o.id === "string" &&
+    o.id !== "" &&
+    o.id !== "undefined" &&
+    typeof o.title === "string" &&
+    typeof o.city === "string" &&
+    typeof o.price === "number" &&
+    typeof o.available_from === "string" &&
+    typeof o.available_to === "string"
+  );
+}
+
+function housingTypeLabel(v: string | null) {
+  if (v === "apartment") return "Ganze Wohnung";
+  if (v === "room") return "Zimmer";
+  return null;
+}
+
+function buildBackQuery(city: string, from: string, to: string) {
+  const qp = new URLSearchParams();
+  if (city) qp.set("city", city);
+  if (from) qp.set("from", from);
+  if (to) qp.set("to", to);
+  const s = qp.toString();
+  return s ? `?${s}` : "";
+}
 
 export default async function ResultsPage({
   searchParams,
@@ -82,28 +84,42 @@ export default async function ResultsPage({
   const city = pick(sp, "city");
   const from = pick(sp, "from");
   const to = pick(sp, "to");
-
   const sort = (pick(sp, "sort") || "price_asc") as SortKey;
 
   const fromDate = parseDate(from);
   const toDate = parseDate(to);
 
-  // 1) Published Inserate aus Supabase laden
   const { data, error } = await supabaseAdmin
     .from("listing_drafts")
-    .select("id,title,city,price,available_from,available_to,email,status,created_at,housing_type,distance_km,furnished,wifi,kitchen,washing_machine,elevator,basement,image_url")
+    .select(
+      "id,title,city,price,available_from,available_to,status,distance_km,housing_type,furnished,wifi,image_url"
+    )
     .eq("status", "published");
 
-  const rows = (data ?? []) as ListingRow[];
-  
-  // 2) Filtern (Stadt + Zeitraum)
+  // ✅ härter: nur Rows zulassen, die wirklich wie ListingRow aussehen
+  const rows: ListingRow[] = Array.isArray(data)
+    ? data.filter(isListingRow)
+    : [];
+    // ✅ DEBUG: Was kommt wirklich aus Supabase an?
+const sample = rows.slice(0, 5).map((r) => ({
+  id: (r as any).id,
+  title: (r as any).title,
+  keys: r ? Object.keys(r as any) : [],
+}));
+
+console.log("RESULTS rows sample:", sample);
+
+// Harte Guard: Wenn hier schon undefined ist, ist das Problem VOR ListingCard.
+if (rows.length > 0 && (!rows[0].id || rows[0].id === "undefined")) {
+  console.log("🚨 rows[0] raw:", rows[0]);
+}
+
   const filtered = rows.filter((l) => {
     const cityOk = !city || l.city.toLowerCase().includes(city.toLowerCase());
 
     const aFrom = parseDate(l.available_from);
     const aTo = parseDate(l.available_to);
 
-    // Inserat muss den gewünschten Zeitraum ABDECKEN
     const dateOk =
       (!fromDate || (aFrom && aFrom <= fromDate)) &&
       (!toDate || (aTo && aTo >= toDate));
@@ -111,11 +127,12 @@ export default async function ResultsPage({
     return cityOk && dateOk;
   });
 
-  // 3) Sortieren
   const sorted = [...filtered].sort((a, b) => {
     if (sort === "price_desc") return b.price - a.price;
     return a.price - b.price;
   });
+
+  const backQuery = buildBackQuery(city, from, to);
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -139,20 +156,25 @@ export default async function ResultsPage({
           Zeitraum: {from || "—"} – {to || "—"}
         </p>
 
-        {/* Sort UI */}
         <SortSelect city={city} from={from} to={to} sort={sort} />
 
-        {/* Optional Debug bei Fehler */}
         {error && (
           <div className="mt-4 rounded-2xl border bg-white p-4 text-sm text-red-600">
             Fehler beim Laden: {error.message}
           </div>
         )}
 
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-  {sorted.map((l) => {
-  const meta = META_BY_ID[l.id] || {};
+        {/* ✅ Bonus: Wenn Supabase “komische” Rows lieferte, siehst du’s hier sofort */}
+        {Array.isArray(data) && data.length !== rows.length ? (
+          <div className="mt-4 rounded-2xl border bg-white p-4 text-sm text-amber-700">
+            Hinweis: {data.length - rows.length} ungültige Datensätze wurden
+            ausgefiltert (fehlende/ungültige ID).
+          </div>
+        ) : null}
 
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {sorted.map((l, idx) => {
+  if (idx < 5) console.log("RENDER l.id:", l.id, "FULL:", l);
   return (
     <ListingCard
       key={l.id}
@@ -162,21 +184,23 @@ export default async function ResultsPage({
       price={l.price}
       availableFrom={formatDate(l.available_from)}
       availableTo={formatDate(l.available_to)}
-      href={`/listing/${l.id}?city=${encodeURIComponent(city)}&from=${encodeURIComponent(
-        from
-      )}&to=${encodeURIComponent(to)}`}
-      distanceKm={meta.distanceKm ?? null}
-      housingType={meta.housingType ?? null}
-      furnished={meta.furnished ?? null}
-      wifi={meta.wifi ?? null}
-      imageUrl={meta.imageUrl ?? null}
+      href={`/listing/${encodeURIComponent(l.id)}?city=${encodeURIComponent(
+        city
+      )}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`}
+      distanceKm={l.distance_km}
+      housingType={housingTypeLabel(l.housing_type)}
+      furnished={l.furnished === "yes" || l.furnished === "partial"}
+      wifi={l.wifi}
+      imageUrl={l.image_url}
     />
   );
 })}
-</div>
+        </div>
 
         {sorted.length === 0 && (
-          <p className="mt-6 text-sm text-slate-600">Keine Treffer für diesen Zeitraum.</p>
+          <p className="mt-6 text-sm text-slate-600">
+            Keine Treffer für diesen Zeitraum.
+          </p>
         )}
       </section>
     </main>

@@ -58,7 +58,7 @@ export default function CreateListingPage() {
 
         <div className="mt-10 rounded-2xl border bg-white p-6">
           <div className="text-sm text-slate-500">Preis</div>
-          <div className="mt-1 text-3xl font-semibold">19 €</div>
+          <div className="mt-1 text-3xl font-semibold">29 €</div>
           <div className="mt-1 text-sm text-slate-600">
             einmalig · 30 Tage sichtbar
           </div>
@@ -67,7 +67,7 @@ export default function CreateListingPage() {
   href="/create-listing/form"
   className="mt-6 block w-full text-center rounded-xl bg-blue-600 text-white py-3 text-sm font-medium hover:bg-blue-700"
 >
-  Inserat erstellen (19 €)
+  Inserat erstellen (29 €)
 </Link>
 
           <p className="mt-3 text-xs text-slate-500">

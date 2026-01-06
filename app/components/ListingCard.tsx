@@ -1,5 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import MetaPill from "./MetaPill";
+console.log("✅ USING ListingCard from app/components/ListingCard.tsx");
 
 type Props = {
   id: string;
@@ -10,51 +12,42 @@ type Props = {
   availableTo: string;
   href: string;
 
-  // v2 meta
   distanceKm?: number | null;
   housingType?: string | null;
   furnished?: boolean | null;
   wifi?: boolean | null;
-
   imageUrl?: string | null;
 };
 
 function formatKm(km?: number | null) {
   if (km === null || km === undefined) return null;
-  // 0.8 -> "0,8 km"
   return `${km.toLocaleString("de-DE", { maximumFractionDigits: 1 })} km`;
 }
 
-export default function ListingCard({
-  id,
+function CardInner({
   title,
   city,
   price,
   availableFrom,
   availableTo,
-  href,
   distanceKm,
   housingType,
   furnished,
   wifi,
   imageUrl,
-}: Props) {
+}: Omit<Props, "id" | "href">) {
   const kmLabel = formatKm(distanceKm);
 
   return (
-    <Link
-      href={href}
-      className="ms-card block overflow-hidden p-0 hover:border-slate-300 hover:shadow-md transition"
-      aria-label={`Inserat öffnen: ${title} in ${city}`}
-    >
-      {/* Bild */}
+    <>
       <div className="h-36 bg-slate-100">
         {imageUrl ? (
-          <img
+          <Image
             src={imageUrl}
-            alt=""
+            alt={title}
+            width={1200}
+            height={800}
             className="h-full w-full object-cover"
-            loading="lazy"
           />
         ) : (
           <div className="h-full w-full flex items-center justify-center text-xs text-slate-500">
@@ -63,9 +56,7 @@ export default function ListingCard({
         )}
       </div>
 
-      {/* Content */}
       <div className="p-4">
-        {/* Head */}
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="text-sm text-slate-500">{city}</div>
@@ -82,7 +73,6 @@ export default function ListingCard({
           </div>
         </div>
 
-        {/* Meta pills */}
         <div className="mt-3 flex flex-wrap gap-2">
           {kmLabel && <MetaPill label={`📍 ${kmLabel} zur Klinik`} />}
           {housingType && <MetaPill label={`🏠 ${housingType}`} />}
@@ -90,13 +80,42 @@ export default function ListingCard({
           {wifi ? <MetaPill label="📶 WLAN" /> : null}
         </div>
 
-        {/* Dates */}
         <div className="mt-3 text-sm text-slate-600">
           verfügbar{" "}
           <span className="font-medium text-slate-800">{availableFrom}</span> –{" "}
           <span className="font-medium text-slate-800">{availableTo}</span>
         </div>
       </div>
+    </>
+  );
+}
+
+export default function ListingCard(props: Props) {
+  const hasValidId =
+    typeof props.id === "string" &&
+    props.id.trim() !== "" &&
+    props.id !== "undefined" &&
+    props.id !== "null";
+
+  const baseClass =
+    "ms-card block overflow-hidden p-0 hover:border-slate-300 hover:shadow-md transition";
+
+  // ✅ Wenn ID kaputt: kein Link, kein Crash, kein “/listing/undefined”
+  if (!hasValidId) {
+    return (
+      <div className={`${baseClass} opacity-60 cursor-not-allowed`} aria-disabled="true">
+        <CardInner {...props} />
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      href={props.href}
+      className={baseClass}
+      aria-label={`Inserat öffnen: ${props.title} in ${props.city}`}
+    >
+      <CardInner {...props} />
     </Link>
   );
 }

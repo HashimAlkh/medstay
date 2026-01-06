@@ -184,7 +184,7 @@ export default function CreateListingForm() {
       </button>
 
       <p className="mt-3 text-xs text-slate-500">
-        Im nächsten Schritt sehen Sie eine Vorschau und gehen dann zur Bezahlung (19 €).
+        Im nächsten Schritt sehen Sie eine Vorschau und gehen dann zur Bezahlung (29 €).
       </p>
     </form>
   );
