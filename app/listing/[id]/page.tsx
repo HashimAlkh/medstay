@@ -63,7 +63,7 @@ export default async function ListingPage({
         <section className="mx-auto max-w-5xl px-4 py-10">
           <h1 className="text-2xl font-semibold tracking-tight">Detailseite – Fehler</h1>
           <p className="mt-2 text-slate-600">ID ist leer/ungültig.</p>
-          <p className="mt-3 text-xs text-slate-500">Debug: rawId = "{rawId}"</p>
+          <p className="mt-3 text-xs text-slate-500">Debug: rawId = {rawId}</p>
         </section>
       </main>
     );

@@ -35,10 +35,10 @@ type ListingRow = {
   price: number;
   available_from: string;
   available_to: string;
-
+  status: string;
   distance_km: number | null;
   housing_type: string | null;
-  furnished: string | null; // "yes" | "partial" | "no" | null
+  furnished: string | null;
   wifi: boolean | null;
   image_url: string | null;
 };
@@ -65,14 +65,7 @@ function housingTypeLabel(v: string | null) {
   return null;
 }
 
-function buildBackQuery(city: string, from: string, to: string) {
-  const qp = new URLSearchParams();
-  if (city) qp.set("city", city);
-  if (from) qp.set("from", from);
-  if (to) qp.set("to", to);
-  const s = qp.toString();
-  return s ? `?${s}` : "";
-}
+
 
 export default async function ResultsPage({
   searchParams,
@@ -101,13 +94,9 @@ export default async function ResultsPage({
     ? data.filter(isListingRow)
     : [];
     // ✅ DEBUG: Was kommt wirklich aus Supabase an?
-const sample = rows.slice(0, 5).map((r) => ({
-  id: (r as any).id,
-  title: (r as any).title,
-  keys: r ? Object.keys(r as any) : [],
-}));
 
-console.log("RESULTS rows sample:", sample);
+
+
 
 // Harte Guard: Wenn hier schon undefined ist, ist das Problem VOR ListingCard.
 if (rows.length > 0 && (!rows[0].id || rows[0].id === "undefined")) {
@@ -131,8 +120,6 @@ if (rows.length > 0 && (!rows[0].id || rows[0].id === "undefined")) {
     if (sort === "price_desc") return b.price - a.price;
     return a.price - b.price;
   });
-
-  const backQuery = buildBackQuery(city, from, to);
 
   return (
     <main className="min-h-screen bg-slate-50">
