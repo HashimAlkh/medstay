@@ -1,8 +1,9 @@
+// app/admin/page.tsx
 export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { supabaseAdmin } from "../lib/supabaseAdmin";
-import { publishDraft, unpublishDraft } from "./actions";
-
+import { publishDraft, rejectDraft } from "./actions";
 
 type SP = Record<string, string | string[] | undefined>;
 
@@ -17,6 +18,20 @@ function formatGermanDate(iso?: string) {
   if (!y || !m || !d) return iso;
   return `${d}.${m}.${y}`;
 }
+
+type ListingRow = {
+  id: string;
+  title: string;
+  city: string;
+  price: number | null;
+  available_from: string | null;
+  available_to: string | null;
+  email: string | null;
+  status: "submitted" | "published" | "rejected" | string;
+  created_at: string | null;
+
+  rejection_reason?: string | null;
+};
 
 export default async function AdminPage({
   searchParams,
@@ -54,18 +69,34 @@ export default async function AdminPage({
     );
   }
 
-  // submitted & published laden (damit du auch zurücknehmen kannst)
-  const { data: submitted } = await supabaseAdmin
-    .from("listing_drafts")
-    .select("id,title,city,price,available_from,available_to,email,status,created_at,housing_type,distance_km,furnished,wifi,kitchen,washing_machine,elevator,basement,image_url")
-    .eq("status", "submitted")
-    .order("created_at", { ascending: false });
+  // Daten laden
+  const baseSelect =
+    "id,title,city,price,available_from,available_to,email,status,created_at,rejection_reason";
 
-  const { data: published } = await supabaseAdmin
-    .from("listing_drafts")
-    .select("id,title,city,price,available_from,available_to,email,status,created_at,housing_type,distance_km,furnished,wifi,kitchen,washing_machine,elevator,basement,image_url")
-    .eq("status", "published")
-    .order("created_at", { ascending: false });
+  const [{ data: submitted }, { data: published }, { data: rejected }] =
+    await Promise.all([
+      supabaseAdmin
+        .from("listing_drafts")
+        .select(baseSelect)
+        .eq("status", "submitted")
+        .order("created_at", { ascending: false }),
+
+      supabaseAdmin
+        .from("listing_drafts")
+        .select(baseSelect)
+        .eq("status", "published")
+        .order("created_at", { ascending: false }),
+
+      supabaseAdmin
+        .from("listing_drafts")
+        .select(baseSelect)
+        .eq("status", "rejected")
+        .order("created_at", { ascending: false }),
+    ]);
+
+  const submittedRows = (submitted ?? []) as ListingRow[];
+  const publishedRows = (published ?? []) as ListingRow[];
+  const rejectedRows = (rejected ?? []) as ListingRow[];
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -79,12 +110,12 @@ export default async function AdminPage({
       </header>
 
       <section className="mx-auto max-w-5xl px-4 py-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Admin Dashboard</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Admin Dashboard
+        </h1>
         <p className="mt-2 text-sm text-slate-600">
-          Hier veröffentlichst du eingereichte Inserate (submitted). Link speichern:
-          <span className="ml-2 font-mono text-xs">
-            /admin?key=****
-          </span>
+          Link speichern:{" "}
+          <span className="ml-2 font-mono text-xs">/admin?key=****</span>
         </p>
 
         {/* SUBMITTED */}
@@ -95,45 +126,83 @@ export default async function AdminPage({
           </p>
 
           <div className="mt-4 grid gap-4">
-            {(submitted || []).length === 0 ? (
+            {submittedRows.length === 0 ? (
               <div className="ms-card text-sm text-slate-600">
-  Keine eingereichten Inserate.
-</div>
+                Keine eingereichten Inserate.
+              </div>
             ) : (
-              (submitted || []).map((l) => (
+              submittedRows.map((l) => (
                 <div key={l.id} className="ms-card">
                   <div className="flex items-start justify-between gap-4">
-                    <div>
+                    <div className="min-w-0">
                       <div className="text-sm text-slate-500">{l.city}</div>
                       <div className="text-lg font-semibold">{l.title}</div>
+
                       <div className="mt-2 text-sm text-slate-700">
                         <span className="font-medium">Zeitraum:</span>{" "}
-                        {formatGermanDate(l.available_from)} – {formatGermanDate(l.available_to)}
+                        {formatGermanDate(l.available_from ?? undefined)} –{" "}
+                        {formatGermanDate(l.available_to ?? undefined)}
                       </div>
+
                       <div className="mt-1 text-sm text-slate-700">
-                        <span className="font-medium">Preis:</span> {l.price} € / Monat
+                        <span className="font-medium">Preis:</span>{" "}
+                        {l.price ?? "—"} € / Monat
                       </div>
+
                       <div className="mt-1 text-xs text-slate-500">
-                        Kontakt: {l.email}
+                        Kontakt: {l.email ?? "—"}
                       </div>
+
                       <div className="mt-1 text-xs text-slate-400">
                         ID: {l.id}
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-2 min-w-[180px]">
+                    <div className="flex flex-col gap-2 min-w-[220px]">
+                      {/* Publish */}
                       <form action={publishDraft.bind(null, l.id)}>
-  <button type="submit" className="ms-btn-primary">
-    Veröffentlichen
-  </button>
-</form>
+                        <button type="submit" className="ms-btn-primary w-full">
+                          Veröffentlichen
+                        </button>
+                      </form>
 
+                      {/* Reject with reason */}
+                      <form
+                        action={async (formData) => {
+                          "use server";
+                          const reason =
+                            formData.get("reason")?.toString() ?? "";
+                          await rejectDraft(l.id, reason);
+                        }}
+                        className="rounded-xl border bg-white p-3"
+                      >
+                        <div className="text-xs font-medium text-slate-700">
+                          Ablehnen
+                        </div>
+                        <textarea
+                          name="reason"
+                          required
+                          placeholder="Ablehnungsgrund…"
+                          className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"
+                          rows={3}
+                        />
+                        <button
+                          type="submit"
+                          className="ms-btn-danger w-full mt-2"
+                        >
+                          Ablehnen
+                        </button>
+                      </form>
+
+                      {/* Preview */}
                       <Link
-  className="ms-btn-secondary block text-center"
-  href={`/create-listing/preview?draft=${encodeURIComponent(l.id)}`}
->
-  Vorschau ansehen
-</Link>
+                        className="ms-btn-secondary block text-center"
+                        href={`/create-listing/preview?draft=${encodeURIComponent(
+                          l.id
+                        )}`}
+                      >
+                        Vorschau ansehen
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -146,40 +215,112 @@ export default async function AdminPage({
         <div className="mt-10">
           <h2 className="text-lg font-semibold">Veröffentlicht (published)</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Diese Inserate sind (bald) auf der Results-Seite sichtbar.
+            Diese Inserate sind auf der Results-Seite sichtbar.
           </p>
 
           <div className="mt-4 grid gap-4">
-            {(published || []).length === 0 ? (
-              <div className="ms-card">
+            {publishedRows.length === 0 ? (
+              <div className="ms-card text-sm text-slate-600">
                 Noch keine veröffentlichten Inserate.
               </div>
             ) : (
-              (published || []).map((l) => (
+              publishedRows.map((l) => (
                 <div key={l.id} className="ms-card">
                   <div className="flex items-start justify-between gap-4">
-                    <div>
+                    <div className="min-w-0">
                       <div className="text-sm text-slate-500">{l.city}</div>
                       <div className="text-lg font-semibold">{l.title}</div>
+
                       <div className="mt-2 text-sm text-slate-700">
-                        {formatGermanDate(l.available_from)} – {formatGermanDate(l.available_to)}
+                        {formatGermanDate(l.available_from ?? undefined)} –{" "}
+                        {formatGermanDate(l.available_to ?? undefined)}
                       </div>
-                      <div className="mt-1 text-sm text-slate-700">{l.price} € / Monat</div>
-                      <div className="mt-1 text-xs text-slate-400">ID: {l.id}</div>
+
+                      <div className="mt-1 text-sm text-slate-700">
+                        {l.price ?? "—"} € / Monat
+                      </div>
+
+                      <div className="mt-1 text-xs text-slate-400">
+                        ID: {l.id}
+                      </div>
                     </div>
 
-                    <div className="flex flex-col gap-2 min-w-[180px]">
-                      <form action={unpublishDraft.bind(null, l.id)}>
-  <button type="submit" className="ms-btn-danger">
-  Zurückziehen
-</button>
-</form>
+                    <div className="flex flex-col gap-2 min-w-[220px]">
+                      {/* "Unpublish" -> reject with default reason */}
+                      <form
+                        action={async () => {
+                          "use server";
+                          await rejectDraft(l.id, "Zurückgezogen durch Admin");
+                        }}
+                      >
+                        <button type="submit" className="ms-btn-danger w-full">
+                          Zurückziehen
+                        </button>
+                      </form>
+
                       <Link
                         className="ms-btn-secondary block text-center"
-                        href={`/create-listing/preview?draft=${encodeURIComponent(l.id)}`}
+                        href={`/create-listing/preview?draft=${encodeURIComponent(
+                          l.id
+                        )}`}
                       >
                         Vorschau ansehen
                       </Link>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* REJECTED */}
+        <div className="mt-10">
+          <h2 className="text-lg font-semibold">Abgelehnt (rejected)</h2>
+          <p className="mt-1 text-sm text-slate-600">
+            Diese Inserate wurden abgelehnt und sind nicht sichtbar.
+          </p>
+
+          <div className="mt-4 grid gap-4">
+            {rejectedRows.length === 0 ? (
+              <div className="ms-card text-sm text-slate-600">
+                Keine abgelehnten Inserate.
+              </div>
+            ) : (
+              rejectedRows.map((l) => (
+                <div key={l.id} className="ms-card">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <div className="text-sm text-slate-500">{l.city}</div>
+                      <div className="text-lg font-semibold">{l.title}</div>
+
+                      <div className="mt-2 text-xs text-slate-500">
+                        Grund:{" "}
+                        <span className="text-slate-700">
+                          {l.rejection_reason || "—"}
+                        </span>
+                      </div>
+
+                      <div className="mt-1 text-xs text-slate-400">
+                        ID: {l.id}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2 min-w-[220px]">
+                      <Link
+                        className="ms-btn-secondary block text-center"
+                        href={`/create-listing/preview?draft=${encodeURIComponent(
+                          l.id
+                        )}`}
+                      >
+                        Vorschau ansehen
+                      </Link>
+
+                      <form action={publishDraft.bind(null, l.id)}>
+                        <button type="submit" className="ms-btn-primary w-full">
+                          Doch veröffentlichen
+                        </button>
+                      </form>
                     </div>
                   </div>
                 </div>
