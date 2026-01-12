@@ -56,17 +56,15 @@ async function safeSendEmail(opts: {
   if (!to) return;
 
   try {
-    const result = await resend!.emails.send({
+    await resend!.emails.send({
       from: process.env.RESEND_FROM!,
       to: [to],
       subject: opts.subject,
       html: opts.html,
     });
 
-    console.log("✅ Resend send ok:", result?.data?.id || result);
-  } catch (e) {
-    console.error("❌ Resend send failed:", e);
-    // bewusst nicht throw
+  } catch {
+ console.error("❌ Resend failed");
   }
 }
 
