@@ -20,7 +20,7 @@ body {
 /* ✅ Zentrales Mini-Design-System */
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900;
+    @apply bg-slate-50 text-slate-900 antialiased;
   }
 
   a {
@@ -47,7 +47,7 @@ body {
   .ms-input {
     @apply w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900
     placeholder:text-slate-500
-    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+    focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500;
   }
 
   .ms-textarea {
@@ -59,13 +59,13 @@ body {
   .ms-select {
     @apply w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900
     appearance-none
-    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
-  } 
+    focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500;;
+  }
 
   /* Buttons */
   .ms-btn-primary {
-    @apply w-full rounded-xl bg-blue-600 text-white py-2.5 text-sm font-medium
-    hover:bg-blue-700 transition;
+    @apply w-full rounded-xl bg-teal-600 text-white py-2.5 text-sm font-medium
+    hover:bg-teal-700 transition;
   }
 
   .ms-btn-secondary {
@@ -76,11 +76,11 @@ body {
   .ms-btn-link {
     @apply text-sm text-slate-600 hover:text-black;
   }
+
   .ms-btn-danger {
     @apply w-full rounded-xl bg-red-600 text-white py-2.5 text-sm font-medium
     hover:bg-red-700 transition;
   }
 }
 
-/* DEBUG – muss sofort sichtbar sein */
-body { outline: 6px solid magenta !important; }
+/* ❌ DEBUG entfernt */

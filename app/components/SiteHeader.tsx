@@ -6,16 +6,18 @@ type SiteHeaderProps = {
 
 export default function SiteHeader({ rightLink }: SiteHeaderProps) {
   return (
-    <header className="w-full border-b bg-white">
+    <header className="w-full bg-white shadow-md">
       <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold tracking-tight">
-          med<span className="text-blue-600">stay</span>
+        <Link href="/" className="flex items-center gap-2">
+          <span className="text-xl font-bold tracking-tight text-slate-900">
+            med<span className="text-teal-600">stay</span>
+          </span>
         </Link>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <Link
             href="/create-listing"
-            className="text-sm font-medium text-slate-700 hover:text-black"
+            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 transition"
           >
             Inserat einstellen
           </Link>
@@ -23,7 +25,7 @@ export default function SiteHeader({ rightLink }: SiteHeaderProps) {
           {rightLink && (
             <Link
               href={rightLink.href}
-              className="text-sm text-slate-600 hover:text-black"
+              className="text-sm text-slate-600 hover:text-slate-900 transition"
             >
               {rightLink.label}
             </Link>
