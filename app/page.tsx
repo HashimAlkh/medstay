@@ -8,7 +8,7 @@ export default function HomePage() {
       {/* Hero */}
       <section className="bg-slate-50">
         <div className="mx-auto max-w-5xl px-4 py-10 md:py-14">
-          <div className="grid gap-8 md:grid-cols-2 md:items-center">
+          <div className="grid gap-8 md:grid-cols-2 md:items-start">
             {/* Left */}
             <div>
               <div className="inline-flex items-center rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700">
@@ -28,14 +28,14 @@ export default function HomePage() {
             {/* Right: Search Card */}
             <div className="md:justify-self-end w-full">
               <div className="rounded-3xl border border-slate-200 bg-white p-5 md:p-6 shadow-sm hover:shadow-md transition">
-                <div className="text-sm font-medium text-slate-900">
-                  Suche starten
+                <div className="text-center text-lg font-medium text-slate-900">
+                  Finde deine Unterkunft
                 </div>
                 
 
                 <form action="/results" method="get" className="mt-4 grid gap-3">
                   <div>
-                    <label className="ms-label">Stadt</label>
+                    <label className="text-slate-500 text-xs font-medium mb-1">Stadt</label>
                     <input
                       name="city"
                       placeholder="z. B. Mannheim"
@@ -45,7 +45,7 @@ export default function HomePage() {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="ms-label">Von</label>
+                      <label className="text-slate-500 text-xs font-medium mb-1">Von</label>
                       <input
                         name="from"
                         type="date"
@@ -53,12 +53,12 @@ export default function HomePage() {
                       />
                     </div>
                     <div>
-                      <label className="ms-label">Bis</label>
+                      <label className="text-slate-500 text-xs font-medium mb-1">Bis</label>
                       <input name="to" type="date" className="ms-input mt-1" />
                     </div>
                   </div>
 
-                  <button type="submit" className="bg-teal-500 text-white rounded-xl px-4 py-2 text-sm font-medium hover:bg-teal-600 transition shadow-sm">
+                  <button type="submit" className="mt-2 bg-teal-500 text-white rounded-xl px-4 py-2 text-md font-medium hover:bg-teal-600 transition shadow-sm">
                     Suchen
                   </button>
 
