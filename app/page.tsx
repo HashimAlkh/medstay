@@ -1,4 +1,6 @@
 import SiteHeader from "./components/SiteHeader";
+import FeaturedListingsCarousel from "./components/FeaturedListingsCarousel";
+
 
 export default function HomePage() {
   return (
@@ -31,7 +33,6 @@ export default function HomePage() {
                 <div className="text-center text-lg font-medium text-slate-900">
                   Finde deine Unterkunft
                 </div>
-                
 
                 <form action="/results" method="get" className="mt-4 grid gap-3">
                   <div>
@@ -58,7 +59,10 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  <button type="submit" className="mt-2 bg-teal-500 text-white rounded-xl px-4 py-2 text-md font-medium hover:bg-teal-600 transition shadow-sm">
+                  <button
+                    type="submit"
+                    className="mt-2 bg-teal-500 text-white rounded-xl px-4 py-2 text-md font-medium hover:bg-teal-600 transition shadow-sm"
+                  >
                     Suchen
                   </button>
 
@@ -94,32 +98,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Steps */}
-      <section className="mx-auto max-w-5xl px-4 py-10">
-        <div className="grid md:grid-cols-3 gap-4">
-          <div className="ms-card">
-            <div className="text-xs font-semibold text-slate-500">SCHRITT 1</div>
-            <h3 className="mt-2 text-base font-semibold text-slate-900">Suchen</h3>
-            <p className="mt-1 text-sm text-slate-600">
-              Stadt & Zeitraum wählen.
-            </p>
-          </div>
-          <div className="ms-card">
-            <div className="text-xs font-semibold text-slate-500">SCHRITT 2</div>
-            <h3 className="mt-2 text-base font-semibold text-slate-900">Inserat ansehen</h3>
-            <p className="mt-1 text-sm text-slate-600">
-              Details checken und entscheiden, ob es passt.
-            </p>
-          </div>
-          <div className="ms-card">
-            <div className="text-xs font-semibold text-slate-500">SCHRITT 3</div>
-            <h3 className="mt-2 text-base font-semibold text-slate-900">Kontakt</h3>
-            <p className="mt-1 text-sm text-slate-600">
-              Direkt mit Vermieter:innen in Kontakt treten.
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* ✅ Featured Listings Carousel (neu) */}
+      <FeaturedListingsCarousel />
+
+      {/* ❌ Steps wurde entfernt */}
     </main>
   );
 }
