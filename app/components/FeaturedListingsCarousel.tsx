@@ -38,27 +38,30 @@ export default async function FeaturedListingsCarousel() {
   if (listings.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-5xl px-4 pb-12">
-      <div className="flex items-end justify-between gap-3">
-        <div>
-          <h2 className=" text-lg md:text-xl font-semibold tracking-tight text-slate-900">
-            Aktuelle Inserate
-          </h2>
-          
-        </div>
+  <section className="mx-auto max-w-5xl px-4 pb-12">
+    <div className="flex items-end justify-between">
+      <h2 className="text-lg md:text-xl font-semibold tracking-tight text-slate-900">
+        Aktuelle Inserate
+      </h2>
 
-        <Link href="/results" className="text-sm font-medium text-teal-700 hover:text-teal-800">
-          Alle anzeigen →
-        </Link>
-      </div>
-
-      <div
-        className="
-          mt-4 flex gap-4 overflow-x-auto pb-2
-          snap-x snap-mandatory
-          [-webkit-overflow-scrolling:touch]
-        "
+      <Link
+        href="/results"
+        className="text-sm font-medium text-teal-700 hover:text-teal-800"
       >
+        Alle anzeigen →
+      </Link>
+    </div>
+
+    {/* Wichtig: -mx-4 + px-4 macht Scroll bis Rand, ohne harte Kante */}
+    <div className="relative mt-4 -mx-4 px-4">
+      <div
+  className="
+    mt-4 flex gap-4 overflow-x-auto
+    snap-x snap-mandatory
+    [-webkit-overflow-scrolling:touch]
+    no-scrollbar
+  "
+>
         {listings.map((l) => (
           <Link
             key={l.id}
@@ -73,9 +76,12 @@ export default async function FeaturedListingsCarousel() {
           >
             <div className="h-36 bg-slate-100">
               {l.image_url ? (
-                // absichtlich <img>, um next/image config stress zu vermeiden
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={l.image_url} alt={l.title} className="h-full w-full object-cover" />
+                <img
+                  src={l.image_url}
+                  alt={l.title}
+                  className="h-full w-full object-cover"
+                />
               ) : (
                 <div className="h-full w-full flex items-center justify-center text-xs text-slate-500">
                   Bild folgt
@@ -107,6 +113,9 @@ export default async function FeaturedListingsCarousel() {
         ))}
       </div>
 
-    </section>
-  );
+      {/* optional: weiche Fade-Kante rechts statt harter Abbruch */}
+      <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-slate-50 to-transparent" />
+    </div>
+  </section>
+);
 }

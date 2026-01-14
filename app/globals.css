@@ -12,21 +12,12 @@
   --font-mono: var(--font-geist-mono);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-}
-
-/* ✅ Zentrales Mini-Design-System */
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
-  }
-
-  a {
-    @apply text-slate-900;
+    @apply bg-slate-50 text-slate-900;
   }
 }
+
 
 @layer components {
   /* Cards */
@@ -83,4 +74,15 @@ body {
   }
 }
 
-/* ❌ DEBUG entfernt */
+
+
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;       /* Firefox */
+    -ms-overflow-style: none;    /* IE/Edge legacy */
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;               /* Chrome/Safari */
+  }
+}
+

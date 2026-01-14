@@ -4,8 +4,9 @@ import FeaturedListingsCarousel from "./components/FeaturedListingsCarousel";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-slate-50 flex flex-col">
-      <SiteHeader />
+    <main className="min-h-screen flex flex-col bg-slate-50">
+      <SiteHeader sticky/>
+
 
       {/* Hero */}
       <section className="bg-slate-50">
@@ -29,7 +30,7 @@ export default function HomePage() {
 
             {/* Right: Search Card */}
             <div className="md:justify-self-end w-full">
-              <div className="rounded-3xl border border-slate-200 bg-white p-5 md:p-6 shadow-sm hover:shadow-md transition">
+              <div className="rounded-3xl border border-slate-200 p-5 md:p-6 shadow-sm hover:shadow-md transition">
                 <div className="text-center text-lg font-medium text-slate-900">
                   Finde deine Unterkunft
                 </div>
@@ -76,19 +77,19 @@ export default function HomePage() {
 
           {/* Trust row */}
           <div className="mt-10 grid gap-3 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-100 bg-white p-4">
+            <div className="rounded-2xl border border-slate-100 p-4">
               <div className="text-sm font-semibold text-slate-900">Kuratiert</div>
               <p className="mt-1 text-sm text-slate-600">
                 Inserate werden geprüft, bevor sie sichtbar sind.
               </p>
             </div>
-            <div className="rounded-2xl border border-slate-100 bg-white p-4">
+            <div className="rounded-2xl border border-slate-100 p-4">
               <div className="text-sm font-semibold text-slate-900">Einfach</div>
               <p className="mt-1 text-sm text-slate-600">
                 Suche → Detailseite → Kontakt. Ohne Overengineering.
               </p>
             </div>
-            <div className="rounded-2xl border border-slate-100 bg-white p-4">
+            <div className="rounded-2xl border border-slate-100 p-4">
               <div className="text-sm font-semibold text-slate-900">Studierendenfokus</div>
               <p className="mt-1 text-sm text-slate-600">
                 Für Rotationen gedacht: Zeitraum & Stadt stehen im Zentrum.
