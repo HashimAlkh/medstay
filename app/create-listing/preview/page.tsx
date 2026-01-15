@@ -65,7 +65,7 @@ export default async function PreviewPage({
   const { data: draft, error } = await supabaseAdmin
     .from("listing_drafts")
     .select(
-      "id,title,city,price,available_from,available_to,description,email,status,created_at,housing_type,distance_km,furnished,wifi,kitchen,washing_machine,elevator,basement,image_url,status,paid_at,payment_status"
+      "id,title,city,price,available_from,available_to,description,email,status,created_at,housing_type,distance_km,furnished,wifi,kitchen,washing_machine,elevator,basement,image_url,status,paid_at,payment_status,email_verified"
     )
     .eq("id", draftId)
     .single();
@@ -221,12 +221,25 @@ export default async function PreviewPage({
 
             <div className="mt-5">
   {draft.status === "draft" ? (
-  <Link
-    href={`/pay?draft=${encodeURIComponent(draft.id)}`}
-    className="block w-full text-center rounded-xl bg-blue-600 text-white py-2.5 text-sm font-medium hover:bg-blue-700"
-  >
-    Kostenpflichtig einreichen ({LISTING_FEE_EUR} €)
-  </Link>
+  draft.email_verified ? (
+    <Link
+      href={`/pay?draft=${encodeURIComponent(draft.id)}`}
+      className="block w-full text-center rounded-xl bg-blue-600 text-white py-2.5 text-sm font-medium hover:bg-blue-700"
+    >
+      Kostenpflichtig einreichen ({LISTING_FEE_EUR} €)
+    </Link>
+  ) : (
+    <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+      <div className="font-medium">E-Mail noch nicht bestätigt</div>
+      <div className="mt-1 text-amber-800">
+        Wir haben dir einen Bestätigungslink an <b>{draft.email}</b> geschickt.
+        Erst danach ist die Bezahlung möglich.
+      </div>
+      <div className="mt-2 text-xs text-amber-700">
+        Prüfe gegebenenfalls deinen Spam-Ordner.
+      </div>
+    </div>
+  )
 ) : (
   <div className="rounded-xl border bg-slate-50 p-3 text-sm text-slate-700">
     Status: <span className="font-medium">{draft.status}</span>

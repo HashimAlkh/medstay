@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { startCheckout } from "./actions";
+import { supabaseAdmin } from "@/app/lib/supabaseAdmin";
 
 type SP = Record<string, string | string[] | undefined>;
 function pick(sp: SP, key: string) {
@@ -10,6 +11,16 @@ function pick(sp: SP, key: string) {
 export default async function PayPage({ searchParams }: { searchParams: SP | Promise<SP> }) {
   const sp = await Promise.resolve(searchParams);
   const draftId = pick(sp, "draft");
+
+  let verified = false;
+if (draftId) {
+  const { data } = await supabaseAdmin
+    .from("listing_drafts")
+    .select("email_verified")
+    .eq("id", draftId)
+    .single();
+  verified = !!data?.email_verified;
+}
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -33,11 +44,19 @@ export default async function PayPage({ searchParams }: { searchParams: SP | Pro
           Für das Einstellen eines Inserats berechnen wir einmalig <span className="font-semibold">29 €</span>.
         </p>
 
-        {!draftId ? (
-          <div className="mt-6 rounded-2xl border bg-white p-6 text-sm text-slate-700">
-            Kein Draft angegeben. Bitte starte über die Vorschau.
-          </div>
-        ) : (
+        {draftId && !verified ? (
+  <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
+    Bitte bestätige zuerst deine E-Mail. Danach kannst du bezahlen.
+    <div className="mt-3">
+      <Link
+        href={`/create-listing/preview?draft=${encodeURIComponent(draftId)}`}
+        className="text-sm font-medium text-amber-900 underline"
+      >
+        Zur Vorschau zurück
+      </Link>
+    </div>
+  </div>
+) : (
           <form action={startCheckout} className="mt-6">
             <input type="hidden" name="draft_id" value={draftId} />
             <button className="w-full rounded-xl bg-blue-600 text-white py-3 text-sm font-medium hover:bg-blue-700">
