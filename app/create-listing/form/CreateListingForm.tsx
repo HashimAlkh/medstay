@@ -8,6 +8,15 @@ export default function CreateListingForm() {
 
   return (
     <form action={createDraft} className="mt-6 grid gap-5">
+      {/* Honeypot – nicht ausfüllen */}
+<input
+  type="text"
+  name="company"
+  tabIndex={-1}
+  autoComplete="off"
+  aria-hidden="true"
+  className="hidden"
+/>
       <div>
         <label className="block text-sm font-medium text-slate-700">
           Titel des Inserats

@@ -9,6 +9,12 @@ const supabase = createClient(
 );
 
 export async function createDraft(formData: FormData) {
+  // ✅ HONEYPOT – GANZ AM ANFANG
+  const company = String(formData.get("company") || "").trim();
+if (company.length > 0) {
+  console.warn("Honeypot triggered – spam blocked");
+  return redirect("/create-listing/success");
+}
   const title = String(formData.get("title") || "").trim();
   const city = String(formData.get("city") || "").trim();
   const price = Number(formData.get("price") || 0);
