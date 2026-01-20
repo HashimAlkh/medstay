@@ -157,7 +157,7 @@ export default function CreateListingForm() {
           name="description"
           rows={4}
           placeholder="Kurze Beschreibung der Unterkunft (möbliert, WLAN, Nähe Klinik, etc.)"
-          className="ms-input mt-1 min-h-[110px]"
+          className="ms-input mt-1 min-h-[27.5]"
           required
         />
       </div>
