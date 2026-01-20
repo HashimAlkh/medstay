@@ -7,46 +7,43 @@ export default function CreateListingForm() {
   const [from, setFrom] = useState("");
 
   return (
-    <form action={createDraft} className="mt-6 grid gap-5">
+    <form action={createDraft} className="grid gap-5">
       {/* Honeypot – nicht ausfüllen */}
-<input
-  type="text"
-  name="company"
-  tabIndex={-1}
-  autoComplete="off"
-  aria-hidden="true"
-  className="hidden"
-/>
+      <input
+        type="text"
+        name="company"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="hidden"
+      />
+
       <div>
-        <label className="block text-sm font-medium text-slate-700">
-          Titel des Inserats
-        </label>
+        <label className="ms-label">Titel des Inserats</label>
         <input
           name="title"
           type="text"
           placeholder="z. B. WG-Zimmer nahe Uniklinik"
           autoComplete="off"
-          className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"
+          className="ms-input mt-1"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-slate-700">Stadt</label>
+        <label className="ms-label">Stadt</label>
         <input
           name="city"
           type="text"
           placeholder="z. B. Mannheim"
           autoComplete="address-level2"
-          className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"
+          className="ms-input mt-1"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-slate-700">
-          Monatspreis (€)
-        </label>
+        <label className="ms-label">Monatspreis (€)</label>
         <input
           name="price"
           type="number"
@@ -54,7 +51,7 @@ export default function CreateListingForm() {
           min={1}
           step="any"
           inputMode="numeric"
-          className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"
+          className="ms-input mt-1"
           required
         />
         <p className="mt-1 text-xs text-slate-500">
@@ -64,13 +61,11 @@ export default function CreateListingForm() {
 
       <div className="grid gap-4 md:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium text-slate-700">
-            Verfügbar von
-          </label>
+          <label className="ms-label">Verfügbar von</label>
           <input
             name="from"
             type="date"
-            className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"
+            className="ms-input mt-1"
             required
             value={from}
             onChange={(e) => setFrom(e.target.value)}
@@ -78,14 +73,12 @@ export default function CreateListingForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700">
-            Verfügbar bis
-          </label>
+          <label className="ms-label">Verfügbar bis</label>
           <input
             name="to"
             type="date"
             min={from || undefined}
-            className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"
+            className="ms-input mt-1"
             required
           />
           <p className="mt-1 text-xs text-slate-500">
@@ -95,7 +88,7 @@ export default function CreateListingForm() {
       </div>
 
       {/* Zusatzinfos (MVP): Entfernung, Wohnungstyp, Möblierung */}
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+      <div className="mt-2 grid gap-3 sm:grid-cols-2">
         <div>
           <div className="ms-label mb-1">Wohnungstyp</div>
           <select name="housing_type" className="ms-select w-full" required>
@@ -116,7 +109,7 @@ export default function CreateListingForm() {
         </div>
       </div>
 
-      <div className="mt-3">
+      <div className="mt-1">
         <div className="ms-label mb-1">Möblierung</div>
         <select name="furnished" className="ms-select w-full">
           <option value="">Bitte wählen</option>
@@ -127,7 +120,7 @@ export default function CreateListingForm() {
       </div>
 
       {/* Ausstattung */}
-      <div className="mt-4">
+      <div className="mt-2">
         <div className="ms-label mb-2">Ausstattung</div>
 
         <div className="grid gap-2 sm:grid-cols-2">
@@ -159,35 +152,31 @@ export default function CreateListingForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-slate-700">
-          Kurzbeschreibung
-        </label>
+        <label className="ms-label">Kurzbeschreibung</label>
         <textarea
           name="description"
           rows={4}
           placeholder="Kurze Beschreibung der Unterkunft (möbliert, WLAN, Nähe Klinik, etc.)"
-          className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"
+          className="ms-input mt-1 min-h-[110px]"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-slate-700">
-          Kontakt-E-Mail
-        </label>
+        <label className="ms-label">Kontakt-E-Mail</label>
         <input
           name="email"
           type="email"
           placeholder="z. B. vermieter@email.de"
           autoComplete="email"
-          className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"
+          className="ms-input mt-1"
           required
         />
       </div>
 
       <button
         type="submit"
-        className="mt-6 w-full rounded-xl bg-blue-600 text-white py-3 text-sm font-medium hover:bg-blue-700"
+        className="mt-2 w-full rounded-xl bg-teal-600 text-white py-3 text-sm font-medium hover:bg-teal-700 transition shadow-sm"
       >
         Vorschau ansehen
       </button>
