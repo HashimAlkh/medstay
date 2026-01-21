@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic";
-
+import SiteHeader from "app/components/SiteHeader";
 import Link from "next/link";
 import SortSelect from "./SortSelect";
 import ListingCard from "@/app/components/ListingCard";
@@ -123,16 +123,7 @@ if (rows.length > 0 && (!rows[0].id || rows[0].id === "undefined")) {
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <header className="w-full border-b bg-white">
-        <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold tracking-tight">
-            med<span className="text-blue-600">stay</span>
-          </Link>
-          <Link href="/" className="text-sm text-slate-600 hover:text-black">
-            Neue Suche
-          </Link>
-        </div>
-      </header>
+      <SiteHeader/>
 
       <section className="mx-auto max-w-5xl px-4 py-6">
         <h1 className="text-2xl font-semibold tracking-tight">

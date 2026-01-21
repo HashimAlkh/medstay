@@ -3,7 +3,10 @@ import SiteHeader from "../components/SiteHeader";
 export default function CreateListingPage() {
   return (
     <main className="min-h-screen bg-slate-50">
-      <SiteHeader rightLink={{ href: "/", label: "Zurück" }} />
+      <SiteHeader
+        mode="flow"
+        rightLink={{ href: "/create-listing/form", label: "Zurück" }}
+      />
 
       <section className="mx-auto max-w-3xl px-4 py-10">
         <h1 className="text-3xl font-semibold tracking-tight">
@@ -74,11 +77,6 @@ export default function CreateListingPage() {
             Bezahlung und Inseratserstellung folgen im nächsten Schritt.
           </p>
         </div>
-
-        <p className="mt-6 text-sm text-slate-500">
-          Medstay befindet sich aktuell im Aufbau. Wir starten bewusst klein, um
-          Qualität und Fairness sicherzustellen.
-        </p>
       </section>
     </main>
   );

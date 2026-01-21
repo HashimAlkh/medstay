@@ -1,147 +1,127 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { supabaseAdmin } from "@/app/lib/supabaseAdmin";
-import { Resend } from "resend";
+import { createClient } from "@supabase/supabase-js";
+import { redirect } from "next/navigation";
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
-// Wenn du im resend.dev Testmodus bist, setz das einmalig in Codespaces Secrets:
-// RESEND_TEST_TO=hashim-2412@hotmail.com
-// Dann werden ALLE Mails zum Testen dorthin geschickt (egal welche Inserat-Mail drinsteht).
-const RESEND_TEST_TO = (process.env.RESEND_TEST_TO || "").trim().toLowerCase();
+type DraftRow = {
+  id: string;
+  title: string | null;
+  city: string | null;
+  price: number | null;
+  available_from: string | null;
+  available_to: string | null;
+  furnished: string | null;
+  description: string | null;
+  email: string | null;
+  image_url: string | null;
+  wifi: boolean | null;
+  kitchen: boolean | null;
+  washing_machine: boolean | null;
+  elevator: boolean | null;
+  basement: boolean | null;
+  housing_type: string | null;
+  distance_km: number | null;
+  status: string | null;
+};
 
-function canSendMail() {
-  return !!(resend && process.env.RESEND_FROM);
-}
-
-function normalizeEmail(email: string | null | undefined) {
-  const v = (email || "").trim().toLowerCase();
-  return v.length ? v : null;
-}
-
-async function getDraftBasics(draftId: string) {
-  const { data, error } = await supabaseAdmin
-    .from("listing_drafts")
-    .select("id,status,email,title,city")
-    .eq("id", draftId)
-    .single();
-
-  if (error || !data) throw new Error("Draft nicht gefunden");
-
-  return data as {
-    id: string;
-    status: string | null;
-    email: string | null;
-    title: string | null;
-    city: string | null;
+// Equipment aus Draft-Flags bauen
+function buildEquipment(draft: DraftRow) {
+  return {
+    wifi: !!draft.wifi,
+    kitchen: !!draft.kitchen,
+    washing_machine: !!draft.washing_machine,
+    elevator: !!draft.elevator,
+    basement: !!draft.basement,
+    housing_type: draft.housing_type ?? null,
+    distance_km: draft.distance_km ?? null,
   };
 }
 
-async function safeSendEmail(opts: {
-  to: string | null;
-  subject: string;
-  html: string;
-}) {
-  if (!canSendMail()) return;
-
-  // Empfänger bestimmen:
-  // - Wenn RESEND_TEST_TO gesetzt ist: IMMER dahin (stabil fürs Testing)
-  // - Sonst: echte Inserat-Mail (normalisiert)
-  const realTo = normalizeEmail(opts.to);
-  const to = RESEND_TEST_TO || realTo;
-
-  if (!to) return;
-
-  try {
-    await resend!.emails.send({
-      from: process.env.RESEND_FROM!,
-      to: [to],
-      subject: opts.subject,
-      html: opts.html,
-    });
-
-  } catch {
- console.error("❌ Resend failed");
-  }
+function adminRedirect() {
+  return redirect(`/admin?key=${encodeURIComponent(process.env.ADMIN_KEY || "")}`);
 }
 
-/** published Mail nur bei echtem Übergang */
 export async function publishDraft(draftId: string) {
-  if (!draftId) throw new Error("publishDraft: draftId fehlt");
-
-  const current = await getDraftBasics(draftId);
-  const shouldSend = current.status === "submitted" || current.status === "rejected";
-
-  // Update zuerst (DB ist Truth)
-  const { error } = await supabaseAdmin
+  // 1) Draft laden
+  const { data: draft, error: fetchErr } = await supabase
     .from("listing_drafts")
-    .update({ status: "published", rejection_reason: null })
-    .eq("id", draftId);
+    .select(
+      "id,title,city,price,available_from,available_to,furnished,description,email,image_url,wifi,kitchen,washing_machine,elevator,basement,housing_type,distance_km,status"
+    )
+    .eq("id", draftId)
+    .single<DraftRow>();
 
-  if (error) throw new Error("Inserat konnte nicht veröffentlicht werden");
-
-  if (shouldSend) {
-    await safeSendEmail({
-      to: current.email,
-      subject: "Dein Inserat wurde veröffentlicht ✅",
-      html: `<p>Hi!</p>
-             <p>Dein Inserat <b>${current.title ?? ""}</b> ist jetzt online.</p>`,
-    });
+  if (fetchErr || !draft) {
+    throw new Error(fetchErr?.message || "Draft nicht gefunden");
   }
 
-  revalidatePath("/admin");
-  revalidatePath("/results");
-  revalidatePath(`/listing/${draftId}`);
-}
+  const nowIso = new Date().toISOString();
 
-/** keine Mail */
-export async function unpublishDraft(draftId: string) {
-  if (!draftId) throw new Error("unpublishDraft: draftId fehlt");
+  // 2) In listings upserten (ACHTUNG: draft_id muss UNIQUE sein für onConflict)
+  const { error: upsertErr } = await supabase
+    .from("listings")
+    .upsert(
+      {
+        draft_id: draft.id,
+        title: draft.title,
+        city: draft.city,
+        price: draft.price,
+        available_from: draft.available_from,
+        available_to: draft.available_to,
+        furnished: draft.furnished,
+        description: draft.description,
+        email: draft.email,
+        image_url: draft.image_url,
+        equipment: buildEquipment(draft),
+        published_at: nowIso,
+      },
+      { onConflict: "draft_id" }
+    );
 
-  const { error } = await supabaseAdmin
+  if (upsertErr) throw new Error(upsertErr.message);
+
+  // 3) Draft markieren
+  const { error: updErr } = await supabase
     .from("listing_drafts")
-    .update({ status: "submitted" })
+    .update({
+      status: "published",
+      published_at: nowIso,
+      rejection_reason: null,
+    })
     .eq("id", draftId);
 
-  if (error) throw new Error("Inserat konnte nicht zurückgezogen werden");
+  if (updErr) throw new Error(updErr.message);
 
-  revalidatePath("/admin");
-  revalidatePath("/results");
-  revalidatePath(`/listing/${draftId}`);
+  adminRedirect();
 }
 
-/** rejected Mail nur bei echtem Übergang */
 export async function rejectDraft(draftId: string, reason: string) {
-  if (!draftId) throw new Error("rejectDraft: draftId fehlt");
-
   const cleanReason = (reason || "").trim();
-  if (cleanReason.length < 3) throw new Error("Ablehnungsgrund fehlt/zu kurz");
 
-  const current = await getDraftBasics(draftId);
-  const shouldSend = current.status !== "rejected"; // Doppelclick vermeiden
-
-  const { error } = await supabaseAdmin
+  // 1) Draft auf rejected setzen + published_at entfernen
+  const { error: updErr } = await supabase
     .from("listing_drafts")
-    .update({ status: "rejected", rejection_reason: cleanReason })
+    .update({
+      status: "rejected",
+      rejection_reason: cleanReason || "Abgelehnt",
+      published_at: null,
+    })
     .eq("id", draftId);
 
-  if (error) throw new Error("Inserat konnte nicht abgelehnt werden");
+  if (updErr) throw new Error(updErr.message);
 
-  if (shouldSend) {
-    await safeSendEmail({
-      to: current.email,
-      subject: "Dein Inserat wurde abgelehnt",
-      html: `<p>Hi!</p>
-             <p>Dein Inserat <b>${current.title ?? ""}</b> wurde leider abgelehnt.</p>
-             <p><b>Grund:</b> ${cleanReason}</p>
-             <p>Du kannst es anpassen und erneut einreichen.</p>`,
-    });
-  }
+  // 2) Falls es schon in listings war: raus damit
+  const { error: delErr } = await supabase
+    .from("listings")
+    .delete()
+    .eq("draft_id", draftId);
 
-  revalidatePath("/admin");
-  revalidatePath("/results");
-  revalidatePath(`/listing/${draftId}`);
+  if (delErr) throw new Error(delErr.message);
+
+  adminRedirect();
 }
