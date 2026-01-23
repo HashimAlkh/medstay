@@ -1,6 +1,5 @@
 export const dynamic = "force-dynamic";
 import SiteHeader from "app/components/SiteHeader";
-import Link from "next/link";
 import SortSelect from "./SortSelect";
 import ListingCard from "@/app/components/ListingCard";
 import { supabaseAdmin } from "../lib/supabaseAdmin";
