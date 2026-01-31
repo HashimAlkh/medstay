@@ -55,7 +55,7 @@ export default function CreateListingForm() {
           required
         />
         <p className="mt-1 text-xs text-slate-500">
-          Tipp: Möbliert/inkl. Nebenkosten kurz in die Beschreibung.
+          Tipp: Wenn Nebenkosten inklusive sind, kurz in die Beschreibung schreiben.
         </p>
       </div>
 
@@ -87,7 +87,7 @@ export default function CreateListingForm() {
         </div>
       </div>
 
-      {/* Zusatzinfos (MVP): Entfernung, Wohnungstyp, Möblierung */}
+      {/* Zusatzinfos: Wohnungstyp + Möblierung (nur ja/nein) */}
       <div className="mt-2 grid gap-3 sm:grid-cols-2">
         <div>
           <div className="ms-label mb-1">Wohnungstyp</div>
@@ -99,24 +99,61 @@ export default function CreateListingForm() {
         </div>
 
         <div>
-          <div className="ms-label mb-1">Entfernung zur Klinik/Uni (km)</div>
-          <input
-            name="distance_km"
-            className="ms-input"
-            inputMode="decimal"
-            placeholder="z. B. 1,2"
-          />
+          <div className="ms-label mb-1">Möblierung</div>
+          <select name="furnished" className="ms-select w-full" required>
+            <option value="">Bitte wählen</option>
+            <option value="yes">möbliert</option>
+            <option value="no">unmöbliert</option>
+          </select>
         </div>
       </div>
 
-      <div className="mt-1">
-        <div className="ms-label mb-1">Möblierung</div>
-        <select name="furnished" className="ms-select w-full">
-          <option value="">Bitte wählen</option>
-          <option value="yes">möbliert</option>
-          <option value="partial">teilmöbliert</option>
-          <option value="no">unmöbliert</option>
-        </select>
+      {/* Adresse (bleibt verborgen) */}
+      <div className="mt-2">
+        <h3 className="text-sm font-semibold text-slate-900">
+          Adresse (bleibt verborgen)
+        </h3>
+        <p className="mt-1 text-xs text-slate-500">
+          Die Adresse wird nicht öffentlich angezeigt. Sie hilft uns, Inserate zuzuordnen
+          und Betrug zu reduzieren.
+        </p>
+
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <label className="ms-label">Straße & Hausnummer</label>
+            <input
+              name="street"
+              type="text"
+              placeholder="z. B. Musterstraße 12"
+              className="ms-input mt-1"
+              required
+              autoComplete="street-address"
+            />
+          </div>
+
+          <div>
+            <label className="ms-label">PLZ</label>
+            <input
+              name="postal_code"
+              type="text"
+              inputMode="numeric"
+              placeholder="z. B. 68159"
+              className="ms-input mt-1"
+              required
+              autoComplete="postal-code"
+            />
+          </div>
+
+          <div>
+            <label className="ms-label">Adresszusatz (optional)</label>
+            <input
+              name="address_note"
+              type="text"
+              placeholder="z. B. Hinterhaus, 3. OG"
+              className="ms-input mt-1"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Ausstattung */}
@@ -130,11 +167,6 @@ export default function CreateListingForm() {
           </label>
 
           <label className="flex items-center gap-2 text-sm text-slate-700">
-            <input type="checkbox" name="kitchen" className="h-4 w-4" />
-            Küche
-          </label>
-
-          <label className="flex items-center gap-2 text-sm text-slate-700">
             <input type="checkbox" name="washing_machine" className="h-4 w-4" />
             Waschmaschine
           </label>
@@ -145,9 +177,29 @@ export default function CreateListingForm() {
           </label>
 
           <label className="flex items-center gap-2 text-sm text-slate-700">
-            <input type="checkbox" name="basement" className="h-4 w-4" />
-            Keller
+            <input type="checkbox" name="parking" className="h-4 w-4" />
+            Parkplatz / Stellplatz
           </label>
+        </div>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div>
+            <div className="ms-label mb-1">Bad</div>
+            <select name="bathroom_type" className="ms-select w-full" required>
+              <option value="">Bitte wählen</option>
+              <option value="private">eigenes Bad</option>
+              <option value="shared">gemeinsames Bad</option>
+            </select>
+          </div>
+
+          <div>
+            <div className="ms-label mb-1">Küche</div>
+            <select name="kitchen_type" className="ms-select w-full" required>
+              <option value="">Bitte wählen</option>
+              <option value="private">eigene Küche</option>
+              <option value="shared">gemeinsame Küche</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -156,8 +208,8 @@ export default function CreateListingForm() {
         <textarea
           name="description"
           rows={4}
-          placeholder="Kurze Beschreibung der Unterkunft (möbliert, WLAN, Nähe Klinik, etc.)"
-          className="ms-input mt-1 min-h-[27.5]"
+          placeholder="Kurze Beschreibung der Unterkunft (z. B. Nebenkosten, Lage, WG-Details, etc.)"
+          className="ms-input mt-1 min-h-[110px]"
           required
         />
       </div>

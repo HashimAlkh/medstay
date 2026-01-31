@@ -1,15 +1,9 @@
 export const dynamic = "force-dynamic";
 
-
 import type React from "react";
 import Link from "next/link";
 import { supabaseAdmin } from "@/app/lib/supabaseAdmin";
-import {
-  equipmentList,
-  formatGermanDate,
-  distanceLabelKm,
-  furnishedLabel,
-} from "@/app/lib/listingView";
+import { equipmentList, formatGermanDate, furnishedLabel } from "@/app/lib/listingView";
 import { LISTING_FEE_EUR } from "@/app/lib/pricing";
 import { submitDraft, resendVerification } from "./actions";
 import SiteHeader from "../../components/SiteHeader";
@@ -24,6 +18,18 @@ function pick(sp: SP, key: string) {
 function housingTypeLabel(v: string | null) {
   if (v === "apartment") return "Ganze Wohnung";
   if (v === "room") return "Zimmer";
+  return "—";
+}
+
+function bathroomLabel(v: string | null) {
+  if (v === "private") return "eigenes Bad";
+  if (v === "shared") return "gemeinsames Bad";
+  return "—";
+}
+
+function kitchenLabel(v: string | null) {
+  if (v === "private") return "eigene Küche";
+  if (v === "shared") return "gemeinsame Küche";
   return "—";
 }
 
@@ -43,8 +49,55 @@ function Banner({
       ? "border-red-200 bg-red-50 text-red-900"
       : "border-slate-200 bg-white text-slate-900";
 
-  return <div className={`mt-4 rounded-2xl border px-4 py-3 text-sm ${cls}`}>{children}</div>;
+  return (
+    <div className={`mt-4 rounded-2xl border px-4 py-3 text-sm ${cls}`}>
+      {children}
+    </div>
+  );
 }
+
+/**
+ * ✅ WICHTIG:
+ * Dieser Typ muss zu deiner Supabase-Tabelle listing_drafts passen.
+ * Wenn du Spalten anders benannt hast, passe hier UND im select-String an.
+ */
+type DraftRow = {
+  id: string;
+  title: string | null;
+  city: string | null;
+  price: number | null;
+  available_from: string | null;
+  available_to: string | null;
+  description: string | null;
+  email: string | null;
+  status: string | null;
+  created_at: string | null;
+
+  housing_type: string | null;
+  furnished: string | null;
+
+  // ✅ Ausstattung (neu)
+  wifi: boolean | null;
+  washing_machine: boolean | null;
+  elevator: boolean | null;
+  parking: boolean | null;
+
+  bathroom_type: string | null; // private | shared
+  kitchen_type: string | null;  // private | shared
+
+  // ✅ Adresse (intern)
+  street: string | null;
+  postal_code: string | null;
+  address_note: string | null;
+
+  image_url: string | null;
+
+  paid_at: string | null;
+  payment_status: string | null;
+
+  // ✅ Mail-Verifizierung
+  email_verified: boolean | null;
+};
 
 export default async function PreviewPage({
   searchParams,
@@ -63,17 +116,12 @@ export default async function PreviewPage({
   if (!draftId) {
     return (
       <main className="min-h-screen bg-slate-50">
-        <SiteHeader
-  mode="flow"
-  rightLink={{ href: "/create-listing/form", label: "Zurück" }}
-/>
-
+        <SiteHeader mode="flow" rightLink={{ href: "/create-listing/form", label: "Zurück" }} />
         <section className="mx-auto max-w-3xl px-4 py-10">
           <h1 className="text-2xl font-semibold tracking-tight">Vorschau</h1>
           <p className="mt-2 text-slate-600">Kein Draft angegeben.</p>
           <p className="mt-3 text-sm text-slate-600">
-            Öffne die Seite mit{" "}
-            <span className="font-mono">?draft=DEINE_ID</span>.
+            Öffne die Seite mit <span className="font-mono">?draft=DEINE_ID</span>.
           </p>
         </section>
       </main>
@@ -83,19 +131,41 @@ export default async function PreviewPage({
   const { data: draft, error } = await supabaseAdmin
     .from("listing_drafts")
     .select(
-      "id,title,city,price,available_from,available_to,description,email,status,created_at,housing_type,distance_km,furnished,wifi,kitchen,washing_machine,elevator,basement,image_url,paid_at,payment_status,email_verified"
+      [
+        "id",
+        "title",
+        "city",
+        "price",
+        "available_from",
+        "available_to",
+        "description",
+        "email",
+        "status",
+        "created_at",
+        "housing_type",
+        "furnished",
+        "wifi",
+        "washing_machine",
+        "elevator",
+        "parking",
+        "bathroom_type",
+        "kitchen_type",
+        "street",
+        "postal_code",
+        "address_note",
+        "image_url",
+        "paid_at",
+        "payment_status",
+        "email_verified",
+      ].join(",")
     )
     .eq("id", draftId)
-    .single();
+    .single<DraftRow>();
 
   if (error || !draft) {
     return (
       <main className="min-h-screen bg-slate-50">
-        <SiteHeader
-  mode="flow"
-  rightLink={{ href: "/create-listing/form", label: "Zurück" }}
-/>
-
+        <SiteHeader mode="flow" rightLink={{ href: "/create-listing/form", label: "Zurück" }} />
         <section className="mx-auto max-w-3xl px-4 py-10">
           <h1 className="text-2xl font-semibold tracking-tight">Vorschau</h1>
           <p className="mt-2 text-slate-600">Draft nicht gefunden.</p>
@@ -110,18 +180,19 @@ export default async function PreviewPage({
   const isPaid = !!draft.paid_at && draft.payment_status === "paid";
   const isSubmitted = draft.status === "submitted";
 
+  // ✅ Ausstattung als Badges (dein listingView.ts muss das verstehen)
   const badges = equipmentList({
     furnished: draft.furnished,
     housing_type: draft.housing_type,
-    wifi: draft.wifi,
-    kitchen: draft.kitchen,
-    washing_machine: draft.washing_machine,
-    elevator: draft.elevator,
-    basement: draft.basement,
+    wifi: !!draft.wifi,
+    washing_machine: !!draft.washing_machine,
+    elevator: !!draft.elevator,
+    parking: !!draft.parking,
+    bathroom_type: draft.bathroom_type,
+    kitchen_type: draft.kitchen_type,
   });
 
   const furnished = furnishedLabel(draft.furnished ?? null) || "—";
-  const distance = distanceLabelKm(draft.distance_km ?? null) || "—";
 
   // ✅ genau 1 Banner: URL-Hinweise priorisieren, danach DB-Status
   let topBanner: React.ReactNode = null;
@@ -134,7 +205,9 @@ export default async function PreviewPage({
     );
   } else if (resendTooFast) {
     topBanner = (
-      <Banner tone="warning">Bitte warte kurz, bevor du die Bestätigungs-Mail erneut anforderst.</Banner>
+      <Banner tone="warning">
+        Bitte warte kurz, bevor du die Bestätigungs-Mail erneut anforderst.
+      </Banner>
     );
   } else if (resent) {
     topBanner = (
@@ -149,7 +222,9 @@ export default async function PreviewPage({
       </Banner>
     );
   } else if (isPaid) {
-    topBanner = <Banner tone="info">Zahlung erfasst ✅ Du kannst dein Inserat jetzt einreichen.</Banner>;
+    topBanner = (
+      <Banner tone="info">Zahlung erfasst ✅ Du kannst dein Inserat jetzt einreichen.</Banner>
+    );
   } else if (isVerified) {
     topBanner = (
       <Banner tone="success">
@@ -159,17 +234,18 @@ export default async function PreviewPage({
   } else {
     topBanner = (
       <Banner tone="warning">
-        E-Mail noch nicht bestätigt. Wir haben dir einen Bestätigungslink an <b>{draft.email}</b> geschickt.
+        E-Mail noch nicht bestätigt. Wir haben dir einen Bestätigungslink an <b>{draft.email}</b>{" "}
+        geschickt.
       </Banner>
     );
   }
 
+  const hasAddress =
+    !!draft.street || !!draft.postal_code || !!draft.address_note;
+
   return (
     <main className="min-h-screen bg-slate-50">
-      <SiteHeader
-  mode="flow"
-  rightLink={{ href: "/create-listing/form", label: "Zurück" }}
-/>
+      <SiteHeader mode="flow" rightLink={{ href: "/create-listing/form", label: "Zurück" }} />
 
       <section className="mx-auto max-w-5xl px-4 py-8">
         <div className="flex items-start justify-between gap-4">
@@ -210,11 +286,15 @@ export default async function PreviewPage({
               </div>
 
               <div className="text-sm text-slate-700">
-                <span className="text-slate-500">Entfernung:</span> {distance}
+                <span className="text-slate-500">Möblierung:</span> {furnished}
               </div>
 
               <div className="text-sm text-slate-700">
-                <span className="text-slate-500">Möblierung:</span> {furnished}
+                <span className="text-slate-500">Bad:</span> {bathroomLabel(draft.bathroom_type)}
+              </div>
+
+              <div className="text-sm text-slate-700">
+                <span className="text-slate-500">Küche:</span> {kitchenLabel(draft.kitchen_type)}
               </div>
             </div>
 
@@ -234,6 +314,25 @@ export default async function PreviewPage({
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* Adresse intern */}
+            <div className="mt-5">
+              <div className="text-sm font-medium text-slate-900">Adresse (intern)</div>
+              {!hasAddress ? (
+                <div className="mt-2 text-sm text-slate-600">—</div>
+              ) : (
+                <div className="mt-2 text-sm text-slate-700">
+                  {(draft.street || "—")}, {(draft.postal_code || "—")}{" "}
+                  {(draft.city || "—")}
+                  {draft.address_note ? (
+                    <div className="mt-1 text-xs text-slate-500">{draft.address_note}</div>
+                  ) : null}
+                </div>
+              )}
+              <p className="mt-2 text-xs text-slate-500">
+                Hinweis: Die Adresse ist nur für interne Prüfung/Matching und wird öffentlich nicht angezeigt.
+              </p>
             </div>
 
             {draft.description ? (

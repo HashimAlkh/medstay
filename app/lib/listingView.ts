@@ -1,40 +1,50 @@
-import type { Furnished, ListingDraft } from "./listingTypes";
-
-export function formatGermanDate(iso?: string | null) {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  if (!y || !m || !d) return iso;
-  return `${d}.${m}.${y}`;
+export function formatGermanDate(dateStr: string | null | undefined) {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("de-DE", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-export function furnishedLabel(v: Furnished | null) {
+// ✅ zurückgebracht für Kompatibilität (wird später aus den Pages entfernt)
+export function distanceLabelKm(km: number | null | undefined) {
+  if (km === null || km === undefined) return "";
+  if (Number.isNaN(Number(km))) return "";
+  return `${Number(km).toLocaleString("de-DE", { maximumFractionDigits: 1 })} km`;
+}
+
+export function furnishedLabel(v: string | null) {
+  if (!v) return "";
   if (v === "yes") return "möbliert";
-  if (v === "partial") return "teilmöbliert";
   if (v === "no") return "unmöbliert";
-  return null;
+  return "";
 }
 
-export function distanceLabelKm(km: number | null) {
-  if (km == null) return null;
-  return `${km.toLocaleString("de-DE", { maximumFractionDigits: 1 })} km zur Klinik/Uni`;
-}
+type EquipmentInput = {
+  furnished?: string | null;
+  housing_type?: string | null;
 
-export function equipmentList(l: Pick<
-  ListingDraft,
-  "wifi" | "kitchen" | "washing_machine" | "elevator" | "basement" | "furnished" | "housing_type"
->) {
+  wifi?: boolean;
+  washing_machine?: boolean;
+  elevator?: boolean;
+  parking?: boolean;
+
+  bathroom_type?: "private" | "shared" | string | null;
+  kitchen_type?: "private" | "shared" | string | null;
+};
+
+export function equipmentList(e: EquipmentInput) {
   const out: string[] = [];
 
-  const f = furnishedLabel(l.furnished ?? null);
-  if (f) out.push(f);
+  if (e.wifi) out.push("WLAN");
+  if (e.washing_machine) out.push("Waschmaschine");
+  if (e.elevator) out.push("Aufzug");
+  if (e.parking) out.push("Parkplatz");
 
-  if (l.housing_type) out.push(l.housing_type);
+  if (e.bathroom_type === "private") out.push("eigenes Bad");
+  else if (e.bathroom_type === "shared") out.push("gemeinsames Bad");
 
-  if (l.wifi) out.push("WLAN");
-  if (l.kitchen) out.push("Küche");
-  if (l.washing_machine) out.push("Waschmaschine");
-  if (l.elevator) out.push("Aufzug");
-  if (l.basement) out.push("Keller");
+  if (e.kitchen_type === "private") out.push("eigene Küche");
+  else if (e.kitchen_type === "shared") out.push("gemeinsame Küche");
 
   return out;
 }

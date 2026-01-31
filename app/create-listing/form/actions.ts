@@ -25,9 +25,6 @@ async function sendVerificationEmail(toEmail: string, draftId: string, token: st
   if (!resend) throw new Error("RESEND_API_KEY fehlt");
   if (!process.env.RESEND_FROM) throw new Error("RESEND_FROM fehlt");
 
-  console.log("SITE_URL =", process.env.SITE_URL);
-console.log("NEXT_PUBLIC_SITE_URL =", process.env.NEXT_PUBLIC_SITE_URL);
-console.log("RESOLVED siteUrl() =", siteUrl());
   const verifyLink = `${siteUrl()}/auth/verify?draft=${encodeURIComponent(
     draftId
   )}&token=${encodeURIComponent(token)}`;
@@ -54,6 +51,15 @@ console.log("RESOLVED siteUrl() =", siteUrl());
   });
 }
 
+function asBoolCheckbox(formData: FormData, name: string) {
+  return formData.get(name) === "on";
+}
+
+function asEnumPrivateShared(val: string) {
+  const v = (val || "").trim();
+  return v === "private" || v === "shared" ? v : null;
+}
+
 export async function createDraft(formData: FormData) {
   // ✅ HONEYPOT – GANZ AM ANFANG
   const company = String(formData.get("company") || "").trim();
@@ -71,16 +77,22 @@ export async function createDraft(formData: FormData) {
   const email = String(formData.get("email") || "").trim().toLowerCase();
 
   const housing_type = String(formData.get("housing_type") || "").trim() || null;
-  const furnished = String(formData.get("furnished") || "").trim() || null;
+  const furnished = String(formData.get("furnished") || "").trim() || null; // "yes" | "no" | null
 
-  const distanceRaw = String(formData.get("distance_km") || "").trim();
-  const distance_km = distanceRaw ? Number(distanceRaw.replace(",", ".")) : null;
+  // Adresse (privat)
+  const street = String(formData.get("street") || "").trim();
+  const postal_code = String(formData.get("postal_code") || "").trim();
+  const address_note = String(formData.get("address_note") || "").trim() || null;
 
-  const wifi = formData.get("wifi") === "on";
-  const kitchen = formData.get("kitchen") === "on";
-  const washing_machine = formData.get("washing_machine") === "on";
-  const elevator = formData.get("elevator") === "on";
-  const basement = formData.get("basement") === "on";
+  // Ausstattung
+  const wifi = asBoolCheckbox(formData, "wifi");
+  const washing_machine = asBoolCheckbox(formData, "washing_machine");
+  const elevator = asBoolCheckbox(formData, "elevator");
+  const parking = asBoolCheckbox(formData, "parking");
+
+  // Private/shared
+  const bathroom_type = asEnumPrivateShared(String(formData.get("bathroom_type") || ""));
+  const kitchen_type = asEnumPrivateShared(String(formData.get("kitchen_type") || ""));
 
   // 🔐 Token generieren (einmalig pro Draft)
   const token = crypto.randomBytes(24).toString("hex");
@@ -98,12 +110,20 @@ export async function createDraft(formData: FormData) {
         email,
         housing_type,
         furnished,
-        distance_km,
+
+        // Adresse
+        street,
+        postal_code,
+        address_note,
+
+        // Ausstattung
         wifi,
-        kitchen,
         washing_machine,
         elevator,
-        basement,
+        parking,
+        bathroom_type,
+        kitchen_type,
+
         status: "draft",
         email_verified: false,
         email_verification_token: token,
@@ -122,9 +142,7 @@ export async function createDraft(formData: FormData) {
     await sendVerificationEmail(email, data.id, token);
   } catch (e) {
     console.error("Email verification send failed:", e);
-    // Draft existiert trotzdem – User sieht Hinweis in Preview
   }
 
-  // Direkt zur Vorschau, aber Zahlung erst nach Verifizierung
   redirect(`/create-listing/preview?draft=${data.id}&needs_verify=1`);
 }

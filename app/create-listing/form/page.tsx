@@ -16,10 +16,7 @@ export default function CreateListingFormPage() {
           Inserat erstellen
         </h1>
 
-        <p className="mt-2 text-slate-600">
-          Tragen Sie die wichtigsten Informationen ein. Im nächsten Schritt sehen Sie
-          eine Vorschau und gehen dann zur Bezahlung (29 €).
-        </p>
+      
 
         <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-5 md:p-6 shadow-sm">
           <CreateListingForm />
