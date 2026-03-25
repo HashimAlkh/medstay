@@ -34,12 +34,17 @@ type ListingRow = {
   price: number;
   available_from: string;
   available_to: string;
-  status: string;
-  distance_km: number | null;
   housing_type: string | null;
   furnished: string | null;
-  wifi: boolean | null;
   image_url: string | null;
+  equipment: {
+    wifi?: boolean;
+    washing_machine?: boolean;
+    elevator?: boolean;
+    parking?: boolean;
+    bathroom_type?: string | null;
+    kitchen_type?: string | null;
+  } | null;
 };
 
 function isListingRow(x: unknown): x is ListingRow {
@@ -82,11 +87,11 @@ export default async function ResultsPage({
   const toDate = parseDate(to);
 
   const { data, error } = await supabaseAdmin
-    .from("listing_drafts")
-    .select(
-      "id,title,city,price,available_from,available_to,status,distance_km,housing_type,furnished,wifi,image_url"
-    )
-    .eq("status", "published");
+  .from("listings")
+  .select(
+    "id,title,city,price,available_from,available_to,housing_type,furnished,image_url,equipment"
+  )
+  .order("published_at", { ascending: false });
 
   // ✅ härter: nur Rows zulassen, die wirklich wie ListingRow aussehen
   const rows: ListingRow[] = Array.isArray(data)
@@ -161,13 +166,11 @@ if (rows.length > 0 && (!rows[0].id || rows[0].id === "undefined")) {
       price={l.price}
       availableFrom={formatDate(l.available_from)}
       availableTo={formatDate(l.available_to)}
-      href={`/listing/${encodeURIComponent(l.id)}?city=${encodeURIComponent(
-        city
-      )}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`}
-      distanceKm={l.distance_km}
-      housingType={housingTypeLabel(l.housing_type)}
-      furnished={l.furnished === "yes" || l.furnished === "partial"}
-      wifi={l.wifi}
+      href={`/listing/${encodeURIComponent(l.id)}?source=results&city=${encodeURIComponent(
+  city
+)}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`}
+      furnished={l.furnished === "yes"}
+wifi={l.equipment?.wifi ?? false}
       imageUrl={l.image_url}
     />
   );

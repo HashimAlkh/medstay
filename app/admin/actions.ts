@@ -19,26 +19,33 @@ type DraftRow = {
   description: string | null;
   email: string | null;
   image_url: string | null;
+
+  housing_type: string | null;
+
   wifi: boolean | null;
-  kitchen: boolean | null;
   washing_machine: boolean | null;
   elevator: boolean | null;
-  basement: boolean | null;
-  housing_type: string | null;
-  distance_km: number | null;
+  parking: boolean | null;
+
+  bathroom_type: string | null;
+  kitchen_type: string | null;
+
+  street: string | null;
+  postal_code: string | null;
+  address_note: string | null;
+
   status: string | null;
 };
 
-// Equipment aus Draft-Flags bauen
 function buildEquipment(draft: DraftRow) {
   return {
     wifi: !!draft.wifi,
-    kitchen: !!draft.kitchen,
     washing_machine: !!draft.washing_machine,
     elevator: !!draft.elevator,
-    basement: !!draft.basement,
+    parking: !!draft.parking,
+    bathroom_type: draft.bathroom_type ?? null,
+    kitchen_type: draft.kitchen_type ?? null,
     housing_type: draft.housing_type ?? null,
-    distance_km: draft.distance_km ?? null,
   };
 }
 
@@ -47,11 +54,32 @@ function adminRedirect() {
 }
 
 export async function publishDraft(draftId: string) {
-  // 1) Draft laden
   const { data: draft, error: fetchErr } = await supabase
     .from("listing_drafts")
     .select(
-      "id,title,city,price,available_from,available_to,furnished,description,email,image_url,wifi,kitchen,washing_machine,elevator,basement,housing_type,distance_km,status"
+      [
+        "id",
+        "title",
+        "city",
+        "price",
+        "available_from",
+        "available_to",
+        "furnished",
+        "description",
+        "email",
+        "image_url",
+        "housing_type",
+        "wifi",
+        "washing_machine",
+        "elevator",
+        "parking",
+        "bathroom_type",
+        "kitchen_type",
+        "street",
+        "postal_code",
+        "address_note",
+        "status",
+      ].join(",")
     )
     .eq("id", draftId)
     .single<DraftRow>();
@@ -62,7 +90,6 @@ export async function publishDraft(draftId: string) {
 
   const nowIso = new Date().toISOString();
 
-  // 2) In listings upserten (ACHTUNG: draft_id muss UNIQUE sein für onConflict)
   const { error: upsertErr } = await supabase
     .from("listings")
     .upsert(
@@ -77,6 +104,13 @@ export async function publishDraft(draftId: string) {
         description: draft.description,
         email: draft.email,
         image_url: draft.image_url,
+        housing_type: draft.housing_type,
+
+        // intern
+        street: draft.street,
+        postal_code: draft.postal_code,
+        address_note: draft.address_note,
+
         equipment: buildEquipment(draft),
         published_at: nowIso,
       },
@@ -85,7 +119,6 @@ export async function publishDraft(draftId: string) {
 
   if (upsertErr) throw new Error(upsertErr.message);
 
-  // 3) Draft markieren
   const { error: updErr } = await supabase
     .from("listing_drafts")
     .update({
@@ -103,7 +136,6 @@ export async function publishDraft(draftId: string) {
 export async function rejectDraft(draftId: string, reason: string) {
   const cleanReason = (reason || "").trim();
 
-  // 1) Draft auf rejected setzen + published_at entfernen
   const { error: updErr } = await supabase
     .from("listing_drafts")
     .update({
@@ -115,7 +147,6 @@ export async function rejectDraft(draftId: string, reason: string) {
 
   if (updErr) throw new Error(updErr.message);
 
-  // 2) Falls es schon in listings war: raus damit
   const { error: delErr } = await supabase
     .from("listings")
     .delete()

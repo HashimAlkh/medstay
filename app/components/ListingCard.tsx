@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import MetaPill from "./MetaPill";
 import { HomeIcon, DoorIcon } from "app/components/icons";
+import { equipmentMeta } from "@/app/lib/equipmentMeta";
 
 type Props = {
   id: string;
@@ -98,10 +99,32 @@ function CardInner({
 
         {/* Pills */}
         <div className="mt-3 flex flex-wrap gap-2">
-          {kmLabel && <MetaPill label={`📍 ${kmLabel} zur Klinik`} />}
-          {furnished ? <MetaPill label="🪑 möbliert" /> : null}
-          {wifi ? <MetaPill label="📶 WLAN" /> : null}
-        </div>
+  {kmLabel && (
+    <MetaPill label={`${kmLabel}`} variant="highlight" />
+  )}
+
+  {furnished && (() => {
+    const Icon = equipmentMeta.furnished.icon;
+    return (
+      <MetaPill
+        label={equipmentMeta.furnished.label}
+        icon={<Icon size={12} />}
+        variant="highlight"
+      />
+    );
+  })()}
+
+  {wifi && (() => {
+    const Icon = equipmentMeta.wifi.icon;
+    return (
+      <MetaPill
+        label={equipmentMeta.wifi.label}
+        icon={<Icon size={12} />}
+        variant="highlight"
+      />
+    );
+  })()}
+</div>
 
         {/* Datum */}
         <div className="mt-3 text-sm text-slate-600">
