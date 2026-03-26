@@ -56,7 +56,7 @@ export async function startCheckout(formData: FormData) {
     success_url: `${origin}/create-listing/success?draft=${encodeURIComponent(
       draftId
     )}&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/pay?draft=${encodeURIComponent(draftId)}&canceled=1`,
+    cancel_url: `${origin}/create-listing/preview?draft=${encodeURIComponent(draftId)}&canceled=1`,
   });
 
   redirect(session.url!);
