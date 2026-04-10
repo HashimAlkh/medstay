@@ -256,7 +256,7 @@ export default async function PreviewPage({
 
         {topBanner}
 
-        <div className="mt-6 grid gap-8 md:grid-cols-[2fr_1fr]">
+        <div className="mt-6">
           {/* Links: Preview Card */}
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
            <div className="relative mb-6 h-[240px] md:h-[320px] rounded-3xl overflow-hidden border border-slate-200 bg-slate-100">
@@ -272,45 +272,43 @@ export default async function PreviewPage({
     </div>
   )}
 </div>
+<div className="flex flex-col gap-8 sm:flex-row sm:items-start">
+  {/* LINKS */}
+<div className="min-w-0 sm:basis-[68%]">
+      <div className="text-sm text-slate-500">{draft.city}</div>
 
-            <div className="text-sm text-slate-500">{draft.city}</div>
-            <div className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
-  {draft.title}
-</div>
-
-            <div className="mt-5 grid gap-2">
-              
-  <div className="grid gap-2">
-    <div className="text-sm text-slate-700">
-      <span className="text-slate-500">Zeitraum:</span>{" "}
-      {formatGermanDate(draft.available_from)} –{" "}
-      {formatGermanDate(draft.available_to)}
+    <div className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
+      {draft.title}
     </div>
 
-    <div className="text-sm text-slate-700">
-      <span className="text-slate-500">Wohnungstyp:</span>{" "}
-      {housingTypeLabel(draft.housing_type)}
+    <div className="mt-5 grid gap-2">
+      <div className="text-sm text-slate-700">
+        <span className="text-slate-500">Zeitraum:</span>{" "}
+        {formatGermanDate(draft.available_from)} –{" "}
+        {formatGermanDate(draft.available_to)}
+      </div>
+
+      <div className="text-sm text-slate-700">
+        <span className="text-slate-500">Wohnungstyp:</span>{" "}
+        {housingTypeLabel(draft.housing_type)}
+      </div>
+
+      <div className="text-sm text-slate-700">
+        <span className="text-slate-500">Möblierung:</span> {furnished}
+      </div>
+
+      <div className="text-sm text-slate-700">
+        <span className="text-slate-500">Bad:</span> {bathroomLabel(draft.bathroom_type)}
+      </div>
+
+      <div className="text-sm text-slate-700">
+        <span className="text-slate-500">Küche:</span> {kitchenLabel(draft.kitchen_type)}
+      </div>
     </div>
 
-    <div className="text-sm text-slate-700">
-      <span className="text-slate-500">Möblierung:</span> {furnished}
-    </div>
+    <div className="mt-6">
+      <div className="text-sm font-medium text-slate-900">Ausstattung</div>
 
-    <div className="text-sm text-slate-700">
-      <span className="text-slate-500">Bad:</span> {bathroomLabel(draft.bathroom_type)}
-    </div>
-
-    <div className="text-sm text-slate-700">
-      <span className="text-slate-500">Küche:</span> {kitchenLabel(draft.kitchen_type)}
-    </div>
-  </div>
-
-  <div>
-    <div className="text-sm font-medium text-slate-900">Ausstattung</div>
-
-    {badgeKeys.length === 0 ? (
-      <div className="mt-2 text-sm text-slate-600">—</div>
-    ) : (
       <div className="mt-3 flex flex-wrap gap-2">
         {badgeKeys.map((key) => {
           const item = equipmentMeta[key];
@@ -326,10 +324,51 @@ export default async function PreviewPage({
           );
         })}
       </div>
-    )}
+    </div>
   </div>
-</div>
 
+  {/* RECHTS */}
+<div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm h-fit sm:basis-[32%] sm:shrink-0">    <div className="text-sm text-slate-500">Preis</div>
+    <div className="mt-1 text-3xl font-semibold text-slate-900">
+      {draft.price} €
+    </div>
+    <div className="text-sm text-slate-500">pro Monat</div>
+
+    <div className="my-4 h-px bg-slate-200" />
+
+    <div className="text-sm font-medium text-slate-900">Kontakt</div>
+    <div className="mt-2 text-sm text-slate-700">
+      {draft.email || "—"}
+    </div>
+
+    <div className="mt-5">
+      {!isVerified ? (
+        <form action={resendVerification}>
+          <input type="hidden" name="draft_id" value={draft.id} />
+          <button className="w-full rounded-xl bg-teal-600 text-white py-2.5 text-sm font-medium hover:bg-teal-700">
+            Bestätigungs-Mail erneut senden
+          </button>
+        </form>
+      ) : !isPaid ? (
+        <form action={startCheckout}>
+          <input type="hidden" name="draft_id" value={draft.id} />
+          <button className="w-full rounded-xl bg-teal-600 text-white py-2.5 text-sm font-medium hover:bg-teal-700">
+            Jetzt bezahlen ({LISTING_FEE_EUR} €)
+          </button>
+        </form>
+      ) : (
+        <form action={submitDraft}>
+          <input type="hidden" name="draft_id" value={draft.id} />
+          <button className="w-full rounded-xl bg-slate-900 text-white py-2.5 text-sm font-medium hover:bg-black">
+            Inserat jetzt einreichen
+          </button>
+        </form>
+      )}
+    </div>
+  </div>
+
+</div>
+          
             {/* Adresse intern */}
             <div className="mt-5">
               <div className="text-sm font-medium text-slate-900">Adresse (intern)</div>
@@ -359,46 +398,8 @@ export default async function PreviewPage({
             ) : null}
           </div>
 
-          {/* Rechts: Preis + CTA */}
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm h-fit md:sticky md:top-24">
-            <div className="text-sm text-slate-500">Preis</div>
-            <div className="text-3xl font-semibold mt-1">{draft.price} €</div>
-            <div className="text-xs text-slate-500 mt-1">pro Monat</div>
-
-            <div className="my-4 h-px bg-slate-200" />
-
-            <div className="text-sm font-medium text-slate-900">Kontakt</div>
-            <div className="mt-2 text-sm text-slate-700">{draft.email ? draft.email : "—"}</div>
-
-            <div className="mt-5">
-              {draft.status !== "draft" ? (
-                <div className="rounded-xl border bg-slate-50 p-3 text-sm text-slate-700">
-                  Status: <span className="font-medium">{draft.status}</span>
-                </div>
-              ) : !isVerified ? (
-                <form action={resendVerification}>
-                  <input type="hidden" name="draft_id" value={draft.id} />
-                  <button className="w-full rounded-xl bg-teal-600 text-white py-2.5 text-sm font-medium hover:bg-teal-700">
-                    Bestätigungs-Mail erneut senden
-                  </button>
-                </form>
-              ) : !isPaid ? (
-                <form action={startCheckout}>
-  <input type="hidden" name="draft_id" value={draft.id} />
-  <button className="w-full rounded-xl bg-teal-600 text-white py-2.5 text-sm font-medium hover:bg-teal-700">
-    Inserat jetzt veröffentlichen ({LISTING_FEE_EUR} €)
-  </button>
-</form>
-              ) : (
-                <form action={submitDraft}>
-                  <input type="hidden" name="draft_id" value={draft.id} />
-                  <button className="w-full rounded-xl bg-slate-900 text-white py-2.5 text-sm font-medium hover:bg-black">
-                    Inserat jetzt einreichen
-                  </button>
-                </form>
-              )}
-            </div>
-          </div>
+          
+        
         </div>
       </section>
     </main>
