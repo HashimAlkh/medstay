@@ -60,6 +60,41 @@ function asEnumPrivateShared(val: string) {
   return v === "private" || v === "shared" ? v : null;
 }
 
+async function uploadListingImage(file: File, draftId: string) {
+  if (!file || file.size === 0) return null;
+
+  const maxSize = 5 * 1024 * 1024;
+
+  if (file.size > maxSize) {
+    throw new Error("Das Bild ist zu groß. Maximal erlaubt sind 5 MB.");
+  }
+
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Bitte lade eine gültige Bilddatei hoch.");
+  }
+
+  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const path = `${draftId}/main.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("listing-photos")
+    .upload(path, file, {
+      cacheControl: "3600",
+      upsert: true,
+      contentType: file.type,
+    });
+
+  if (uploadError) {
+    throw new Error(uploadError.message);
+  }
+
+  const { data } = supabase.storage
+    .from("listing-photos")
+    .getPublicUrl(path);
+
+  return data.publicUrl;
+}
+
 export async function createDraft(formData: FormData) {
   // ✅ HONEYPOT – GANZ AM ANFANG
   const company = String(formData.get("company") || "").trim();
@@ -136,6 +171,23 @@ export async function createDraft(formData: FormData) {
   if (error || !data) {
     throw new Error(error?.message || "Draft konnte nicht gespeichert werden");
   }
+
+  const image = formData.get("image");
+
+if (image instanceof File && image.size > 0) {
+  const imageUrl = await uploadListingImage(image, data.id);
+
+  if (imageUrl) {
+    const { error: imageUpdateError } = await supabase
+      .from("listing_drafts")
+      .update({ image_url: imageUrl })
+      .eq("id", data.id);
+
+    if (imageUpdateError) {
+      throw new Error(imageUpdateError.message);
+    }
+  }
+}
 
   // ✉️ Bestätigungsmail senden (wenn ENV korrekt)
   try {

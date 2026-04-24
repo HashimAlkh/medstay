@@ -2,11 +2,70 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
+import { Resend } from "resend";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+const resend =
+  process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+function siteUrl() {
+  return (
+    process.env.SITE_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "http://localhost:3000"
+  ).replace(/\/$/, "");
+}
+
+async function sendPublishedEmail(email: string | null, title: string | null, listingId: string) {
+  if (!email || !resend || !process.env.RESEND_FROM) return;
+
+  const listingUrl = `${siteUrl()}/listing/${encodeURIComponent(listingId)}`;
+
+  await resend.emails.send({
+    from: process.env.RESEND_FROM,
+    to: [email],
+    subject: "Dein Medstay-Inserat wurde veröffentlicht",
+    html: `
+      <div style="font-family:Arial,sans-serif;line-height:1.5">
+        <p>Hallo,</p>
+        <p>dein Inserat <b>${title || "dein Inserat"}</b> wurde freigeschaltet und ist jetzt online sichtbar.</p>
+        <p>
+          <a href="${listingUrl}" style="display:inline-block;padding:10px 14px;border-radius:10px;background:#14b8a6;color:#fff;text-decoration:none;font-weight:600">
+            Inserat ansehen
+          </a>
+        </p>
+        <p style="color:#64748b;font-size:13px">
+  Wenn du Änderungen an deinem Inserat vornehmen möchtest, antworte einfach auf diese E-Mail.
+</p>
+      </div>
+    `,
+  });
+}
+
+async function sendRejectedEmail(email: string | null, title: string | null, reason: string) {
+  if (!email || !resend || !process.env.RESEND_FROM) return;
+
+  await resend.emails.send({
+    from: process.env.RESEND_FROM,
+    to: [email],
+    subject: "Dein Medstay-Inserat wurde nicht freigeschaltet",
+    html: `
+      <div style="font-family:Arial,sans-serif;line-height:1.5">
+        <p>Hallo,</p>
+        <p>dein Inserat <b>${title || "dein Inserat"}</b> wurde leider nicht freigeschaltet.</p>
+        <p><b>Grund:</b> ${reason || "Kein Grund angegeben"}</p>
+        <p style="color:#64748b;font-size:13px">
+  Wenn du Änderungen an deinem Inserat vornehmen möchtest, antworte einfach auf diese E-Mail.
+</p>
+
+      </div>
+    `,
+  });
+}
 
 type DraftRow = {
   id: string;
@@ -118,6 +177,12 @@ export async function publishDraft(draftId: string) {
     );
 
   if (upsertErr) throw new Error(upsertErr.message);
+  
+  const { data: listing } = await supabase
+  .from("listings")
+  .select("id")
+  .eq("draft_id", draft.id)
+  .single();
 
   const { error: updErr } = await supabase
     .from("listing_drafts")
@@ -129,12 +194,24 @@ export async function publishDraft(draftId: string) {
     .eq("id", draftId);
 
   if (updErr) throw new Error(updErr.message);
+  if (listing?.id) {
+  try {
+    await sendPublishedEmail(draft.email, draft.title, listing.id);
+  } catch (e) {
+    console.error("Published email failed:", e);
+  }
+}
 
   adminRedirect();
 }
 
 export async function rejectDraft(draftId: string, reason: string) {
   const cleanReason = (reason || "").trim();
+  const { data: draft } = await supabase
+  .from("listing_drafts")
+  .select("title,email")
+  .eq("id", draftId)
+  .single();
 
   const { error: updErr } = await supabase
     .from("listing_drafts")
@@ -153,6 +230,15 @@ export async function rejectDraft(draftId: string, reason: string) {
     .eq("draft_id", draftId);
 
   if (delErr) throw new Error(delErr.message);
+  try {
+  await sendRejectedEmail(
+    draft?.email ?? null,
+    draft?.title ?? null,
+    cleanReason || "Abgelehnt"
+  );
+} catch (e) {
+  console.error("Rejected email failed:", e);
+}
 
   adminRedirect();
 }
