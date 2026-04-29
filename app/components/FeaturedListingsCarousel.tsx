@@ -22,11 +22,10 @@ function formatShortRange(fromIso?: string, toIso?: string) {
 
 export default async function FeaturedListingsCarousel() {
   const { data, error } = await supabaseAdmin
-    .from("listing_drafts")
-    .select("id,title,city,price,available_from,available_to,image_url,status,created_at")
-    .eq("status", "published")
-    .order("created_at", { ascending: false })
-    .limit(10);
+  .from("listings")
+  .select("id,title,city,price,available_from,available_to,image_url,published_at")
+  .order("published_at", { ascending: false })
+  .limit(10);
 
   if (error) {
     // leise failen: Startseite soll nie crashen

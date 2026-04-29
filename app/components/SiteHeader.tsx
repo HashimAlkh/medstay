@@ -30,11 +30,18 @@ export default function SiteHeader({
         <div className="flex items-center gap-3">
           {mode !== "flow" && (
             <Link
-              href="/create-listing"
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 transition"
-            >
-              Inserat einstellen
-            </Link>
+  href="/create-listing/form"
+  className="
+    inline-flex items-center gap-2
+    text-sm font-semibold
+    text-teal-600
+    hover:text-teal-700
+    transition
+  "
+>
+  <span className="text-lg leading-none">＋</span>
+  Inserat einstellen
+</Link>
           )}
 
           {rightLink && (

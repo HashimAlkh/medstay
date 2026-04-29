@@ -19,6 +19,7 @@ type ListingRow = {
   furnished: string | null;
   housing_type: string | null;
   image_url: string | null;
+  email: string | null;
 
   equipment: {
     wifi?: boolean;
@@ -57,6 +58,7 @@ export default async function ListingDetailPage({
         "furnished",
         "housing_type",
         "image_url",
+        "email",
         "equipment",
       ].join(",")
     )
@@ -68,149 +70,139 @@ export default async function ListingDetailPage({
   const eq = listing.equipment || {};
 
   const badgeKeys = equipmentKeys({
-  furnished: listing.furnished,
-  housing_type: listing.housing_type,
-  wifi: !!eq.wifi,
-  washing_machine: !!eq.washing_machine,
-  elevator: !!eq.elevator,
-  parking: !!eq.parking,
-  bathroom_type: eq.bathroom_type,
-  kitchen_type: eq.kitchen_type,
-});
+    furnished: listing.furnished,
+    housing_type: listing.housing_type,
+    wifi: !!eq.wifi,
+    washing_machine: !!eq.washing_machine,
+    elevator: !!eq.elevator,
+    parking: !!eq.parking,
+    bathroom_type: eq.bathroom_type,
+    kitchen_type: eq.kitchen_type,
+  });
 
   const furnished = furnishedLabel(listing.furnished ?? null) || "—";
-  const leftBadges = badgeKeys.slice(0, 3);
-const rightBadges = badgeKeys.slice(3, 6);
+
   return (
     <main className="min-h-screen bg-slate-50">
       <SiteHeader mode="flow" rightLink={{ href: "/results", label: "Zurück" }} />
 
-      {/* HERO IMAGE */}
-      <div className="mx-auto max-w-5xl px-4 mt-8">
-  <div className="relative h-[240px] md:h-[340px] rounded-3xl overflow-hidden bg-slate-100 shadow-sm border border-slate-200">
-          {listing.image_url ? (
-            <Image src={listing.image_url} alt="" fill className="object-cover" />
-          ) : (
-            <div className="h-full flex items-center justify-center text-slate-500">
-              Bild folgt
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* CONTENT */}
-      <section className="mx-auto max-w-5xl px-4 py-8 grid gap-6 lg:grid-cols-[1.65fr,0.95fr]">
-
-        {/* LEFT */}
-        <div className="space-y-5">
-
-          {/* TITLE BLOCK */}
-          <div className="rounded-3xl bg-white p-6 border border-slate-200 shadow-sm">
-            <div className="text-sm text-slate-500">{listing.city}</div>
-            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mt-2 text-slate-900">
-               {listing.title}
-            </h1>
-
-            <div className="mt-4 grid gap-2 text-sm text-slate-700">
-              <div>
-                <span className="text-slate-500">Zeitraum:</span>{" "}
-                {formatGermanDate(listing.available_from)} –{" "}
-                {formatGermanDate(listing.available_to)}
+      <section className="mx-auto max-w-5xl px-4 py-8">
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          {/* HERO IMAGE */}
+          <div className="relative mb-6 h-[240px] md:h-[340px] overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
+            {listing.image_url ? (
+              <Image
+                src={listing.image_url}
+                alt={listing.title || "Inserat"}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center text-sm text-slate-500">
+                Bild folgt
               </div>
-
-              <div>
-                <span className="text-slate-500">Typ:</span>{" "}
-                {housingTypeLabel(listing.housing_type)}
-              </div>
-
-              <div>
-                <span className="text-slate-500">Möblierung:</span> {furnished}
-              </div>
-
-
-              
-            </div>
+            )}
           </div>
 
-          {/* EQUIPMENT */}
-          <div className="rounded-3xl bg-white p-6 border border-slate-200 shadow-sm">
-            <div className="text-sm font-medium text-slate-900 mb-2">
-              Ausstattung
-            </div>
+          <div className="flex flex-col gap-8 sm:flex-row sm:items-start">
+            {/* LEFT */}
+            <div className="min-w-0 sm:basis-[68%]">
+              <div className="text-sm text-slate-500">{listing.city}</div>
 
-            <div className="flex gap-6">
-              {badgeKeys.length === 0 ? (
-  <span className="text-sm text-slate-500">—</span>
-) : (
-  <>
-    <div className="flex flex-col gap-2">
-      {leftBadges.map((key) => {
-        const item = equipmentMeta[key];
-        const Icon = item.icon;
+              <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
+                {listing.title}
+              </h1>
 
-        return (
-  <MetaPill
-    key={key}
-    label={item.label}
-    icon={<Icon size={14} />}
-    variant="highlight"
-  />
-);
-      })}
-    </div>
+              <div className="mt-5 grid gap-2 text-sm text-slate-700">
+                <div>
+                  <span className="text-slate-500">Zeitraum:</span>{" "}
+                  {formatGermanDate(listing.available_from)} –{" "}
+                  {formatGermanDate(listing.available_to)}
+                </div>
 
-    <div className="flex flex-col gap-2">
-      {rightBadges.map((key) => {
-        const item = equipmentMeta[key];
-        const Icon = item.icon;
+                <div>
+                  <span className="text-slate-500">Wohnungstyp:</span>{" "}
+                  {housingTypeLabel(listing.housing_type)}
+                </div>
 
-        return (
-  <MetaPill
-    key={key}
-    label={item.label}
-    icon={<Icon size={14} />}
-    variant="highlight"
-  />
-);
-      })}
-    </div>
-  </>
-)}
-            </div>
-          </div>
-
-          {/* DESCRIPTION */}
-          {listing.description && (
-            <div className="rounded-3xl bg-white p-6 border border-slate-200 shadow-sm">
-              <div className="text-sm font-medium text-slate-900">
-                Beschreibung
+                <div>
+                  <span className="text-slate-500">Möblierung:</span> {furnished}
+                </div>
               </div>
-              <p className="mt-2 text-sm text-slate-700 whitespace-pre-line">
-                {listing.description}
+
+              <div className="mt-6">
+                <div className="text-sm font-medium text-slate-900">
+                  Ausstattung
+                </div>
+
+                {badgeKeys.length === 0 ? (
+                  <div className="mt-2 text-sm text-slate-500">—</div>
+                ) : (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {badgeKeys.map((key) => {
+                      const item = equipmentMeta[key];
+                      const Icon = item.icon;
+
+                      return (
+                        <MetaPill
+                          key={key}
+                          label={item.label}
+                          icon={<Icon size={12} />}
+                          variant="highlight"
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {listing.description ? (
+                <div className="mt-6">
+                  <div className="text-sm font-medium text-slate-900">
+                    Beschreibung
+                  </div>
+                  <p className="mt-2 whitespace-pre-line text-sm leading-6 text-slate-700">
+                    {listing.description}
+                  </p>
+                </div>
+              ) : null}
+            </div>
+
+            {/* RIGHT */}
+            <aside className="h-fit rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm sm:basis-[32%] sm:shrink-0">
+              <div className="text-sm text-slate-500">Preis</div>
+              <div className="mt-1 text-3xl font-semibold text-slate-900">
+                {listing.price} €
+              </div>
+              <div className="text-sm text-slate-500">pro Monat</div>
+
+              <div className="my-4 h-px bg-slate-200" />
+
+              <div className="text-sm font-medium text-slate-900">Kontakt</div>
+              <p className="mt-2 text-sm text-slate-600">
+                Bei Interesse kannst du den Vermieter kontaktieren.
               </p>
-            </div>
-          )}
-        </div>
 
-        {/* RIGHT */}
-        <aside className="rounded-3xl bg-white p-6 border border-slate-200 shadow-sm h-fit sticky top-24">
-          <div className="text-sm text-slate-500">Preis</div>
-          <div className="text-3xl font-semibold mt-1">
-            {listing.price} €
+              {listing.email ? (
+                <a
+                  href={`mailto:${listing.email}?subject=${encodeURIComponent(
+                    `Anfrage zu deinem Medstay-Inserat: ${listing.title || ""}`
+                  )}`}
+                  className="mt-5 inline-flex w-full items-center justify-center rounded-2xl bg-teal-600 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700"
+                >
+                  Kontakt aufnehmen
+                </a>
+              ) : (
+                <button
+                  disabled
+                  className="mt-5 w-full rounded-2xl bg-slate-300 py-3 text-sm font-semibold text-white"
+                >
+                  Kontakt nicht verfügbar
+                </button>
+              )}
+            </aside>
           </div>
-          <div className="text-xs text-slate-500">pro Monat</div>
-
-          <div className="my-4 h-px bg-slate-200" />
-
-          <div className="text-sm font-medium text-slate-900">Kontakt</div>
-          <p className="mt-2 text-sm text-slate-600">
-            Erst nach Anfrage sichtbar
-          </p>
-
-          <button className="mt-5 w-full rounded-2xl bg-teal-500 text-white py-3 text-sm font-medium hover:bg-teal-600 transition shadow-sm">
-            Kontakt anfragen
-          </button>
-        </aside>
+        </div>
       </section>
     </main>
   );

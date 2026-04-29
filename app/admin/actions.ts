@@ -77,7 +77,7 @@ type DraftRow = {
   furnished: string | null;
   description: string | null;
   email: string | null;
-  image_url: string | null;
+  image_urls: string[] | null;
 
   housing_type: string | null;
 
@@ -126,7 +126,7 @@ export async function publishDraft(draftId: string) {
         "furnished",
         "description",
         "email",
-        "image_url",
+        "image_urls",
         "housing_type",
         "wifi",
         "washing_machine",
@@ -162,7 +162,7 @@ export async function publishDraft(draftId: string) {
         furnished: draft.furnished,
         description: draft.description,
         email: draft.email,
-        image_url: draft.image_url,
+        image_url: draft.image_urls,
         housing_type: draft.housing_type,
 
         // intern
