@@ -112,22 +112,21 @@ export async function createDraft(formData: FormData) {
   const email = String(formData.get("email") || "").trim().toLowerCase();
 
   const housing_type = String(formData.get("housing_type") || "").trim() || null;
-  const furnished = String(formData.get("furnished") || "").trim() || null; // "yes" | "no" | null
+  const furnished = null;
 
   // Adresse (privat)
-  const street = String(formData.get("street") || "").trim();
-  const postal_code = String(formData.get("postal_code") || "").trim();
-  const address_note = String(formData.get("address_note") || "").trim() || null;
+  const street = null;
+const postal_code = null;
+const address_note = null;
 
   // Ausstattung
   const wifi = asBoolCheckbox(formData, "wifi");
   const washing_machine = asBoolCheckbox(formData, "washing_machine");
-  const elevator = asBoolCheckbox(formData, "elevator");
   const parking = asBoolCheckbox(formData, "parking");
 
   // Private/shared
-  const bathroom_type = asEnumPrivateShared(String(formData.get("bathroom_type") || ""));
-  const kitchen_type = asEnumPrivateShared(String(formData.get("kitchen_type") || ""));
+const bathroom_type = null;
+const kitchen_type = null;
 
   // 🔐 Token generieren (einmalig pro Draft)
   const token = crypto.randomBytes(24).toString("hex");
@@ -154,7 +153,6 @@ export async function createDraft(formData: FormData) {
         // Ausstattung
         wifi,
         washing_machine,
-        elevator,
         parking,
         bathroom_type,
         kitchen_type,

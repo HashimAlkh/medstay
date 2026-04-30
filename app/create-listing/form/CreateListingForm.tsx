@@ -34,10 +34,10 @@ function ToggleGroup({
               key={option.value}
               type="button"
               onClick={() => onChange(option.value)}
-              className={`rounded-2xl border px-4 py-3 text-sm font-medium transition ${
+              className={`rounded-2xl border px-4 py-2.5 text-sm font-semibold transition ${
                 active
-                  ? "border-teal-600 bg-teal-50 text-teal-700"
-                  : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                  ? "border-teal-500 bg-teal-50 text-teal-700 shadow-sm"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-teal-200 hover:bg-teal-50/40"
               }`}
             >
               {option.label}
@@ -54,9 +54,6 @@ function ToggleGroup({
 export default function CreateListingForm() {
   const [from, setFrom] = useState("");
   const [housingType, setHousingType] = useState("");
-  const [furnished, setFurnished] = useState("");
-  const [bathroomType, setBathroomType] = useState("");
-  const [kitchenType, setKitchenType] = useState("");
 
   return (
     <form action={createDraft} className="grid gap-8">
@@ -93,184 +90,131 @@ export default function CreateListingForm() {
         className="hidden"
       />
 
-      <section className="grid gap-5">
-        <div>
-          <label className="ms-label">Titel des Inserats</label>
-          <input
-            name="title"
-            type="text"
-            placeholder="z. B. Helles WG-Zimmer nahe Uniklinik"
-            autoComplete="off"
-            className="ms-input mt-1"
-            required
-          />
-        </div>
+      <section className="grid gap-4 md:grid-cols-2">
+  <div>
+    <label className="ms-label">Titel</label>
+    <input
+      name="title"
+      type="text"
+      placeholder="z. B. WG-Zimmer nahe Uniklinik"
+      className="ms-input mt-1"
+      required
+    />
+  </div>
 
-        <div>
-          <label className="ms-label">Stadt</label>
-          <input
-            name="city"
-            type="text"
-            placeholder="z. B. Mannheim"
-            autoComplete="address-level2"
-            className="ms-input mt-1"
-            required
-          />
-        </div>
-      </section>
+  <div>
+    <label className="ms-label">Stadt</label>
+    <input
+      name="city"
+      type="text"
+      placeholder="z. B. Mannheim"
+      className="ms-input mt-1"
+      required
+    />
+  </div>
+</section>
+<section className="grid gap-4 md:grid-cols-2">
+  <div>
+    <label className="ms-label">Zimmer</label>
+    <input
+      name="rooms"
+      type="number"
+      min={1}
+      placeholder="z. B. 2"
+      className="ms-input mt-1"
+    />
+  </div>
 
-      <section className="rounded-3xl bg-slate-50 p-5">
-        <h3 className="text-sm font-semibold text-slate-900">
-          Adresse
-        </h3>
-        <p className="mt-1 text-xs leading-5 text-slate-500">
-          Die genaue Adresse wird nicht öffentlich angezeigt. Sie dient nur der internen Prüfung.
-        </p>
+  <div>
+    <label className="ms-label">Größe (m²)</label>
+    <input
+      name="size_sqm"
+      type="number"
+      min={1}
+      placeholder="z. B. 55"
+      className="ms-input mt-1"
+    />
+  </div>
+</section>
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div className="sm:col-span-2">
-            <label className="ms-label">Straße & Hausnummer</label>
+<section className="grid gap-4 md:grid-cols-3">
+    <div>
+    <label className="ms-label">Preis (€)</label>
+    <input
+      name="price"
+      type="number"
+      min={1}
+      placeholder="z. B. 650"
+      className="ms-input mt-1"
+      required
+    />
+  </div>
+  <div>
+    <label className="ms-label">Verfügbar von</label>
+    <input
+      name="from"
+      type="date"
+      className="ms-input mt-1"
+      required
+    />
+  </div>
+
+  <div>
+    <label className="ms-label">Verfügbar bis</label>
+    <input
+      name="to"
+      type="date"
+      className="ms-input mt-1"
+      required
+    />
+  </div>
+
+
+</section>
+
+<section className="rounded-3xl border border-slate-100 bg-slate-50/70 p-5">
+  <h3 className="text-sm font-semibold text-slate-900">Wohnungsdetails</h3>
+
+  <div className="mt-4 grid gap-5">
+    <div className="max-w-md">
+      <ToggleGroup
+        name="housing_type"
+        label="Wohnungstyp"
+        value={housingType}
+        onChange={setHousingType}
+        options={[
+          { value: "apartment", label: "Wohnung" },
+          { value: "room", label: "WG" },
+        ]}
+      />
+    </div>
+
+    <div>
+      <div className="ms-label mb-2">Ausstattung</div>
+
+      <div className="flex flex-wrap gap-2">
+        {[
+          ["wifi", "WLAN"],
+          ["washing_machine", "Waschmaschine"],
+          ["parking", "Parkplatz"],
+        ].map(([name, label]) => (
+          <label
+            key={name}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-teal-200 hover:bg-teal-50/40"
+          >
             <input
-              name="street"
-              type="text"
-              placeholder="z. B. Musterstraße 12"
-              className="ms-input mt-1"
-              required
-              autoComplete="street-address"
+              type="checkbox"
+              name={name}
+              className="h-3.5 w-3.5 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
             />
-          </div>
+            <span>{label}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
 
-          <div>
-            <label className="ms-label">PLZ</label>
-            <input
-              name="postal_code"
-              type="text"
-              inputMode="numeric"
-              placeholder="z. B. 68159"
-              className="ms-input mt-1"
-              required
-              autoComplete="postal-code"
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="grid gap-5">
-        <div>
-          <label className="ms-label">Monatspreis (€)</label>
-          <input
-            name="price"
-            type="number"
-            placeholder="z. B. 650"
-            min={1}
-            step="any"
-            inputMode="numeric"
-            className="ms-input mt-1"
-            required
-          />
-          <p className="mt-1 text-xs text-slate-500">
-            Wenn Nebenkosten inklusive sind, erwähne das kurz in der Beschreibung.
-          </p>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="ms-label">Verfügbar von</label>
-            <input
-              name="from"
-              type="date"
-              className="ms-input mt-1"
-              required
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="ms-label">Verfügbar bis</label>
-            <input
-              name="to"
-              type="date"
-              min={from || undefined}
-              className="ms-input mt-1"
-              required
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="grid gap-5 rounded-3xl bg-slate-50 p-5">
-        <h3 className="text-sm font-semibold text-slate-900">
-          Wohnungsdetails
-        </h3>
-
-        <div className="grid gap-5 md:grid-cols-2">
-          <ToggleGroup
-            name="housing_type"
-            label="Wohnungstyp"
-            value={housingType}
-            onChange={setHousingType}
-            options={[
-              { value: "apartment", label: "Ganze Wohnung" },
-              { value: "room", label: "Zimmer" },
-            ]}
-          />
-
-          <ToggleGroup
-            name="furnished"
-            label="Möblierung"
-            value={furnished}
-            onChange={setFurnished}
-            options={[
-              { value: "yes", label: "möbliert" },
-              { value: "no", label: "unmöbliert" },
-            ]}
-          />
-
-          <ToggleGroup
-            name="bathroom_type"
-            label="Bad"
-            value={bathroomType}
-            onChange={setBathroomType}
-            options={[
-              { value: "private", label: "eigenes Bad" },
-              { value: "shared", label: "gemeinsames Bad" },
-            ]}
-          />
-
-          <ToggleGroup
-            name="kitchen_type"
-            label="Küche"
-            value={kitchenType}
-            onChange={setKitchenType}
-            options={[
-              { value: "private", label: "eigene Küche" },
-              { value: "shared", label: "gemeinsame Küche" },
-            ]}
-          />
-        </div>
-      </section>
-
-      <section>
-        <div className="ms-label mb-2">Ausstattung</div>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          {[
-            ["wifi", "WLAN"],
-            ["washing_machine", "Waschmaschine"],
-            ["elevator", "Aufzug"],
-            ["parking", "Parkplatz / Stellplatz"],
-          ].map(([name, label]) => (
-            <label
-              key={name}
-              className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700"
-            >
-              <input type="checkbox" name={name} className="h-4 w-4" />
-              {label}
-            </label>
-          ))}
-        </div>
-      </section>
 
       <section>
         <label className="ms-label">Kurzbeschreibung</label>
