@@ -20,6 +20,8 @@ type ListingRow = {
   housing_type: string | null;
   image_url: string | null;
   email: string | null;
+  rooms: number | null;
+  size_sqm: number | null;
 
   equipment: {
     wifi?: boolean;
@@ -60,6 +62,8 @@ export default async function ListingDetailPage({
         "image_url",
         "email",
         "equipment",
+        "rooms",
+        "size_sqm",
       ].join(",")
     )
     .eq("id", id)
@@ -119,15 +123,20 @@ export default async function ListingDetailPage({
                   {formatGermanDate(listing.available_from)} –{" "}
                   {formatGermanDate(listing.available_to)}
                 </div>
-
                 <div>
                   <span className="text-slate-500">Wohnungstyp:</span>{" "}
                   {housingTypeLabel(listing.housing_type)}
                 </div>
+                <div>
+                  <span className="text-slate-500">Zimmer:</span>{" "}
+                  {listing.rooms ?? "—"}
+                </div>
 
                 <div>
-                  <span className="text-slate-500">Möblierung:</span> {furnished}
+                  <span className="text-slate-500">Größe:</span>{" "}
+                  {listing.size_sqm ? `${listing.size_sqm} m²` : "—"}
                 </div>
+                
               </div>
 
               <div className="mt-6">

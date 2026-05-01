@@ -29,10 +29,11 @@
     @apply my-4 h-px bg-slate-200;
   }
 
-  /* Labels */
+
   .ms-label {
-    @apply text-xs font-medium text-slate-700;
+    @apply text-sm font-medium text-slate-800 tracking-tight;
   }
+
 
   /* Inputs */
   .ms-input {

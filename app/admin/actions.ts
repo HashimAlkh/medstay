@@ -78,6 +78,8 @@ type DraftRow = {
   description: string | null;
   email: string | null;
   image_urls: string[] | null;
+  rooms: number | null;
+  size_sqm: number | null;
 
   housing_type: string | null;
 
@@ -132,6 +134,8 @@ export async function publishDraft(draftId: string) {
         "washing_machine",
         "elevator",
         "parking",
+        "rooms",
+        "size_sqm",
         "bathroom_type",
         "kitchen_type",
         "street",
@@ -164,7 +168,8 @@ export async function publishDraft(draftId: string) {
         email: draft.email,
         image_url: draft.image_urls,
         housing_type: draft.housing_type,
-
+        rooms: draft.rooms,
+        size_sqm: draft.size_sqm,
         // intern
         street: draft.street,
         postal_code: draft.postal_code,

@@ -70,7 +70,8 @@ type DraftRow = {
   email: string | null;
   status: string | null;
   created_at: string | null;
-
+  rooms: number | null;
+  size_sqm: number | null;
   housing_type: string | null;
   furnished: string | null;
 
@@ -148,6 +149,8 @@ export default async function PreviewPage({
         "parking",
         "bathroom_type",
         "kitchen_type",
+        "rooms",
+        "size_sqm",
         "street",
         "postal_code",
         "address_note",
@@ -292,18 +295,16 @@ export default async function PreviewPage({
         <span className="text-slate-500">Wohnungstyp:</span>{" "}
         {housingTypeLabel(draft.housing_type)}
       </div>
-
-      <div className="text-sm text-slate-700">
-        <span className="text-slate-500">Möblierung:</span> {furnished}
+      <div>
+        <span className="text-slate-500">Zimmer:</span>{" "}
+        {draft.rooms ?? "—"}
       </div>
 
-      <div className="text-sm text-slate-700">
-        <span className="text-slate-500">Bad:</span> {bathroomLabel(draft.bathroom_type)}
+      <div>
+        <span className="text-slate-500">Größe:</span>{" "}
+        {draft.size_sqm ? `${draft.size_sqm} m²` : "—"}
       </div>
-
-      <div className="text-sm text-slate-700">
-        <span className="text-slate-500">Küche:</span> {kitchenLabel(draft.kitchen_type)}
-      </div>
+      
     </div>
 
     <div className="mt-6">
@@ -368,25 +369,6 @@ export default async function PreviewPage({
   </div>
 
 </div>
-          
-            {/* Adresse intern */}
-            <div className="mt-5">
-              <div className="text-sm font-medium text-slate-900">Adresse (intern)</div>
-              {!hasAddress ? (
-                <div className="mt-2 text-sm text-slate-600">—</div>
-              ) : (
-                <div className="mt-2 text-sm text-slate-700">
-                  {(draft.street || "—")}, {(draft.postal_code || "—")}{" "}
-                  {(draft.city || "—")}
-                  {draft.address_note ? (
-                    <div className="mt-1 text-xs text-slate-500">{draft.address_note}</div>
-                  ) : null}
-                </div>
-              )}
-              <p className="mt-2 text-xs text-slate-500">
-                Hinweis: Die Adresse ist nur für interne Prüfung/Matching und wird öffentlich nicht angezeigt.
-              </p>
-            </div>
 
             {draft.description ? (
               <div className="mt-4">

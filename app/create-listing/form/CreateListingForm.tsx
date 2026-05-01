@@ -2,58 +2,52 @@
 
 import { useState } from "react";
 import { createDraft } from "./actions";
+import { Wifi, WashingMachine, Car } from "lucide-react";
 
 type ToggleOption = {
   value: string;
   label: string;
 };
 
-function ToggleGroup({
+
+function AmenityChip({
   name,
   label,
-  value,
-  onChange,
-  options,
+  icon,
 }: {
   name: string;
   label: string;
-  value: string;
-  onChange: (next: string) => void;
-  options: ToggleOption[];
+  icon: React.ReactNode;
 }) {
+  const [checked, setChecked] = useState(false);
+
   return (
-    <div>
-      <div className="ms-label mb-2">{label}</div>
-
-      <div className="grid grid-cols-2 gap-2">
-        {options.map((option) => {
-          const active = value === option.value;
-
-          return (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => onChange(option.value)}
-              className={`rounded-2xl border px-4 py-2.5 text-sm font-semibold transition ${
-                active
-                  ? "border-teal-500 bg-teal-50 text-teal-700 shadow-sm"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-teal-200 hover:bg-teal-50/40"
-              }`}
-            >
-              {option.label}
-            </button>
-          );
-        })}
-      </div>
-
-      <input type="hidden" name={name} value={value} required />
-    </div>
+    <label
+      className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${
+        checked
+          ? "border-teal-500 bg-teal-50 text-teal-700"
+          : "border-slate-200 bg-white text-slate-700 hover:border-teal-200 hover:bg-teal-50/40"
+      }`}
+    >
+      <input
+        type="checkbox"
+        name={name}
+        checked={checked}
+        onChange={(e) => setChecked(e.target.checked)}
+        className="sr-only"
+      />
+      <span className={checked ? "text-teal-600" : "text-slate-500"}>
+        {icon}
+      </span>
+      {label}
+    </label>
   );
 }
 
+
 export default function CreateListingForm() {
   const [from, setFrom] = useState("");
-  const [housingType, setHousingType] = useState("");
+  const [housingType, setHousingType] = useState("apartment");
 
   return (
     <form action={createDraft} className="grid gap-8">
@@ -175,41 +169,62 @@ export default function CreateListingForm() {
 <section className="rounded-3xl border border-slate-100 bg-slate-50/70 p-5">
   <h3 className="text-sm font-semibold text-slate-900">Wohnungsdetails</h3>
 
-  <div className="mt-4 grid gap-5">
-    <div className="max-w-md">
-      <ToggleGroup
-        name="housing_type"
-        label="Wohnungstyp"
-        value={housingType}
-        onChange={setHousingType}
-        options={[
-          { value: "apartment", label: "Wohnung" },
-          { value: "room", label: "WG" },
-        ]}
-      />
+  <div className="mt-5 grid gap-6 md:grid-cols-2 items-start">
+    {/* Wohnungstyp Switch */}
+    <div className="flex flex-col gap-2">
+      <div className="ms-label mb-2">Wohnungstyp</div>
+
+      <input type="hidden" name="housing_type" value={housingType} required />
+
+<div className="inline-flex w-fit rounded-full border border-slate-200 bg-white ">
+  <button
+          type="button"
+          onClick={() => setHousingType("apartment")}
+          className={`w-[220px] rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+            housingType === "apartment"
+              ? "bg-teal-600 text-white shadow-sm"
+              : "text-slate-600 hover:bg-slate-50"
+          }`}
+        >
+          Wohnung
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setHousingType("room")}
+          className={` rounded-full px-6 py-2.5 text-sm font-semibold transition ${
+            housingType === "room"
+              ? "bg-teal-600 text-white shadow-sm"
+              : "text-slate-600 hover:bg-slate-50"
+          }`}
+        >
+          WG
+        </button>
+      </div>
     </div>
 
-    <div>
+    {/* Ausstattung */}
+    <div className="flex flex-col gap-2">
       <div className="ms-label mb-2">Ausstattung</div>
 
       <div className="flex flex-wrap gap-2">
-        {[
-          ["wifi", "WLAN"],
-          ["washing_machine", "Waschmaschine"],
-          ["parking", "Parkplatz"],
-        ].map(([name, label]) => (
-          <label
-            key={name}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-teal-200 hover:bg-teal-50/40"
-          >
-            <input
-              type="checkbox"
-              name={name}
-              className="h-3.5 w-3.5 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
-            />
-            <span>{label}</span>
-          </label>
-        ))}
+        <AmenityChip
+          name="wifi"
+          label="WLAN"
+          icon={<Wifi className="h-4 w-4" />}
+        />
+
+        <AmenityChip
+          name="washing_machine"
+          label="Waschmaschine"
+          icon={<WashingMachine className="h-4 w-4" />}
+        />
+
+        <AmenityChip
+          name="parking"
+          label="Parkplatz"
+          icon={<Car className="h-4 w-4" />}
+        />
       </div>
     </div>
   </div>

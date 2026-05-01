@@ -106,6 +106,8 @@ export async function createDraft(formData: FormData) {
   const title = String(formData.get("title") || "").trim();
   const city = String(formData.get("city") || "").trim();
   const price = Number(formData.get("price") || 0);
+  const rooms = Number(formData.get("rooms") || 0) || null;
+  const size_sqm = Number(formData.get("size_sqm") || 0) || null;
   const available_from = String(formData.get("from") || "");
   const available_to = String(formData.get("to") || "");
   const description = String(formData.get("description") || "").trim();
@@ -144,6 +146,8 @@ const kitchen_type = null;
         email,
         housing_type,
         furnished,
+        rooms,
+        size_sqm,
 
         // Adresse
         street,
