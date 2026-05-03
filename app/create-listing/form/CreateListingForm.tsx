@@ -48,6 +48,7 @@ function AmenityChip({
 export default function CreateListingForm() {
   const [from, setFrom] = useState("");
   const [housingType, setHousingType] = useState("apartment");
+  const [imageName, setImageName] = useState("");
 
   return (
     <form action={createDraft} className="grid gap-8">
@@ -68,12 +69,22 @@ export default function CreateListingForm() {
     </p>
 
     <input
-      name="image"
-      type="file"
-      accept="image/*"
-      className="sr-only"
-    />
+  name="image"
+  type="file"
+  accept="image/*"
+  className="sr-only"
+  onChange={(e) => {
+    const file = e.target.files?.[0];
+    setImageName(file ? file.name : "");
+  }}
+/>
   </label>
+
+  {imageName && (
+  <p className="mt-2 text-center text-xs font-medium text-teal-700">
+    Bild ausgewählt: {imageName}
+  </p>
+)}  
 </section>
       <input
         type="text"

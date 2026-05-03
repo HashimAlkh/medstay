@@ -77,7 +77,8 @@ function CardInner({
 ) : null}
 
   {/* Bild / Placeholder */}
-  {imageUrl ? (
+{imageUrl ? (
+  <>
     <Image
       src={imageUrl}
       alt={title}
@@ -85,15 +86,16 @@ function CardInner({
       height={800}
       className="h-full w-full object-cover"
     />
-  ) : (
-    <div className="h-full w-full flex items-center justify-center text-xs text-slate-500">
-      Bild folgt
-    </div>
-  )}
-  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+  </>
+) : (
+  <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-100 text-sm text-slate-500">
+    Bild folgt
+  </div>
+)}
 
   {(rooms || sizeSqm) && (
-  <div className="absolute bottom-2 left-2">
+  <div className="absolute bottom-2 left-2 z-20">
     <div className="rounded-full bg-white/90 backdrop-blur px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">
       {rooms ? `${rooms} Zimmer` : ""}
       {rooms && sizeSqm ? " · " : ""}
