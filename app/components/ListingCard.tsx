@@ -3,6 +3,7 @@ import Image from "next/image";
 import MetaPill from "./MetaPill";
 import { HomeIcon, DoorIcon } from "app/components/icons";
 import { equipmentMeta } from "@/app/lib/equipmentMeta";
+import { Users } from "lucide-react";
 
 type Props = {
   id: string;
@@ -21,6 +22,9 @@ type Props = {
   furnished?: boolean | null;
   wifi?: boolean | null;
   imageUrl?: string | null;
+  rooms?: number | null;
+  sizeSqm?: number | null;
+  parking?: boolean | null;
 };
 
 function formatKm(km?: number | null) {
@@ -43,14 +47,19 @@ function CardInner({
   furnished,
   wifi,
   imageUrl,
+  rooms,
+  sizeSqm,
+  parking,
 }: Omit<Props, "id" | "href">) {
   const kmLabel = formatKm(distanceKm);
   const wohnung = isWohnung(housingType);
+  const showWifi = !!wifi;
+  const showParking = !!parking;
 
   return (
     <>
       {/* Bildbereich */}
-<div className="relative h-36 bg-slate-100 overflow-hidden">
+<div className="relative h-40 bg-slate-100 overflow-hidden">
   
 
   {/* Badge oben rechts */}
@@ -58,10 +67,10 @@ function CardInner({
   <div className="absolute z-20 top-[10px] right-[10px] left-auto">
     <div className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3 py-1 shadow-sm">
       <span className="text-teal-700">
-        {wohnung ? <HomeIcon className="h-4 w-4" /> : <DoorIcon className="h-4 w-4" />}
+        {wohnung ? <HomeIcon className="h-4 w-4" /> : <Users className="h-4 w-4" />}
       </span>
       <span className="text-xs font-semibold text-teal-700">
-        {wohnung ? "Wohnung" : "Zimmer"}
+        {wohnung ? "Wohnung" : "WG"}
       </span>
     </div>
   </div>
@@ -81,57 +90,62 @@ function CardInner({
       Bild folgt
     </div>
   )}
+  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+
+  {(rooms || sizeSqm) && (
+  <div className="absolute bottom-2 left-2">
+    <div className="rounded-full bg-white/90 backdrop-blur px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">
+      {rooms ? `${rooms} Zimmer` : ""}
+      {rooms && sizeSqm ? " · " : ""}
+      {sizeSqm ? `${sizeSqm} m²` : ""}
+    </div>
+  </div>
+)}
 </div>
 
       {/* Content */}
       <div className="p-4">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center justify-between">
           <div className="min-w-0">
             <div className="text-sm text-slate-500">{city}</div>
-            <div className="mt-1 font-semibold text-slate-900 truncate">{title}</div>
+            <div className="mt-1 text-lg font-semibold text-slate-900 leading-tight">{title}</div>
+            <div className="mt-1 text-sm text-slate-500">
+              {availableFrom} – {availableTo}
+            </div>
           </div>
 
           <div className="shrink-0 text-right">
-            <div className="text-sm text-slate-500">Monat</div>
+
             <div className="mt-0.5 text-lg font-semibold text-slate-900">{price} €</div>
           </div>
         </div>
 
+
         {/* Pills */}
-        <div className="mt-3 flex flex-wrap gap-2">
-  {kmLabel && (
-    <MetaPill label={`${kmLabel}`} variant="highlight" />
-  )}
+        <div className="mt-3 flex flex-nowrap gap-2 overflow-hidden">
+          {wifi && (() => {
+            const Icon = equipmentMeta.wifi.icon;
+            return (
+              <MetaPill
+                label={equipmentMeta.wifi.label}
+                icon={<Icon size={12} />}
+                variant="highlight"
+              />
+            );
+          })()}
 
-  {furnished && (() => {
-    const Icon = equipmentMeta.furnished.icon;
-    return (
-      <MetaPill
-        label={equipmentMeta.furnished.label}
-        icon={<Icon size={12} />}
-        variant="highlight"
-      />
-    );
-  })()}
-
-  {wifi && (() => {
-    const Icon = equipmentMeta.wifi.icon;
-    return (
-      <MetaPill
-        label={equipmentMeta.wifi.label}
-        icon={<Icon size={12} />}
-        variant="highlight"
-      />
-    );
-  })()}
-</div>
-
-        {/* Datum */}
-        <div className="mt-3 text-sm text-slate-600">
-          verfügbar{" "}
-          <span className="font-medium text-slate-800">{availableFrom}</span> –{" "}
-          <span className="font-medium text-slate-800">{availableTo}</span>
+          {parking && (() => {
+            const Icon = equipmentMeta.parking.icon;
+            return (
+              <MetaPill
+                label={equipmentMeta.parking.label}
+                icon={<Icon size={12} />}
+                variant="highlight"
+              />
+            );
+          })()}
         </div>
+
       </div>
     </>
   );

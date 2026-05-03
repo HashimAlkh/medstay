@@ -1,6 +1,6 @@
 import SiteHeader from "./components/SiteHeader";
 import FeaturedListingsCarousel from "./components/FeaturedListingsCarousel";
-
+import HomeSearchForm from "./components/HomeSearchForm";
 
 export default function HomePage() {
   return (
@@ -35,42 +35,7 @@ export default function HomePage() {
                   Finde deine Unterkunft
                 </div>
 
-                <form action="/results" method="get" className="mt-4 grid gap-3">
-                  <div>
-                    <label className="text-slate-500 text-xs font-medium mb-1">Stadt</label>
-                    <input
-                      name="city"
-                      placeholder="z. B. Mannheim"
-                      className="ms-input mt-1"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-slate-500 text-xs font-medium mb-1">Von</label>
-                      <input
-                        name="from"
-                        type="date"
-                        className="ms-input mt-1"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-slate-500 text-xs font-medium mb-1">Bis</label>
-                      <input name="to" type="date" className="ms-input mt-1" />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="mt-2 bg-teal-500 text-white rounded-xl px-4 py-2 text-md font-medium hover:bg-teal-600 transition shadow-sm"
-                  >
-                    Suchen
-                  </button>
-
-                  <p className="text-xs text-slate-500">
-                    Tipp: Lass Stadt leer, um alle Inserate zu sehen.
-                  </p>
-                </form>
+                <HomeSearchForm />
               </div>
             </div>
           </div>
