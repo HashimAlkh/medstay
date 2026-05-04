@@ -60,21 +60,21 @@ function asEnumPrivateShared(val: string) {
   return v === "private" || v === "shared" ? v : null;
 }
 
-async function uploadListingImage(file: File, draftId: string) {
+async function uploadListingImage(file: File, draftId: string, index: number) {
   if (!file || file.size === 0) return null;
 
   const maxSize = 5 * 1024 * 1024;
 
   if (file.size > maxSize) {
-    throw new Error("Das Bild ist zu groß. Maximal erlaubt sind 5 MB.");
+    throw new Error("Ein Bild ist zu groß. Maximal erlaubt sind 5 MB.");
   }
 
   if (!file.type.startsWith("image/")) {
-    throw new Error("Bitte lade eine gültige Bilddatei hoch.");
+    throw new Error("Bitte lade nur gültige Bilddateien hoch.");
   }
 
   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const path = `${draftId}/main.${ext}`;
+  const path = `${draftId}/image-${index + 1}.${ext}`;
 
   const { error: uploadError } = await supabase.storage
     .from("listing-photos")
@@ -84,9 +84,7 @@ async function uploadListingImage(file: File, draftId: string) {
       contentType: file.type,
     });
 
-  if (uploadError) {
-    throw new Error(uploadError.message);
-  }
+  if (uploadError) throw new Error(uploadError.message);
 
   const { data } = supabase.storage
     .from("listing-photos")
@@ -94,6 +92,8 @@ async function uploadListingImage(file: File, draftId: string) {
 
   return data.publicUrl;
 }
+
+
 
 export async function createDraft(formData: FormData) {
   // ✅ HONEYPOT – GANZ AM ANFANG
@@ -103,6 +103,8 @@ export async function createDraft(formData: FormData) {
     return redirect("/create-listing/success");
   }
 
+  const draftId = String(formData.get("draft_id") || "").trim();
+const isEditing = !!draftId;
   const title = String(formData.get("title") || "").trim();
   const city = String(formData.get("city") || "").trim();
   const price = Number(formData.get("price") || 0);
@@ -133,34 +135,47 @@ const kitchen_type = null;
   // 🔐 Token generieren (einmalig pro Draft)
   const token = crypto.randomBytes(24).toString("hex");
 
+const payload = {
+  title,
+  city,
+  price,
+  available_from,
+  available_to,
+  description,
+  email,
+  housing_type,
+  furnished,
+  rooms,
+  size_sqm,
+
+  street,
+  postal_code,
+  address_note,
+
+  wifi,
+  washing_machine,
+  parking,
+  bathroom_type,
+  kitchen_type,
+};
+
+let finalDraftId = draftId;
+
+if (isEditing) {
+  const { error } = await supabase
+    .from("listing_drafts")
+    .update(payload)
+    .eq("id", draftId);
+
+  if (error) {
+    throw new Error(error.message || "Draft konnte nicht aktualisiert werden");
+  }
+} else {
   const { data, error } = await supabase
     .from("listing_drafts")
     .insert([
       {
-        title,
-        city,
-        price,
-        available_from,
-        available_to,
-        description,
-        email,
-        housing_type,
-        furnished,
-        rooms,
-        size_sqm,
-
-        // Adresse
-        street,
-        postal_code,
-        address_note,
-
-        // Ausstattung
-        wifi,
-        washing_machine,
-        parking,
-        bathroom_type,
-        kitchen_type,
-
+        ...payload,
         status: "draft",
         email_verified: false,
         email_verification_token: token,
@@ -174,29 +189,47 @@ const kitchen_type = null;
     throw new Error(error?.message || "Draft konnte nicht gespeichert werden");
   }
 
-  const image = formData.get("image");
+  finalDraftId = data.id;
+}
 
-if (image instanceof File && image.size > 0) {
-  const imageUrl = await uploadListingImage(image, data.id);
+ const files = formData
+  .getAll("image")
+  .filter((item): item is File => item instanceof File && item.size > 0)
+  .slice(0, 5);
 
-  if (imageUrl) {
-    const { error: imageUpdateError } = await supabase
-      .from("listing_drafts")
-      .update({ image_url: imageUrl })
-      .eq("id", data.id);
+const imageUrls: string[] = [];
 
-    if (imageUpdateError) {
-      throw new Error(imageUpdateError.message);
-    }
+for (let i = 0; i < files.length; i++) {
+  const imageUrl = await uploadListingImage(files[i], finalDraftId, i);
+  if (imageUrl) imageUrls.push(imageUrl);
+}
+
+if (imageUrls.length > 0) {
+  const { error: imageUpdateError } = await supabase
+    .from("listing_drafts")
+    .update({
+      image_url: imageUrls[0],
+      image_urls: imageUrls,
+    })
+    .eq("id",finalDraftId);
+
+  if (imageUpdateError) {
+    throw new Error(imageUpdateError.message);
   }
 }
 
   // ✉️ Bestätigungsmail senden (wenn ENV korrekt)
+  if (!isEditing) {
   try {
-    await sendVerificationEmail(email, data.id, token);
+    await sendVerificationEmail(email, finalDraftId, token);
   } catch (e) {
     console.error("Email verification send failed:", e);
   }
+}
 
-  redirect(`/create-listing/preview?draft=${data.id}&needs_verify=1`);
+redirect(
+  `/create-listing/preview?draft=${encodeURIComponent(finalDraftId)}${
+    isEditing ? "&updated=1" : "&needs_verify=1"
+  }`
+);
 }

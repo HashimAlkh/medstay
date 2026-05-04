@@ -45,13 +45,43 @@ function AmenityChip({
 }
 
 
-export default function CreateListingForm() {
-  const [from, setFrom] = useState("");
-  const [housingType, setHousingType] = useState("apartment");
-  const [imageName, setImageName] = useState("");
+type InitialDraft = {
+  id: string;
+  title: string | null;
+  city: string | null;
+  price: number | null;
+  rooms: number | null;
+  size_sqm: number | null;
+  available_from: string | null;
+  available_to: string | null;
+  description: string | null;
+  email: string | null;
+  housing_type: string | null;
+  wifi: boolean | null;
+  washing_machine: boolean | null;
+  parking: boolean | null;
+  image_url: string | null;
+  image_urls: string[] | null;
+} | null;
+
+export default function CreateListingForm({
+  initialDraft,
+}: {
+  initialDraft?: InitialDraft;
+}) {
+  const [from, setFrom] = useState(initialDraft?.available_from || "");
+const [housingType, setHousingType] = useState(
+  initialDraft?.housing_type || "apartment"
+);
+const [imageCount, setImageCount] = useState(
+  initialDraft?.image_urls?.length || (initialDraft?.image_url ? 1 : 0)
+);
 
   return (
     <form action={createDraft} className="grid gap-8">
+      {initialDraft?.id && (
+  <input type="hidden" name="draft_id" value={initialDraft.id} />
+)}
     <section>
   <label className="ms-label">Bild der Unterkunft</label>
 
@@ -71,20 +101,21 @@ export default function CreateListingForm() {
     <input
   name="image"
   type="file"
+  multiple
   accept="image/*"
   className="sr-only"
   onChange={(e) => {
-    const file = e.target.files?.[0];
-    setImageName(file ? file.name : "");
-  }}
+  const files = e.target.files;
+  setImageCount(files ? files.length : 0);
+}}
 />
   </label>
 
-  {imageName && (
+{imageCount > 0 && (
   <p className="mt-2 text-center text-xs font-medium text-teal-700">
-    Bild ausgewählt: {imageName}
+    {imageCount} {imageCount === 1 ? "Bild" : "Bilder"} ausgewählt
   </p>
-)}  
+)}
 </section>
       <input
         type="text"
@@ -104,6 +135,7 @@ export default function CreateListingForm() {
       placeholder="z. B. WG-Zimmer nahe Uniklinik"
       className="ms-input mt-1"
       required
+      defaultValue={initialDraft?.title || ""}
     />
   </div>
 
@@ -115,6 +147,7 @@ export default function CreateListingForm() {
       placeholder="z. B. Mannheim"
       className="ms-input mt-1"
       required
+      defaultValue={initialDraft?.city || ""}
     />
   </div>
 </section>
@@ -127,6 +160,7 @@ export default function CreateListingForm() {
       min={1}
       placeholder="z. B. 2"
       className="ms-input mt-1"
+      defaultValue={initialDraft?.rooms ?? ""}
     />
   </div>
 
@@ -138,6 +172,7 @@ export default function CreateListingForm() {
       min={1}
       placeholder="z. B. 55"
       className="ms-input mt-1"
+      defaultValue={initialDraft?.size_sqm ?? ""}
     />
   </div>
 </section>
@@ -152,16 +187,19 @@ export default function CreateListingForm() {
       placeholder="z. B. 650"
       className="ms-input mt-1"
       required
+      defaultValue={initialDraft?.price ?? ""}
     />
   </div>
   <div>
     <label className="ms-label">Verfügbar von</label>
     <input
-      name="from"
-      type="date"
-      className="ms-input mt-1"
-      required
-    />
+  name="from"
+  type="date"
+  className="ms-input mt-1"
+  required
+  value={from}
+  onChange={(e) => setFrom(e.target.value)}
+/>
   </div>
 
   <div>
@@ -171,6 +209,7 @@ export default function CreateListingForm() {
       type="date"
       className="ms-input mt-1"
       required
+      defaultValue={initialDraft?.available_to || ""}
     />
   </div>
 
@@ -250,6 +289,7 @@ export default function CreateListingForm() {
           placeholder="z. B. ruhige Lage, möbliert, gute Anbindung, Nebenkosten inklusive ..."
           className="ms-input mt-1 min-h-[130px]"
           required
+          defaultValue={initialDraft?.description || ""}
         />
       </section>
 
@@ -262,6 +302,7 @@ export default function CreateListingForm() {
           autoComplete="email"
           className="ms-input mt-1"
           required
+          defaultValue={initialDraft?.email || ""}
         />
       </section>
 

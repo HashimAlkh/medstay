@@ -80,7 +80,7 @@ type DraftRow = {
   image_url: string | null;
   rooms: number | null;
   size_sqm: number | null;
-
+  image_urls: string[] | null;
   housing_type: string | null;
 
   wifi: boolean | null;
@@ -142,6 +142,7 @@ export async function publishDraft(draftId: string) {
         "postal_code",
         "address_note",
         "status",
+        "image_urls",
       ].join(",")
     )
     .eq("id", draftId)
@@ -174,7 +175,7 @@ export async function publishDraft(draftId: string) {
         street: draft.street,
         postal_code: draft.postal_code,
         address_note: draft.address_note,
-
+        image_urls: draft.image_urls,
         equipment: buildEquipment(draft),
         published_at: nowIso,
       },

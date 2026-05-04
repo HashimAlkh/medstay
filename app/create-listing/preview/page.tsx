@@ -9,6 +9,7 @@ import { startCheckout } from "@/app/pay/actions";
 import SiteHeader from "../../components/SiteHeader";
 import { equipmentMeta } from "@/app/lib/equipmentMeta";
 import MetaPill from "@/app/components/MetaPill";
+import ImageGallery from "@/app/components/ImageGallery";
 
 type SP = Record<string, string | string[] | undefined>;
 
@@ -90,6 +91,7 @@ type DraftRow = {
   address_note: string | null;
 
   image_url: string | null;
+  image_urls: string[] | null;
 
   paid_at: string | null;
   payment_status: string | null;
@@ -155,6 +157,7 @@ export default async function PreviewPage({
         "postal_code",
         "address_note",
         "image_url",
+        "image_urls",
         "paid_at",
         "payment_status",
         "email_verified",
@@ -246,7 +249,13 @@ export default async function PreviewPage({
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <SiteHeader mode="flow" rightLink={{ href: "/create-listing/form", label: "Zurück" }} />
+      <SiteHeader
+  mode="flow"
+  rightLink={{
+    href: `/create-listing/form?draft=${encodeURIComponent(draft.id)}`,
+    label: "Zurück",
+  }}
+/>
 
       <section className="mx-auto max-w-5xl px-4 py-8">
         <div className="flex items-start justify-between gap-4">
@@ -262,18 +271,16 @@ export default async function PreviewPage({
         <div className="mt-6">
           {/* Links: Preview Card */}
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-           <div className="relative mb-6 h-[240px] md:h-[320px] rounded-3xl overflow-hidden border border-slate-200 bg-slate-100">
-  {draft.image_url ? (
-    <img
-      src={draft.image_url}
-      alt={draft.title || "Vorschaubild"}
-      className="h-full w-full object-cover"
-    />
-  ) : (
-    <div className="absolute inset-0 flex items-center justify-center text-sm text-slate-500">
-      Bild folgt
-    </div>
-  )}
+           <div className="mb-6">
+  {draft.image_urls && draft.image_urls.length > 0 ? (
+  <ImageGallery images={draft.image_urls} />
+) : draft.image_url ? (
+  <ImageGallery images={[draft.image_url]} />
+) : (
+  <div className="absolute inset-0 flex items-center justify-center text-sm text-slate-500">
+    Bild folgt
+  </div>
+)}
 </div>
 <div className="flex flex-col gap-8 sm:flex-row sm:items-start">
   {/* LINKS */}
@@ -295,15 +302,15 @@ export default async function PreviewPage({
         <span className="text-slate-500">Wohnungstyp:</span>{" "}
         {housingTypeLabel(draft.housing_type)}
       </div>
-      <div>
-        <span className="text-slate-500">Zimmer:</span>{" "}
-        {draft.rooms ?? "—"}
-      </div>
+      <div className="text-sm text-slate-700">
+  <span className="text-slate-500">Zimmer:</span>{" "}
+  {draft.rooms ?? "—"}
+</div>
 
-      <div>
-        <span className="text-slate-500">Größe:</span>{" "}
-        {draft.size_sqm ? `${draft.size_sqm} m²` : "—"}
-      </div>
+<div className="text-sm text-slate-700">
+  <span className="text-slate-500">Größe:</span>{" "}
+  {draft.size_sqm ? `${draft.size_sqm} m²` : "—"}
+</div>
       
     </div>
 

@@ -1,12 +1,12 @@
 export const dynamic = "force-dynamic";
 
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/app/lib/supabaseAdmin";
 import SiteHeader from "@/app/components/SiteHeader";
 import { equipmentMeta } from "@/app/lib/equipmentMeta";
 import MetaPill from "@/app/components/MetaPill";
 import { equipmentKeys, formatGermanDate, furnishedLabel } from "@/app/lib/listingView";
+import ImageGallery from "@/app/components/ImageGallery";
 
 type ListingRow = {
   id: string;
@@ -19,6 +19,7 @@ type ListingRow = {
   furnished: string | null;
   housing_type: string | null;
   image_url: string | null;
+  image_urls: string[] | null;
   email: string | null;
   rooms: number | null;
   size_sqm: number | null;
@@ -60,6 +61,7 @@ export default async function ListingDetailPage({
         "furnished",
         "housing_type",
         "image_url",
+        "image_urls",
         "email",
         "equipment",
         "rooms",
@@ -93,20 +95,17 @@ export default async function ListingDetailPage({
       <section className="mx-auto max-w-5xl px-4 py-8">
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           {/* HERO IMAGE */}
-          <div className="relative mb-6 h-[240px] md:h-[340px] overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
-            {listing.image_url ? (
-              <Image
-                src={listing.image_url}
-                alt={listing.title || "Inserat"}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center text-sm text-slate-500">
-                Bild folgt
-              </div>
-            )}
-          </div>
+<div className="mb-6">
+  {listing.image_urls && listing.image_urls.length > 0 ? (
+    <ImageGallery images={listing.image_urls} />
+  ) : listing.image_url ? (
+    <ImageGallery images={[listing.image_url]} />
+  ) : (
+    <div className="flex h-56 items-center justify-center rounded-3xl border border-slate-200 bg-slate-100 text-sm text-slate-500 md:h-[300px]">
+      Bild folgt
+    </div>
+  )}
+</div>
 
           <div className="flex flex-col gap-8 sm:flex-row sm:items-start">
             {/* LEFT */}
