@@ -50,6 +50,7 @@ type InitialDraft = {
   title: string | null;
   city: string | null;
   price: number | null;
+  deposit: number | null;
   rooms: number | null;
   size_sqm: number | null;
   available_from: string | null;
@@ -177,7 +178,7 @@ const [imageCount, setImageCount] = useState(
   </div>
 </section>
 
-<section className="grid gap-4 md:grid-cols-3">
+<section className="grid gap-4 md:grid-cols-2">
     <div>
     <label className="ms-label">Preis (€)</label>
     <input
@@ -190,6 +191,17 @@ const [imageCount, setImageCount] = useState(
       defaultValue={initialDraft?.price ?? ""}
     />
   </div>
+  <div>
+  <label className="ms-label">Kaution (€)</label>
+  <input
+    name="deposit"
+    type="number"
+    min={0}
+    placeholder="z. B. 650"
+    className="ms-input mt-1"
+    defaultValue={initialDraft?.deposit ?? ""}
+  />
+</div>
   <div>
     <label className="ms-label">Verfügbar von</label>
     <input

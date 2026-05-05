@@ -13,6 +13,7 @@ type ListingRow = {
   title: string | null;
   city: string | null;
   price: number | null;
+  deposit: number | null;
   available_from: string | null;
   available_to: string | null;
   description: string | null;
@@ -55,6 +56,7 @@ export default async function ListingDetailPage({
         "title",
         "city",
         "price",
+        "deposit",
         "available_from",
         "available_to",
         "description",
@@ -183,22 +185,22 @@ export default async function ListingDetailPage({
                 {listing.price} €
               </div>
               <div className="text-sm text-slate-500">pro Monat</div>
-
+              <div className="mt-2 text-sm text-slate-600">
+  Kaution:{" "}
+  <span className="font-semibold text-slate-900">
+    {listing.deposit ? `${listing.deposit} €` : "—"}
+  </span>
+</div>
               <div className="my-4 h-px bg-slate-200" />
-
-              <div className="text-sm font-medium text-slate-900">Kontakt</div>
-              <p className="mt-2 text-sm text-slate-600">
-                Bei Interesse kannst du den Vermieter kontaktieren.
-              </p>
 
               {listing.email ? (
                 <a
                   href={`mailto:${listing.email}?subject=${encodeURIComponent(
                     `Anfrage zu deinem Medstay-Inserat: ${listing.title || ""}`
                   )}`}
-                  className="mt-5 inline-flex w-full items-center justify-center rounded-2xl bg-teal-600 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700"
+                  className="mt-1 inline-flex w-full items-center justify-center rounded-2xl bg-teal-600 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700"
                 >
-                  Kontakt aufnehmen
+                  Vermieter kontaktieren
                 </a>
               ) : (
                 <button

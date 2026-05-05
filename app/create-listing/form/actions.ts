@@ -108,6 +108,7 @@ const isEditing = !!draftId;
   const title = String(formData.get("title") || "").trim();
   const city = String(formData.get("city") || "").trim();
   const price = Number(formData.get("price") || 0);
+  const deposit = Number(formData.get("deposit") || 0) || null;
   const rooms = Number(formData.get("rooms") || 0) || null;
   const size_sqm = Number(formData.get("size_sqm") || 0) || null;
   const available_from = String(formData.get("from") || "");
@@ -139,6 +140,7 @@ const payload = {
   title,
   city,
   price,
+  deposit,
   available_from,
   available_to,
   description,

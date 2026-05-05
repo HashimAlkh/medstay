@@ -65,6 +65,7 @@ type DraftRow = {
   title: string | null;
   city: string | null;
   price: number | null;
+  deposit: number | null;
   available_from: string | null;
   available_to: string | null;
   description: string | null;
@@ -137,6 +138,7 @@ export default async function PreviewPage({
         "title",
         "city",
         "price",
+        "deposit",
         "available_from",
         "available_to",
         "description",
@@ -341,13 +343,14 @@ export default async function PreviewPage({
       {draft.price} €
     </div>
     <div className="text-sm text-slate-500">pro Monat</div>
-
+    <div className="mt-2 text-sm text-slate-600">
+  Kaution:{" "}
+  <span className="font-semibold text-slate-900">
+    {draft.deposit ? `${draft.deposit} €` : "—"}
+  </span>
+</div>
     <div className="my-4 h-px bg-slate-200" />
-
-    <div className="text-sm font-medium text-slate-900">Kontakt</div>
-    <div className="mt-2 text-sm text-slate-700">
-      {draft.email || "—"}
-    </div>
+ 
 
     <div className="mt-5">
       {!isVerified ? (

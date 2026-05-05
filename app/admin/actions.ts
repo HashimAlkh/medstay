@@ -72,6 +72,7 @@ type DraftRow = {
   title: string | null;
   city: string | null;
   price: number | null;
+  deposit: number | null;
   available_from: string | null;
   available_to: string | null;
   furnished: string | null;
@@ -123,6 +124,7 @@ export async function publishDraft(draftId: string) {
         "title",
         "city",
         "price",
+        "deposit",
         "available_from",
         "available_to",
         "furnished",
@@ -162,6 +164,7 @@ export async function publishDraft(draftId: string) {
         title: draft.title,
         city: draft.city,
         price: draft.price,
+        deposit: draft.deposit,
         available_from: draft.available_from,
         available_to: draft.available_to,
         furnished: draft.furnished,
