@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { createDraft } from "./actions";
 import { Wifi, WashingMachine, Car } from "lucide-react";
 
@@ -65,6 +65,13 @@ type InitialDraft = {
   image_urls: string[] | null;
 } | null;
 
+type LocalImage = {
+  id: string;
+  url: string;
+  file?: File;
+  existing: boolean;
+};
+
 export default function CreateListingForm({
   initialDraft,
 }: {
@@ -74,9 +81,42 @@ export default function CreateListingForm({
 const [housingType, setHousingType] = useState(
   initialDraft?.housing_type || "apartment"
 );
-const [imageCount, setImageCount] = useState(
-  initialDraft?.image_urls?.length || (initialDraft?.image_url ? 1 : 0)
+const initialImages: LocalImage[] =
+  initialDraft?.image_urls?.length
+    ? initialDraft.image_urls.map((url, index) => ({
+        id: `existing-${index}`,
+        url,
+        existing: true,
+      }))
+    : initialDraft?.image_url
+    ? [
+        {
+          id: "existing-0",
+          url: initialDraft.image_url,
+          existing: true,
+        },
+      ]
+    : [];
+
+const [images, setImages] = useState<LocalImage[]>(initialImages);
+const [primaryImageId, setPrimaryImageId] = useState<string | null>(
+  initialImages[0]?.id || null
 );
+const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+function syncFileInput(nextImages: LocalImage[]) {
+  if (!fileInputRef.current) return;
+
+  const dt = new DataTransfer();
+
+  nextImages.forEach((img) => {
+    if (img.file) {
+      dt.items.add(img.file);
+    }
+  });
+
+  fileInputRef.current.files = dt.files;
+}
 
   return (
     <form action={createDraft} className="grid gap-8">
@@ -100,23 +140,114 @@ const [imageCount, setImageCount] = useState(
     </p>
 
     <input
+  ref={fileInputRef}
   name="image"
   type="file"
   multiple
   accept="image/*"
   className="sr-only"
   onChange={(e) => {
-  const files = e.target.files;
-  setImageCount(files ? files.length : 0);
+  const files = Array.from(e.target.files || []);
+
+  const newImages: LocalImage[] = files.map((file) => ({
+    id: `${file.name}-${file.size}-${crypto.randomUUID()}`,
+    url: URL.createObjectURL(file),
+    file,
+    existing: false,
+  }));
+
+  const combined = [...images, ...newImages].slice(0, 5);
+
+  setImages(combined);
+  syncFileInput(combined);
+
+  if (!primaryImageId && combined.length > 0) {
+    setPrimaryImageId(combined[0].id);
+  }
 }}
 />
   </label>
 
-{imageCount > 0 && (
+{images.length > 0 && (
   <p className="mt-2 text-center text-xs font-medium text-teal-700">
-    {imageCount} {imageCount === 1 ? "Bild" : "Bilder"} ausgewählt
+    {images.length} {images.length === 1 ? "Bild" : "Bilder"} ausgewählt
   </p>
 )}
+
+{images.length > 0 && (
+  <div className="mt-4">
+    <div className="h-56 overflow-hidden rounded-3xl bg-slate-100 md:h-[300px]">
+      <img
+        src={images.find((img) => img.id === primaryImageId)?.url || images[0].url}
+        alt="Hauptbild"
+        className="h-full w-full object-cover"
+      />
+    </div>
+
+    <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
+      {images.map((img) => {
+        const active = img.id === primaryImageId;
+
+        return (
+          <div key={img.id} className="relative h-16 w-24 shrink-0">
+            <button
+              type="button"
+              onClick={() => setPrimaryImageId(img.id)}
+              className={`h-full w-full overflow-hidden rounded-2xl border transition ${
+                active
+                  ? "border-teal-500 ring-2 ring-teal-200"
+                  : "border-slate-200 opacity-80 hover:opacity-100"
+              }`}
+            >
+              <img src={img.url} alt="" className="h-full w-full object-cover" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+  const updatedImages = images.filter((i) => i.id !== img.id);
+
+  setImages(updatedImages);
+  syncFileInput(updatedImages);
+
+  if (primaryImageId === img.id) {
+    setPrimaryImageId(
+      updatedImages.length > 0 ? updatedImages[0].id : null
+    );
+  }
+}}
+              className="absolute right-1 top-1 z-20 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-sm font-light text-white shadow-md ring-1 ring-white"
+            >
+              ×
+            </button>
+          </div>
+        );
+      })}
+    </div>
+
+    <p className="mt-1 text-xs text-slate-500">
+      Klicke auf ein Bild, um es als Hauptbild festzulegen.
+    </p>
+    <input
+  type="hidden"
+  name="existing_image_urls"
+  value={JSON.stringify(
+    images
+      .filter((img) => img.existing)
+      .map((img) => img.url)
+  )}
+/>
+
+<input
+  type="hidden"
+  name="primary_image_url"
+  value={
+    images.find((img) => img.id === primaryImageId)?.url || ""
+  }
+/>
+  </div>
+)}
+
 </section>
       <input
         type="text"

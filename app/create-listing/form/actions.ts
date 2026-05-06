@@ -193,27 +193,45 @@ if (isEditing) {
 
   finalDraftId = data.id;
 }
+let existingImageUrls: string[] = [];
+
+try {
+  existingImageUrls = JSON.parse(
+    String(formData.get("existing_image_urls") || "[]")
+  );
+} catch {
+  existingImageUrls = [];
+}
+
+const primaryImageUrl = String(formData.get("primary_image_url") || "").trim();
 
  const files = formData
   .getAll("image")
   .filter((item): item is File => item instanceof File && item.size > 0)
   .slice(0, 5);
 
-const imageUrls: string[] = [];
+const uploadedImageUrls: string[] = [];
 
 for (let i = 0; i < files.length; i++) {
   const imageUrl = await uploadListingImage(files[i], finalDraftId, i);
-  if (imageUrl) imageUrls.push(imageUrl);
+  if (imageUrl) uploadedImageUrls.push(imageUrl);
 }
 
-if (imageUrls.length > 0) {
+const finalImageUrls = [...existingImageUrls, ...uploadedImageUrls].slice(0, 5);
+
+if (finalImageUrls.length > 0 || isEditing) {
+  const finalMainImage =
+    primaryImageUrl && finalImageUrls.includes(primaryImageUrl)
+      ? primaryImageUrl
+      : finalImageUrls[0] || null;
+
   const { error: imageUpdateError } = await supabase
     .from("listing_drafts")
     .update({
-      image_url: imageUrls[0],
-      image_urls: imageUrls,
+      image_url: finalMainImage,
+      image_urls: finalImageUrls,
     })
-    .eq("id",finalDraftId);
+    .eq("id", finalDraftId);
 
   if (imageUpdateError) {
     throw new Error(imageUpdateError.message);

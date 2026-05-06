@@ -30,6 +30,7 @@ if (draftId) {
         "title",
         "city",
         "price",
+        "deposit",
         "rooms",
         "size_sqm",
         "available_from",
