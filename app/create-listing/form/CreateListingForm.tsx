@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState } from "react";
 import { createDraft } from "./actions";
 import { Wifi, WashingMachine, Car } from "lucide-react";
@@ -448,7 +449,40 @@ function syncFileInput(nextImages: LocalImage[]) {
           defaultValue={initialDraft?.email || ""}
         />
       </section>
+          <section className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+  <div className="flex items-start gap-3">
+    <input
+      id="legal"
+      name="legal"
+      type="checkbox"
+      required
+      className="mt-1 h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+    />
 
+    <label
+      htmlFor="legal"
+      className="text-sm leading-6 text-slate-600"
+    >
+      Ich akzeptiere die{" "}
+      <Link
+        href="/agb"
+        target="_blank"
+        className="font-medium text-teal-700 hover:text-teal-800"
+      >
+        AGB
+      </Link>{" "}
+      und die{" "}
+      <Link
+        href="/datenschutz"
+        target="_blank"
+        className="font-medium text-teal-700 hover:text-teal-800"
+      >
+        Datenschutzerklärung
+      </Link>
+      .
+    </label>
+  </div>
+</section>
       <div>
         <button
           type="submit"

@@ -12,7 +12,7 @@ export default function HomeSearchForm() {
         <input name="city" placeholder="z. B. Mannheim" className="ms-input mt-1" />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label className="ms-label">Von</label>
           <input name="from" type="date" className="ms-input mt-1" />

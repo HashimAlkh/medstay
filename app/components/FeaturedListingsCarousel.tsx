@@ -37,7 +37,7 @@ export default async function FeaturedListingsCarousel() {
   if (listings.length === 0) return null;
 
   return (
-  <section className="mx-auto max-w-5xl px-4 pb-12">
+  <section className="w-full overflow-hidden px-5 pb-12">
     <div className="flex items-end justify-between">
       <h2 className="text-lg md:text-xl font-semibold tracking-tight text-slate-900">
         Aktuelle Inserate
