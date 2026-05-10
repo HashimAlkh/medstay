@@ -218,23 +218,23 @@ export default async function PreviewPage({
   } else if (resent) {
     topBanner = (
       <Banner tone="success">
-        Bestätigungs-Mail wurde erneut gesendet ✅ Bitte prüfe auch den Spam-Ordner.
+        Bestätigungs-Mail wurde erneut gesendet! Bitte prüfe auch den Spam-Ordner.
       </Banner>
     );
   } else if (isSubmitted) {
     topBanner = (
       <Banner tone="success">
-        Inserat eingereicht ✅ Wir prüfen es kurz und schalten es anschließend frei.
+        Inserat eingereicht! Wir prüfen es kurz und schalten es anschließend frei.
       </Banner>
     );
   } else if (isPaid) {
     topBanner = (
-      <Banner tone="info">Zahlung erfasst ✅ Du kannst dein Inserat jetzt einreichen.</Banner>
+      <Banner tone="info">Zahlung erfasst! Du kannst dein Inserat jetzt einreichen.</Banner>
     );
   } else if (isVerified) {
     topBanner = (
       <Banner tone="success">
-        E-Mail bestätigt ✅ {verifiedParam ? "Du kannst jetzt bezahlen." : "Du kannst jetzt bezahlen."}
+        E-Mail bestätigt! {verifiedParam ? "Du kannst jetzt bezahlen." : "Du kannst jetzt bezahlen."}
       </Banner>
     );
   } else {

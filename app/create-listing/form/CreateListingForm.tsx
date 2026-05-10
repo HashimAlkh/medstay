@@ -78,7 +78,8 @@ export default function CreateListingForm({
 }: {
   initialDraft?: InitialDraft;
 }) {
-  const [from, setFrom] = useState(initialDraft?.available_from || "");
+const [from, setFrom] = useState(initialDraft?.available_from || "");
+const [to, setTo] = useState(initialDraft?.available_to || "");
 const [housingType, setHousingType] = useState(
   initialDraft?.housing_type || "apartment"
 );
@@ -335,32 +336,35 @@ function syncFileInput(nextImages: LocalImage[]) {
   />
 </div>
   <div>
-    <label className="ms-label">Verfügbar von</label>
-    <input
-  name="from"
-  type="date"
-  className="ms-input mt-1"
-  required
-  value={from}
-  onChange={(e) => setFrom(e.target.value)}
-/>
-  </div>
+  <label className="ms-label">Verfügbar von</label>
+  <input
+    name="from"
+    type="date"
+    className="ms-date-input mt-1"
+    required
+    value={from}
+    max={to || undefined}
+    onChange={(e) => setFrom(e.target.value)}
+  />
+</div>
 
-  <div>
-    <label className="ms-label">Verfügbar bis</label>
-    <input
-      name="to"
-      type="date"
-      className="ms-input mt-1"
-      required
-      defaultValue={initialDraft?.available_to || ""}
-    />
-  </div>
+<div>
+  <label className="ms-label">Verfügbar bis</label>
+  <input
+    name="to"
+    type="date"
+    className="ms-date-input mt-1"
+    required
+    value={to}
+    min={from || undefined}
+    onChange={(e) => setTo(e.target.value)}
+  />
+</div>
 
 
 </section>
 
-<section className="rounded-3xl border border-slate-100 bg-slate-50/70 p-5">
+<section className="w-full max-w-full overflow-hidden rounded-3xl border border-slate-100 bg-slate-50/70 p-5">
   <h3 className="text-sm font-semibold text-slate-900">Wohnungsdetails</h3>
 
   <div className="mt-5 grid gap-6 md:grid-cols-2 items-start">
@@ -370,31 +374,33 @@ function syncFileInput(nextImages: LocalImage[]) {
 
       <input type="hidden" name="housing_type" value={housingType} required />
 
-<div className="inline-flex w-fit rounded-full border border-slate-200 bg-white ">
-  <button
-          type="button"
-          onClick={() => setHousingType("apartment")}
-          className={`w-[220px] rounded-full px-4 py-2.5 text-sm font-semibold transition ${
-            housingType === "apartment"
-              ? "bg-teal-600 text-white shadow-sm"
-              : "text-slate-600 hover:bg-slate-50"
-          }`}
-        >
-          Wohnung
-        </button>
+<div className="flex justify-center">
+  <div className="inline-flex rounded-2xl border border-slate-200 bg-white p-1">
+    <button
+      type="button"
+      onClick={() => setHousingType("apartment")}
+      className={`w-36 rounded-xl px-4 py-2 text-sm font-semibold transition ${
+        housingType === "apartment"
+          ? "bg-teal-600 text-white shadow-sm"
+          : "text-slate-600 hover:bg-slate-50"
+      }`}
+    >
+      Wohnung
+    </button>
 
-        <button
-          type="button"
-          onClick={() => setHousingType("room")}
-          className={` rounded-full px-6 py-2.5 text-sm font-semibold transition ${
-            housingType === "room"
-              ? "bg-teal-600 text-white shadow-sm"
-              : "text-slate-600 hover:bg-slate-50"
-          }`}
-        >
-          WG
-        </button>
-      </div>
+    <button
+      type="button"
+      onClick={() => setHousingType("room")}
+      className={`w-40 rounded-xl px-4 py-2 text-sm font-semibold transition ${
+        housingType === "room"
+          ? "bg-teal-600 text-white shadow" 
+          : "text-slate-600 hover:bg-slate-50"
+      }`}
+    >
+      WG
+    </button>
+  </div>
+</div>
     </div>
 
     {/* Ausstattung */}

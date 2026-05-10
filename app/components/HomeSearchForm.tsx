@@ -4,6 +4,8 @@ import { useState } from "react";
 
 export default function HomeSearchForm() {
   const [open, setOpen] = useState(false);
+  const [from, setFrom] = useState("");
+const [to, setTo] = useState("");
 
   return (
     <form action="/results" method="get" className="mt-4 grid gap-3">
@@ -15,12 +17,33 @@ export default function HomeSearchForm() {
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label className="ms-label">Von</label>
-          <input name="from" type="date" className="ms-input mt-1" />
+          <input
+  name="from"
+  type="date"
+  className="ms-date-input mt-1"
+  value={from}
+  max={to || undefined}
+  onChange={(e) => setFrom(e.target.value)}
+/>
         </div>
 
         <div>
           <label className="ms-label">Bis</label>
-          <input name="to" type="date" className="ms-input mt-1" />
+          <input
+
+  name="to"
+
+  type="date"
+
+  className="ms-date-input mt-1"
+
+  value={to}
+
+  min={from || undefined}
+
+  onChange={(e) => setTo(e.target.value)}
+
+/>
         </div>
       </div>
 
