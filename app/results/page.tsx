@@ -86,6 +86,22 @@ export default async function ResultsPage({
 
   const fromDate = parseDate(from);
   const toDate = parseDate(to);
+  const query = new URLSearchParams();
+
+if (city) query.set("city", city);
+if (from) query.set("from", from);
+if (to) query.set("to", to);
+if (maxPrice) query.set("max_price", String(maxPrice));
+if (minRooms) query.set("min_rooms", String(minRooms));
+if (minSize) query.set("min_size", String(minSize));
+if (housingType) query.set("housing_type", housingType);
+if (sort) query.set("sort", sort);
+
+const resultsQueryString = query.toString();
+const searchHref = resultsQueryString ? `/?${resultsQueryString}` : "/";
+const resultsHref = resultsQueryString
+  ? `/results?${resultsQueryString}`
+  : "/results";
 
   const { data, error } = await supabaseAdmin
     .from("listings")
@@ -130,7 +146,7 @@ export default async function ResultsPage({
   </h1>
 
 <a
-  href={`/?city=${encodeURIComponent(city)}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`}
+  href={searchHref}
   className="inline-flex items-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-4 py-2 text-sm font-semibold text-teal-700 hover:bg-teal-100 hover:border-teal-300 transition"
 >
   <Search className="h-4 w-4" />
@@ -148,6 +164,10 @@ export default async function ResultsPage({
   city={city}
   from={from}
   to={to}
+  max_price={maxPrice?.toString() ?? ""}
+  min_rooms={minRooms?.toString() ?? ""}
+  min_size={minSize?.toString() ?? ""}
+  housing_type={housingType}
   sort={sort}
 />
 

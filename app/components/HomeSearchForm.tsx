@@ -2,16 +2,40 @@
 
 import { useState } from "react";
 
-export default function HomeSearchForm() {
-  const [open, setOpen] = useState(false);
-  const [from, setFrom] = useState("");
-const [to, setTo] = useState("");
+export default function HomeSearchForm({
+  initialCity = "",
+  initialFrom = "",
+  initialTo = "",
+  initialMaxPrice = "",
+  initialMinRooms = "",
+  initialMinSize = "",
+  initialHousingType = "",
+}: {
+  initialCity?: string;
+  initialFrom?: string;
+  initialTo?: string;
+  initialMaxPrice?: string;
+  initialMinRooms?: string;
+  initialMinSize?: string;
+  initialHousingType?: string;
+}) {
+  const [open, setOpen] = useState(
+    !!initialMaxPrice || !!initialMinRooms || !!initialMinSize || !!initialHousingType
+  );
+
+  const [from, setFrom] = useState(initialFrom);
+  const [to, setTo] = useState(initialTo);
 
   return (
     <form action="/results" method="get" className="mt-4 grid gap-3">
       <div>
         <label className="ms-label">Stadt</label>
-        <input name="city" placeholder="z. B. Mannheim" className="ms-input mt-1" />
+        <input
+  name="city"
+  placeholder="z. B. Mannheim"
+  className="ms-input mt-1"
+  defaultValue={initialCity}
+/>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -59,22 +83,32 @@ const [to, setTo] = useState("");
         <div className="grid gap-3 rounded-2xl bg-slate-50 p-4 sm:grid-cols-2">
           <div>
             <label className="ms-label">Preis bis</label>
-            <input name="max_price" type="number" placeholder="z. B. 700" className="ms-input mt-1" />
+            <input
+  name="max_price"
+  type="number"
+  placeholder="z. B. 700"
+  className="ms-input mt-1"
+  defaultValue={initialMaxPrice}
+/>
           </div>
 
           <div>
             <label className="ms-label">Zimmer ab</label>
-            <input name="min_rooms" type="number" placeholder="z. B. 1" className="ms-input mt-1" />
+            <input name="min_rooms" type="number" placeholder="z. B. 1" className="ms-input mt-1" defaultValue={initialMinRooms} />
           </div>
 
           <div>
             <label className="ms-label">Größe ab</label>
-            <input name="min_size" type="number" placeholder="m²" className="ms-input mt-1" />
+            <input name="min_size" type="number" placeholder="m²" className="ms-input mt-1" defaultValue={initialMinSize} />
           </div>
 
           <div>
             <label className="ms-label">Typ</label>
-            <select name="housing_type" className="ms-input mt-1">
+            <select
+  name="housing_type"
+  className="ms-input mt-1"
+  defaultValue={initialHousingType}
+>
               <option value="">Alle</option>
               <option value="apartment">Wohnung</option>
               <option value="room">WG</option>

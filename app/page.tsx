@@ -2,7 +2,22 @@ import SiteHeader from "./components/SiteHeader";
 import FeaturedListingsCarousel from "./components/FeaturedListingsCarousel";
 import HomeSearchForm from "./components/HomeSearchForm";
 
-export default function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = await searchParams;
+
+  const city = typeof sp.city === "string" ? sp.city : "";
+  const from = typeof sp.from === "string" ? sp.from : "";
+  const to = typeof sp.to === "string" ? sp.to : "";
+  const max_price = typeof sp.max_price === "string" ? sp.max_price : "";
+  const min_rooms = typeof sp.min_rooms === "string" ? sp.min_rooms : "";
+  const min_size = typeof sp.min_size === "string" ? sp.min_size : "";
+  const housing_type =
+    typeof sp.housing_type === "string" ? sp.housing_type : "";
+
   return (
     <main className="min-h-screen flex flex-col bg-slate-50">
       <SiteHeader sticky/>
@@ -35,7 +50,15 @@ export default function HomePage() {
                   Finde deine Unterkunft
                 </div>
 
-                <HomeSearchForm />
+                <HomeSearchForm
+  initialCity={city}
+  initialFrom={from}
+  initialTo={to}
+  initialMaxPrice={max_price}
+  initialMinRooms={min_rooms}
+  initialMinSize={min_size}
+  initialHousingType={housing_type}
+/>
               </div>
             </div>
           </div>
