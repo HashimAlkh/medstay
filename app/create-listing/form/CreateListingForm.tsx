@@ -134,7 +134,7 @@ function syncFileInput(nextImages: LocalImage[]) {
     </div>
 
     <p className="mt-3 text-sm font-medium text-slate-700">
-      Hauptbild hochladen
+      Du kannst bis zu 5 Bilder hochladen.
     </p>
 
     <p className="mt-1 text-xs text-slate-500">
@@ -228,7 +228,7 @@ function syncFileInput(nextImages: LocalImage[]) {
     </div>
 
     <p className="mt-1 text-xs text-slate-500">
-      Klicke auf ein Bild, um es als Hauptbild festzulegen.
+      Das erste Bild wird als Hauptbild verwendet.
     </p>
     <input
   type="hidden"
@@ -340,7 +340,7 @@ function syncFileInput(nextImages: LocalImage[]) {
   <input
     name="from"
     type="date"
-    className="ms-date-input mt-1"
+    className="ms-input mt-1"
     required
     value={from}
     max={to || undefined}
@@ -379,7 +379,7 @@ function syncFileInput(nextImages: LocalImage[]) {
     <button
       type="button"
       onClick={() => setHousingType("apartment")}
-      className={`w-36 rounded-xl px-4 py-2 text-sm font-semibold transition ${
+      className={`w-34 rounded-xl px-6 py-2 text-sm font-semibold transition ${
         housingType === "apartment"
           ? "bg-teal-600 text-white shadow-sm"
           : "text-slate-600 hover:bg-slate-50"
@@ -391,7 +391,7 @@ function syncFileInput(nextImages: LocalImage[]) {
     <button
       type="button"
       onClick={() => setHousingType("room")}
-      className={`w-40 rounded-xl px-4 py-2 text-sm font-semibold transition ${
+      className={`w-36 rounded-xl px-6 py-2 text-sm font-semibold transition ${
         housingType === "room"
           ? "bg-teal-600 text-white shadow" 
           : "text-slate-600 hover:bg-slate-50"

@@ -249,6 +249,19 @@ export default async function PreviewPage({
   const hasAddress =
     !!draft.street || !!draft.postal_code || !!draft.address_note;
 
+  const previewImages =
+  draft.image_url && draft.image_urls?.length
+    ? [
+        draft.image_url,
+        ...draft.image_urls.filter(
+          (url) => url !== draft.image_url
+        ),
+      ]
+    : draft.image_urls?.length
+    ? draft.image_urls
+    : draft.image_url
+    ? [draft.image_url]
+    : [];
   return (
     <main className="min-h-screen bg-slate-50">
       <SiteHeader
@@ -274,10 +287,8 @@ export default async function PreviewPage({
           {/* Links: Preview Card */}
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
            <div className="mb-6">
-  {draft.image_urls && draft.image_urls.length > 0 ? (
-  <ImageGallery images={draft.image_urls} />
-) : draft.image_url ? (
-  <ImageGallery images={[draft.image_url]} />
+{previewImages.length > 0 ? (
+  <ImageGallery images={previewImages} />
 ) : (
   <div className="absolute inset-0 flex items-center justify-center text-sm text-slate-500">
     Bild folgt

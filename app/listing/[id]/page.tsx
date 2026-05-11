@@ -75,6 +75,15 @@ export default async function ListingDetailPage({
 
   if (error || !listing) return notFound();
 
+  const detailImages =
+  listing.image_url && listing.image_urls?.length
+    ? [listing.image_url, ...listing.image_urls.filter((url) => url !== listing.image_url)]
+    : listing.image_urls?.length
+    ? listing.image_urls
+    : listing.image_url
+    ? [listing.image_url]
+    : [];
+
   const eq = listing.equipment || {};
 
   const badgeKeys = equipmentKeys({
@@ -98,11 +107,9 @@ export default async function ListingDetailPage({
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           {/* HERO IMAGE */}
 <div className="mb-6">
-  {listing.image_urls && listing.image_urls.length > 0 ? (
-    <ImageGallery images={listing.image_urls} />
-  ) : listing.image_url ? (
-    <ImageGallery images={[listing.image_url]} />
-  ) : (
+{detailImages.length > 0 ? (
+  <ImageGallery images={detailImages} />
+) : (
     <div className="flex h-56 items-center justify-center rounded-3xl border border-slate-200 bg-slate-100 text-sm text-slate-500 md:h-[300px]">
       Bild folgt
     </div>

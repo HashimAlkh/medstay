@@ -30,7 +30,7 @@ export default function SiteHeader({
         <div className="flex items-center gap-3">
           {mode !== "flow" && (
             <Link
-  href="/create-listing/form"
+  href="/create-listing/"
   className="
     inline-flex items-center gap-2
     text-sm font-semibold
