@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { createDraft } from "./actions";
 import { Wifi, WashingMachine, Car } from "lucide-react";
+import { useFormStatus } from "react-dom";
 
 type ToggleOption = {
   value: string;
@@ -72,7 +73,19 @@ type LocalImage = {
   file?: File;
   existing: boolean;
 };
+function SubmitButton() {
+  const { pending } = useFormStatus();
 
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="w-full rounded-2xl bg-teal-600 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-70"
+    >
+      {pending ? "Wird vorbereitet..." : "Vorschau ansehen"}
+    </button>
+  );
+}
 export default function CreateListingForm({
   initialDraft,
 }: {
@@ -490,12 +503,7 @@ function syncFileInput(nextImages: LocalImage[]) {
   </div>
 </section>
       <div>
-        <button
-          type="submit"
-          className="w-full rounded-2xl bg-teal-600 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700"
-        >
-          Vorschau ansehen
-        </button>
+        <SubmitButton />
 
         <p className="mt-3 text-xs text-slate-500">
           Im nächsten Schritt prüfst du dein Inserat in der Vorschau und gehst danach zur Bezahlung.
