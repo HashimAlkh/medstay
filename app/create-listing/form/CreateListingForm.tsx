@@ -353,7 +353,7 @@ function syncFileInput(nextImages: LocalImage[]) {
   <input
     name="to"
     type="date"
-    className="ms-date-input mt-1"
+    className="ms-input mt-1"
     required
     value={to}
     min={from || undefined}

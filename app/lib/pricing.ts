@@ -1,1 +1,1 @@
-export const LISTING_FEE_EUR = 29;
+export const LISTING_FEE_EUR = 14.99;
