@@ -3,6 +3,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import { Resend } from "resend";
+import { emailTemplate } from "@/app/lib/emailTemplate";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -29,20 +30,19 @@ async function sendPublishedEmail(email: string | null, title: string | null, li
     from: process.env.RESEND_FROM,
     to: [email],
     subject: "Dein Medstay-Inserat wurde veröffentlicht",
-    html: `
-      <div style="font-family:Arial,sans-serif;line-height:1.5">
-        <p>Hallo,</p>
-        <p>dein Inserat <b>${title || "dein Inserat"}</b> wurde freigeschaltet und ist jetzt online sichtbar.</p>
-        <p>
-          <a href="${listingUrl}" style="display:inline-block;padding:10px 14px;border-radius:10px;background:#14b8a6;color:#fff;text-decoration:none;font-weight:600">
-            Inserat ansehen
-          </a>
-        </p>
-        <p style="color:#64748b;font-size:13px">
-  Wenn du Änderungen an deinem Inserat vornehmen möchtest, antworte einfach auf diese E-Mail.
-</p>
-      </div>
-    `,
+    html: emailTemplate({
+  title: "Dein Inserat ist jetzt online",
+  content: `
+    <p>Hallo,</p>
+
+    <p>
+      dein Inserat <b>${title || "dein Inserat"}</b>
+      wurde erfolgreich freigeschaltet und ist jetzt online sichtbar.
+    </p>
+  `,
+  buttonText: "Inserat ansehen",
+  buttonUrl: listingUrl,
+}),
   });
 }
 
@@ -53,17 +53,21 @@ async function sendRejectedEmail(email: string | null, title: string | null, rea
     from: process.env.RESEND_FROM,
     to: [email],
     subject: "Dein Medstay-Inserat wurde nicht freigeschaltet",
-    html: `
-      <div style="font-family:Arial,sans-serif;line-height:1.5">
-        <p>Hallo,</p>
-        <p>dein Inserat <b>${title || "dein Inserat"}</b> wurde leider nicht freigeschaltet.</p>
-        <p><b>Grund:</b> ${reason || "Kein Grund angegeben"}</p>
-        <p style="color:#64748b;font-size:13px">
-  Wenn du Änderungen an deinem Inserat vornehmen möchtest, antworte einfach auf diese E-Mail.
-</p>
+    html: emailTemplate({
+  title: "Dein Inserat wurde nicht freigeschaltet",
+  content: `
+    <p>Hallo,</p>
 
-      </div>
-    `,
+    <p>
+      dein Inserat <b>${title || "dein Inserat"}</b>
+      wurde leider nicht freigeschaltet.
+    </p>
+
+    <p>
+      <b>Grund:</b> ${reason || "Kein Grund angegeben"}
+    </p>
+  `,
+}),
   });
 }
 

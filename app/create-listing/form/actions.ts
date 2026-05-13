@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import { Resend } from "resend";
 import crypto from "crypto";
+import { emailTemplate } from "@/app/lib/emailTemplate";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -33,21 +34,27 @@ async function sendVerificationEmail(toEmail: string, draftId: string, token: st
     from: process.env.RESEND_FROM!,
     to: [toEmail],
     subject: "Bitte bestätige deine E-Mail für dein Medstay-Inserat",
-    html: `
-      <div style="font-family: Arial, sans-serif; line-height:1.5">
-        <p>Hi,</p>
-        <p>bitte bestätige kurz deine E-Mail-Adresse, damit du dein Inserat einreichen und bezahlen kannst.</p>
-        <p>
-          <a href="${verifyLink}" style="display:inline-block;padding:10px 14px;border-radius:10px;background:#14b8a6;color:#fff;text-decoration:none;font-weight:600">
-            E-Mail bestätigen
-          </a>
-        </p>
-        <p style="color:#64748b;font-size:12px">
-          Falls der Button nicht geht, kopiere diesen Link in den Browser:<br/>
-          ${verifyLink}
-        </p>
-      </div>
-    `,
+    html: emailTemplate({
+  title: "Bestätige deine E-Mail-Adresse",
+  content: `
+    <p>Hallo,</p>
+
+    <p>
+      bitte bestätige kurz deine E-Mail-Adresse, damit du dein Inserat
+      einreichen und bezahlen kannst.
+    </p>
+
+    <p style="margin-top:24px;color:#64748b;font-size:13px;">
+      Falls der Button nicht funktioniert, kopiere diesen Link in den Browser:
+      <br/><br/>
+      <a href="${verifyLink}" style="color:#0f766e;">
+        ${verifyLink}
+      </a>
+    </p>
+  `,
+  buttonText: "E-Mail bestätigen",
+  buttonUrl: verifyLink,
+}),
   });
 }
 
