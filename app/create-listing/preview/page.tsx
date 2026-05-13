@@ -10,6 +10,7 @@ import SiteHeader from "../../components/SiteHeader";
 import { equipmentMeta } from "@/app/lib/equipmentMeta";
 import MetaPill from "@/app/components/MetaPill";
 import ImageGallery from "@/app/components/ImageGallery";
+import ResendButton from "@/app/components/ResendButton";
 
 type SP = Record<string, string | string[] | undefined>;
 
@@ -367,9 +368,7 @@ export default async function PreviewPage({
       {!isVerified ? (
         <form action={resendVerification}>
           <input type="hidden" name="draft_id" value={draft.id} />
-          <button className="w-full rounded-xl bg-teal-600 text-white py-2.5 text-sm font-medium hover:bg-teal-700">
-            Bestätigungs-Mail erneut senden
-          </button>
+          <ResendButton />
         </form>
       ) : !isPaid ? (
         <form action={startCheckout}>
