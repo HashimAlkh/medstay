@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import type React from "react";
 import { supabaseAdmin } from "@/app/lib/supabaseAdmin";
-import { LISTING_FEE_EUR } from "@/app/lib/pricing";
+import {LISTING_FEE_LABEL} from "@/app/lib/pricing";
 import { submitDraft, resendVerification } from "./actions";
 import { equipmentKeys, formatGermanDate, furnishedLabel } from "@/app/lib/listingView";
 import { startCheckout } from "@/app/pay/actions";
@@ -375,7 +375,7 @@ export default async function PreviewPage({
         <form action={startCheckout}>
           <input type="hidden" name="draft_id" value={draft.id} />
           <button className="w-full rounded-xl bg-teal-600 text-white py-2.5 text-sm font-medium hover:bg-teal-700">
-            Jetzt bezahlen ({LISTING_FEE_EUR} €)
+            Jetzt bezahlen ({LISTING_FEE_LABEL} €)
           </button>
         </form>
       ) : (
