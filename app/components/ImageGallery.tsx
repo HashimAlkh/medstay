@@ -27,8 +27,8 @@ export default function ImageGallery({ images }: { images: string[] }) {
                 onClick={() => setActive(img)}
                 className={`relative h-16 w-24 shrink-0 cursor-pointer overflow-hidden rounded-2xl border transition hover:scale-[1.02] ${
                   isActive
-                    ? "border-teal-500 ring-2 ring-teal-200"
-                    : "border-slate-200 opacity-75 hover:opacity-100"
+                    ? "border-slate-300 ring-1 ring-slate-300 shadow-sm scale-[1.02]"
+                    : "border-slate-200 opacity-70 hover:opacity-100"
                 }`}
               >
                 <Image
