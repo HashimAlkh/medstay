@@ -24,8 +24,10 @@ export const metadata: Metadata = {
     "Finde passende Wohnungen für dein PJ, deine Famulatur oder dein Pflegepraktikum – speziell für Medizinstudierende.",
 
   icons: {
-    icon: "/icon.svg",
-  },
+  icon: "/medstay-icon.svg",
+  shortcut: "/medstay-icon.svg",
+  apple: "/medstay-icon.svg",
+},
 
   openGraph: {
     title: "medstay",

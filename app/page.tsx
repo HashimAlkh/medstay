@@ -34,12 +34,11 @@ export default async function HomePage({
               </div>
 
               <h1 className="mt-4 text-3xl md:text-5xl font-semibold tracking-tight text-slate-900">
-                Unterkünfte für dein Praktikum – unkompliziert.
+                Wohnungen für dein Praktikum – unkompliziert.
               </h1>
 
               <p className="mt-4 text-slate-600 leading-relaxed max-w-xl">
-                Wohnen von Medizinstudierenden – für Medizinstudierende. Finde
-                schnell passende Zimmer und Wohnungen im gewünschten Zeitraum.
+                Zimmer und Wohnungen von Medizinstudierenden für Medizinstudierende - unkompliziert und passend zu deinem Zeitraum.
               </p>
             </div>
 
