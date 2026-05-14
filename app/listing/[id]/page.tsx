@@ -12,6 +12,7 @@ type ListingRow = {
   id: string;
   title: string | null;
   city: string | null;
+  street: string | null;
   price: number | null;
   deposit: number | null;
   available_from: string | null;
@@ -36,7 +37,7 @@ type ListingRow = {
 };
 
 function housingTypeLabel(v: string | null) {
-  if (v === "apartment") return "Ganze Wohnung";
+  if (v === "apartment") return "Wohnung";
   if (v === "room") return "Zimmer";
   return "—";
 }
@@ -55,6 +56,7 @@ export default async function ListingDetailPage({
         "id",
         "title",
         "city",
+        "street",
         "price",
         "deposit",
         "available_from",
@@ -124,8 +126,13 @@ export default async function ListingDetailPage({
               <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
                 {listing.title}
               </h1>
+              {listing.street && (
+  <p className="mt-2 text-sm text-slate-600">
+    {listing.street}
+  </p>
+)}
 
-              <div className="mt-5 grid gap-2 text-sm text-slate-700">
+              <div className="mt-5 grid gap-2 text-base text-slate-700">
                 <div>
                   <span className="text-slate-500">Zeitraum:</span>{" "}
                   {formatGermanDate(listing.available_from)} –{" "}
@@ -148,7 +155,7 @@ export default async function ListingDetailPage({
               </div>
 
               <div className="mt-6">
-                <div className="text-sm font-medium text-slate-900">
+                <div className="text-base font-medium text-slate-900">
                   Ausstattung
                 </div>
 
@@ -175,10 +182,10 @@ export default async function ListingDetailPage({
 
               {listing.description ? (
                 <div className="mt-6">
-                  <div className="text-sm font-medium text-slate-900">
+                  <div className="text-base font-medium text-slate-900">
                     Beschreibung
                   </div>
-                  <p className="mt-2 whitespace-pre-line text-sm leading-6 text-slate-700">
+                  <p className="mt-2 whitespace-pre-line text-base leading-6 text-slate-700">
                     {listing.description}
                   </p>
                 </div>

@@ -20,7 +20,7 @@ function pick(sp: SP, key: string) {
 }
 
 function housingTypeLabel(v: string | null) {
-  if (v === "apartment") return "Ganze Wohnung";
+  if (v === "apartment") return "Wohnung";
   if (v === "room") return "Zimmer";
   return "—";
 }
@@ -138,6 +138,7 @@ export default async function PreviewPage({
         "id",
         "title",
         "city",
+        "street",
         "price",
         "deposit",
         "available_from",
@@ -304,24 +305,29 @@ export default async function PreviewPage({
     <div className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
       {draft.title}
     </div>
+    {draft.street && (
+  <div className="mt-1 text-sm text-slate-600">
+    {draft.street}
+  </div>
+)}
 
     <div className="mt-5 grid gap-2">
-      <div className="text-sm text-slate-700">
+      <div className="text-base text-slate-700">
         <span className="text-slate-500">Zeitraum:</span>{" "}
         {formatGermanDate(draft.available_from)} –{" "}
         {formatGermanDate(draft.available_to)}
       </div>
 
-      <div className="text-sm text-slate-700">
+      <div className="text-base text-slate-700">
         <span className="text-slate-500">Wohnungstyp:</span>{" "}
         {housingTypeLabel(draft.housing_type)}
       </div>
-      <div className="text-sm text-slate-700">
+      <div className="text-base text-slate-700">
   <span className="text-slate-500">Zimmer:</span>{" "}
   {draft.rooms ?? "—"}
 </div>
 
-<div className="text-sm text-slate-700">
+<div className="text-base text-slate-700">
   <span className="text-slate-500">Größe:</span>{" "}
   {draft.size_sqm ? `${draft.size_sqm} m²` : "—"}
 </div>
@@ -329,7 +335,7 @@ export default async function PreviewPage({
     </div>
 
     <div className="mt-6">
-      <div className="text-sm font-medium text-slate-900">Ausstattung</div>
+      <div className="text-base font-medium text-slate-900">Ausstattung</div>
 
       <div className="mt-3 flex flex-wrap gap-2">
         {badgeKeys.map((key) => {
@@ -392,8 +398,8 @@ export default async function PreviewPage({
 
             {draft.description ? (
               <div className="mt-4">
-                <div className="text-sm font-medium text-slate-900">Beschreibung</div>
-                <p className="mt-2 text-sm text-slate-700 whitespace-pre-line">
+                <div className="text-base font-medium text-slate-900">Beschreibung</div>
+                <p className="mt-2 text-base text-slate-700 whitespace-pre-line">
                   {draft.description}
                 </p>
               </div>

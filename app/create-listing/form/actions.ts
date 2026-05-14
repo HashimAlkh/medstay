@@ -127,7 +127,7 @@ const isEditing = !!draftId;
   const furnished = null;
 
   // Adresse (privat)
-  const street = null;
+  const street = String(formData.get("street") || "").trim() || null;
 const postal_code = null;
 const address_note = null;
 

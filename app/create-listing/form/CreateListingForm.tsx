@@ -51,6 +51,7 @@ type InitialDraft = {
   id: string;
   title: string | null;
   city: string | null;
+  street: string | null;
   price: number | null;
   deposit: number | null;
   rooms: number | null;
@@ -245,6 +246,7 @@ function syncFileInput(nextImages: LocalImage[]) {
     </p>
     <input
   type="hidden"
+  required
   name="existing_image_urls"
   value={JSON.stringify(
     images
@@ -298,6 +300,17 @@ function syncFileInput(nextImages: LocalImage[]) {
     />
   </div>
 </section>
+<section>
+  <label className="ms-label">Straße + Hausnummer (optional)</label>
+  <input
+    name="street"
+    type="text"
+    placeholder="z. B. Cheliusstraße 1-3"
+    className="ms-input mt-1"
+    defaultValue={initialDraft?.street || ""}
+  />
+
+</section>
 <section className="grid gap-4 md:grid-cols-2">
   <div>
     <label className="ms-label">Zimmer</label>
@@ -343,7 +356,7 @@ function syncFileInput(nextImages: LocalImage[]) {
     name="deposit"
     type="number"
     min={0}
-    placeholder="z. B. 650"
+    placeholder="z. B. 200"
     className="ms-input mt-1"
     defaultValue={initialDraft?.deposit ?? ""}
   />
