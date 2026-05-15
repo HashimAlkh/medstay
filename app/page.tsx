@@ -34,7 +34,7 @@ export default async function HomePage({
               </div>
 
               <h1 className="mt-4 text-3xl md:text-5xl font-semibold tracking-tight text-slate-900">
-                Wohnungen für dein Praktikum – unkompliziert.
+                Finde eine möblierte Unterkunft für dein nächstes Praktikum.
               </h1>
 
               <p className="mt-4 text-slate-600 leading-relaxed max-w-xl">
@@ -61,35 +61,59 @@ export default async function HomePage({
               </div>
             </div>
           </div>
+<div className="h-8 md:h-14" />
+          {/* Featured Listings */}
+<div className="mt-12">
+  <FeaturedListingsCarousel />
+</div>
+<div className="h-6 md:h-14" />
+{/* Why medstay */}
+<div className="mt-20">
+  <div className="mb-6">
+    <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
+      Warum med<span className="text-teal-600">stay</span>?
+    </h2>
 
-          {/* Trust row */}
-          <div className="mt-10 grid gap-3 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-100 p-4">
-              <div className="text-sm font-semibold text-slate-900">Kuratiert</div>
-              <p className="mt-1 text-sm text-slate-600">
-                Inserate werden geprüft, bevor sie sichtbar sind.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-slate-100 p-4">
-              <div className="text-sm font-semibold text-slate-900">Einfach</div>
-              <p className="mt-1 text-sm text-slate-600">
-                Suche → Detailseite → Kontakt. Ohne Overengineering.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-slate-100 p-4">
-              <div className="text-sm font-semibold text-slate-900">Studierendenfokus</div>
-              <p className="mt-1 text-sm text-slate-600">
-                Für Rotationen gedacht: Zeitraum & Stadt stehen im Zentrum.
-              </p>
-            </div>
-          </div>
+  </div>
+
+  <div className="mt-8 grid gap-4 md:grid-cols-3">
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="text-base font-semibold text-slate-700">
+        Flexible Zwischenmieten
+      </div>
+
+      <p className="mt-2 text-sm leading-6 text-slate-600">
+        Finde Wohnungen passend zu PJ, Famulatur und Praktika.
+      </p>
+    </div>
+
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="text-base font-semibold text-slate-700">
+        Möbliert einziehen
+      </div>
+
+      <p className="mt-2 text-sm leading-6 text-slate-600">
+        Keine Möbel, keine Einrichtungskosten, kein unnötiger Stress.
+      </p>
+    </div>
+
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="text-base font-semibold text-slate-700">
+        Vermiete deine Wohnung
+      </div>
+
+      <p className="mt-2 text-sm leading-6 text-slate-600">
+        Vermeide Leerstand während Rotation, Auslandspraktika oder Ferien.
+      </p>
+    </div>
+  </div>
+</div>
+ 
+           
         </div>
       </section>
+            
 
-      {/* ✅ Featured Listings Carousel (neu) */}
-      <FeaturedListingsCarousel />
-
-      {/* ❌ Steps wurde entfernt */}
     </main>
   );
 }

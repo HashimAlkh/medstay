@@ -124,9 +124,7 @@ export default function HomeSearchForm({
         Suchen
       </button>
 
-      <p className="text-xs text-slate-500">
-        Tipp: Lass Stadt leer, um alle Inserate zu sehen.
-      </p>
+    
     </form>
   );
 }
