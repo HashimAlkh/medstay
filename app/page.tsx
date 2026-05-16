@@ -66,7 +66,7 @@ export default async function HomePage({
 <div className="mt-12">
   <FeaturedListingsCarousel />
 </div>
-<div className="h-6 md:h-14" />
+<div className="h-6 md:h-10" />
 {/* Why medstay */}
 <div className="mt-20">
   <div className="mb-6">

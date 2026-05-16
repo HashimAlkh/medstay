@@ -305,7 +305,7 @@ function syncFileInput(nextImages: LocalImage[]) {
   <input
     name="street"
     type="text"
-    placeholder="z. B. Cheliusstraße 1-3"
+    placeholder="z. B. Musterstraße 12a"
     className="ms-input mt-1"
     defaultValue={initialDraft?.street || ""}
   />

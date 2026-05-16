@@ -3,11 +3,15 @@ export function emailTemplate({
   content,
   buttonText,
   buttonUrl,
+  secondaryButtonText,
+  secondaryButtonUrl,
 }: {
   title: string;
   content: string;
   buttonText?: string;
   buttonUrl?: string;
+  secondaryButtonText?: string;
+  secondaryButtonUrl?: string;
 }) {
   return `
     <div style="margin:0;padding:40px 16px;background:#f8fafc;font-family:Arial,sans-serif;color:#0f172a;">
@@ -50,6 +54,29 @@ export function emailTemplate({
         `
             : ""
         }
+        ${
+  secondaryButtonText && secondaryButtonUrl
+    ? `
+      <div style="margin-top:12px">
+        <a
+          href="${secondaryButtonUrl}"
+          style="
+            display:inline-block;
+            padding:10px 14px;
+            border-radius:10px;
+            border:1px solid #99f6e4;
+            color:#0f766e;
+            text-decoration:none;
+            font-weight:600;
+            background:#ffffff;
+          "
+        >
+          ${secondaryButtonText}
+        </a>
+      </div>
+    `
+    : ""
+}
 
         <div style="margin-top:40px;padding-top:24px;border-top:1px solid #e2e8f0;">
           <p style="margin:0;font-size:13px;line-height:1.7;color:#64748b;">

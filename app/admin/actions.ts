@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import { Resend } from "resend";
 import { emailTemplate } from "@/app/lib/emailTemplate";
+import crypto from "crypto";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -21,11 +22,11 @@ function siteUrl() {
   ).replace(/\/$/, "");
 }
 
-async function sendPublishedEmail(email: string | null, title: string | null, listingId: string) {
+async function sendPublishedEmail(email: string | null, title: string | null, listingId: string, manageToken: string) {
   if (!email || !resend || !process.env.RESEND_FROM) return;
 
   const listingUrl = `${siteUrl()}/listing/${encodeURIComponent(listingId)}`;
-
+  const manageUrl = `${siteUrl()}/manage-listing?token=${manageToken}`;
   await resend.emails.send({
     from: process.env.RESEND_FROM,
     to: [email],
@@ -33,15 +34,22 @@ async function sendPublishedEmail(email: string | null, title: string | null, li
     html: emailTemplate({
   title: "Dein Inserat ist jetzt online",
   content: `
-    <p>Hallo,</p>
+  <p>Hallo,</p>
 
-    <p>
-      dein Inserat <b>${title || "dein Inserat"}</b>
-      wurde erfolgreich freigeschaltet und ist jetzt online sichtbar.
-    </p>
-  `,
+  <p>
+    dein Inserat <b>${title || "dein Inserat"}</b>
+    wurde erfolgreich freigeschaltet und ist jetzt online sichtbar.
+  </p>
+
+  <p style="margin-top:16px;color:#475569;font-size:14px;line-height:1.6">
+    Über den Verwaltungslink kannst du dein Inserat noch für
+    <b>48 Stunden</b> bearbeiten und jederzeit deaktivieren.
+  </p>
+`,
   buttonText: "Inserat ansehen",
   buttonUrl: listingUrl,
+  secondaryButtonText: "Inserat verwalten",
+  secondaryButtonUrl: manageUrl,
 }),
   });
 }
@@ -159,12 +167,19 @@ export async function publishDraft(draftId: string) {
   }
 
   const nowIso = new Date().toISOString();
+  const manageToken = crypto.randomBytes(24).toString("hex");
+
+const editExpiresAt = new Date(
+  Date.now() + 48 * 60 * 60 * 1000
+).toISOString();
 
   const { error: upsertErr } = await supabase
     .from("listings")
     .upsert(
       {
         draft_id: draft.id,
+        manage_token: manageToken,
+        edit_token_expires_at: editExpiresAt,
         title: draft.title,
         city: draft.city,
         price: draft.price,
@@ -209,7 +224,7 @@ export async function publishDraft(draftId: string) {
   if (updErr) throw new Error(updErr.message);
   if (listing?.id) {
   try {
-    await sendPublishedEmail(draft.email, draft.title, listing.id);
+    await sendPublishedEmail(draft.email, draft.title, listing.id, manageToken);
   } catch (e) {
     console.error("Published email failed:", e);
   }
