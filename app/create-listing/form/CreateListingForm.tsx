@@ -16,12 +16,16 @@ function AmenityChip({
   name,
   label,
   icon,
+  defaultChecked = false,
+  disabled = false,
 }: {
   name: string;
   label: string;
   icon: React.ReactNode;
+  defaultChecked?: boolean;
+  disabled?: boolean;
 }) {
-  const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useState(defaultChecked);
 
   return (
     <label
@@ -31,13 +35,14 @@ function AmenityChip({
           : "border-slate-200 bg-white text-slate-700 hover:border-teal-200 hover:bg-teal-50/40"
       }`}
     >
-      <input
-        type="checkbox"
-        name={name}
-        checked={checked}
-        onChange={(e) => setChecked(e.target.checked)}
-        className="sr-only"
-      />
+<input
+  type="checkbox"
+  name={name}
+  checked={checked}
+  disabled={disabled}
+  onChange={(e) => setChecked(e.target.checked)}
+  className="sr-only"
+/>
       <span className={checked ? "text-teal-600" : "text-slate-500"}>
         {icon}
       </span>
@@ -74,8 +79,16 @@ type LocalImage = {
   file?: File;
   existing: boolean;
 };
-function SubmitButton() {
+function SubmitButton({
+  mode = "create",
+  readonly = false,
+}: {
+  mode?: "create" | "edit";
+  readonly?: boolean;
+}) {
   const { pending } = useFormStatus();
+
+  if (readonly) return null;
 
   return (
     <button
@@ -83,15 +96,29 @@ function SubmitButton() {
       disabled={pending}
       className="w-full rounded-2xl bg-teal-600 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-70"
     >
-      {pending ? "Wird vorbereitet..." : "Vorschau ansehen"}
+      {pending
+        ? mode === "edit"
+          ? "Änderungen werden gespeichert..."
+          : "Wird vorbereitet..."
+        : mode === "edit"
+        ? "Änderungen speichern"
+        : "Vorschau ansehen"}
     </button>
   );
 }
 export default function CreateListingForm({
   initialDraft,
+  mode = "create",
+  readonly = false,
+  manageToken,
 }: {
   initialDraft?: InitialDraft;
+  mode?: "create" | "edit";
+  readonly?: boolean;
+  manageToken?: string;
 }) {
+const formAction = 
+  mode === "edit" ? "/api/manage-listing/update" : createDraft;
 const [from, setFrom] = useState(initialDraft?.available_from || "");
 const [to, setTo] = useState(initialDraft?.available_to || "");
 const [housingType, setHousingType] = useState(
@@ -135,9 +162,12 @@ function syncFileInput(nextImages: LocalImage[]) {
 }
 
   return (
-    <form action={createDraft} className="grid gap-8">
+    <form action={formAction} method={mode === "edit" ? "POST" : undefined} className="grid gap-8">
       {initialDraft?.id && (
   <input type="hidden" name="draft_id" value={initialDraft.id} />
+)}
+{mode === "edit" && manageToken && (
+  <input type="hidden" name="manage_token" value={manageToken} />
 )}
     <section>
   <label className="ms-label">Bild der Unterkunft</label>
@@ -159,6 +189,7 @@ function syncFileInput(nextImages: LocalImage[]) {
   ref={fileInputRef}
   name="image"
   type="file"
+  disabled={readonly}
   multiple
   accept="image/*"
   className="sr-only"
@@ -281,6 +312,7 @@ function syncFileInput(nextImages: LocalImage[]) {
     <input
       name="title"
       type="text"
+      disabled={readonly}
       placeholder="z. B. WG-Zimmer nahe Uniklinik"
       className="ms-input mt-1"
       required
@@ -293,7 +325,8 @@ function syncFileInput(nextImages: LocalImage[]) {
     <input
       name="city"
       type="text"
-      placeholder="z. B. Mannheim"
+      disabled={readonly}
+      placeholder="z. B. München"
       className="ms-input mt-1"
       required
       defaultValue={initialDraft?.city || ""}
@@ -305,6 +338,7 @@ function syncFileInput(nextImages: LocalImage[]) {
   <input
     name="street"
     type="text"
+    disabled={readonly}
     placeholder="z. B. Musterstraße 12a"
     className="ms-input mt-1"
     defaultValue={initialDraft?.street || ""}
@@ -317,6 +351,7 @@ function syncFileInput(nextImages: LocalImage[]) {
     <input
       name="rooms"
       type="number"
+      disabled={readonly}
       min={1}
       placeholder="z. B. 2"
       className="ms-input mt-1"
@@ -329,6 +364,7 @@ function syncFileInput(nextImages: LocalImage[]) {
     <input
       name="size_sqm"
       type="number"
+      disabled={readonly}
       min={1}
       placeholder="z. B. 55"
       className="ms-input mt-1"
@@ -343,6 +379,7 @@ function syncFileInput(nextImages: LocalImage[]) {
     <input
       name="price"
       type="number"
+      disabled={readonly}
       min={1}
       placeholder="z. B. 650"
       className="ms-input mt-1"
@@ -355,6 +392,7 @@ function syncFileInput(nextImages: LocalImage[]) {
   <input
     name="deposit"
     type="number"
+    disabled={readonly}
     min={0}
     placeholder="z. B. 200"
     className="ms-input mt-1"
@@ -366,6 +404,7 @@ function syncFileInput(nextImages: LocalImage[]) {
   <input
     name="from"
     type="date"
+    disabled={readonly}
     className="ms-input mt-1"
     required
     value={from}
@@ -379,6 +418,7 @@ function syncFileInput(nextImages: LocalImage[]) {
   <input
     name="to"
     type="date"
+    disabled={readonly}
     className="ms-input mt-1"
     required
     value={to}
@@ -398,12 +438,13 @@ function syncFileInput(nextImages: LocalImage[]) {
     <div className="flex flex-col gap-2">
       <div className="ms-label mb-2">Wohnungstyp</div>
 
-      <input type="hidden" name="housing_type" value={housingType} required />
+      <input type="hidden" name="housing_type" disabled={readonly} value={housingType} required />
 
 <div className="flex justify-center">
   <div className="inline-flex rounded-2xl border border-slate-200 bg-white p-1">
     <button
       type="button"
+      disabled={readonly}
       onClick={() => setHousingType("apartment")}
       className={`w-34 rounded-xl px-6 py-2 text-sm font-semibold transition ${
         housingType === "apartment"
@@ -416,6 +457,7 @@ function syncFileInput(nextImages: LocalImage[]) {
 
     <button
       type="button"
+      disabled={readonly}
       onClick={() => setHousingType("room")}
       className={`w-36 rounded-xl px-6 py-2 text-sm font-semibold transition ${
         housingType === "room"
@@ -438,18 +480,24 @@ function syncFileInput(nextImages: LocalImage[]) {
           name="wifi"
           label="WLAN"
           icon={<Wifi className="h-4 w-4" />}
+          defaultChecked={!!initialDraft?.wifi}
+          disabled={readonly}
         />
 
         <AmenityChip
           name="washing_machine"
           label="Waschmaschine"
           icon={<WashingMachine className="h-4 w-4" />}
+          defaultChecked={!!initialDraft?.washing_machine}
+          disabled={readonly}
         />
 
         <AmenityChip
           name="parking"
           label="Parkplatz"
           icon={<Car className="h-4 w-4" />}
+          defaultChecked={!!initialDraft?.parking}
+          disabled={readonly}
         />
       </div>
     </div>
@@ -461,6 +509,7 @@ function syncFileInput(nextImages: LocalImage[]) {
         <label className="ms-label">Kurzbeschreibung</label>
         <textarea
           name="description"
+          disabled={readonly}
           rows={5}
           placeholder="z. B. ruhige Lage, möbliert, gute Anbindung, Nebenkosten inklusive ..."
           className="ms-input mt-1 min-h-[130px]"
@@ -474,6 +523,7 @@ function syncFileInput(nextImages: LocalImage[]) {
         <input
           name="email"
           type="email"
+          disabled={readonly}
           placeholder="z. B. vermieter@email.de"
           autoComplete="email"
           className="ms-input mt-1"
@@ -487,7 +537,9 @@ function syncFileInput(nextImages: LocalImage[]) {
       id="legal"
       name="legal"
       type="checkbox"
-      required
+      disabled={readonly}
+      required={mode === "create"}
+      defaultChecked={mode === "edit"}
       className="mt-1 h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
     />
 
@@ -516,11 +568,19 @@ function syncFileInput(nextImages: LocalImage[]) {
   </div>
 </section>
       <div>
-        <SubmitButton />
+        <SubmitButton mode={mode} readonly={readonly} />
 
-        <p className="mt-3 text-xs text-slate-500">
-          Im nächsten Schritt prüfst du dein Inserat in der Vorschau und gehst danach zur Bezahlung.
-        </p>
+        {mode === "create" && (
+  <p className="mt-3 text-xs text-slate-500">
+    Im nächsten Schritt prüfst du dein Inserat in der Vorschau und gehst danach zur Bezahlung.
+  </p>
+)}
+
+{mode === "edit" && !readonly && (
+  <p className="mt-3 text-xs text-slate-500">
+    Deine Änderungen werden direkt am veröffentlichten Inserat gespeichert.
+  </p>
+)}
       </div>
     </form>
   );

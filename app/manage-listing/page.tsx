@@ -1,21 +1,20 @@
 import { supabaseAdmin } from "@/app/lib/supabaseAdmin";
-import Link from "next/link";
+import CreateListingForm from "app/create-listing/form/CreateListingForm";
+import DeactivateListingForm from "./DeactivateListingForm";
 
 export default async function ManageListingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ token?: string }>;
+  searchParams: Promise<{ token?: string; saved?: string }>;
 }) {
   const sp = await searchParams;
-
   const token = sp.token;
+  const saved = sp.saved === "1";
 
   if (!token) {
     return (
       <main className="mx-auto max-w-xl px-4 py-20">
-        <h1 className="text-2xl font-semibold">
-          Ungültiger Link
-        </h1>
+        <h1 className="text-2xl font-semibold">Ungültiger Link</h1>
       </main>
     );
   }
@@ -25,7 +24,20 @@ export default async function ManageListingPage({
     .select(`
       id,
       title,
-      draft_id,
+      city,
+      street,
+      price,
+      deposit,
+      rooms,
+      size_sqm,
+      available_from,
+      available_to,
+      description,
+      email,
+      housing_type,
+      image_url,
+      image_urls,
+      equipment,
       edit_token_expires_at
     `)
     .eq("manage_token", token)
@@ -34,9 +46,7 @@ export default async function ManageListingPage({
   if (!listing) {
     return (
       <main className="mx-auto max-w-xl px-4 py-20">
-        <h1 className="text-2xl font-semibold">
-          Inserat nicht gefunden
-        </h1>
+        <h1 className="text-2xl font-semibold">Inserat nicht gefunden</h1>
       </main>
     );
   }
@@ -45,43 +55,46 @@ export default async function ManageListingPage({
     listing.edit_token_expires_at &&
     new Date(listing.edit_token_expires_at) > new Date();
 
+  const initialDraft = {
+    ...listing,
+    wifi: !!listing.equipment?.wifi,
+    washing_machine: !!listing.equipment?.washing_machine,
+    parking: !!listing.equipment?.parking,
+  };
+
   return (
-    <main className="mx-auto max-w-2xl px-4 py-16">
-      <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+    <main className="mx-auto max-w-3xl px-4 py-12">
+      <div className="mb-8">
         <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
           Inserat verwalten
         </h1>
 
-        <p className="mt-3 text-slate-600">
-          {listing.title}
+        <p className="mt-2 text-slate-600">
+          Hier kannst du dein veröffentlichtes Inserat bearbeiten oder deaktivieren.
         </p>
-
-        <div className="mt-8 flex flex-col gap-4">
-          {editable ? (
-            <Link
-              href={`/create-listing?draft=${listing.draft_id}`}
-              className="inline-flex w-fit items-center justify-center rounded-2xl bg-teal-600 px-5 py-3 font-medium text-white hover:bg-teal-700"
-            >
-              Inserat bearbeiten
-            </Link>
-          ) : (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-              Die Bearbeitungsfrist von 48 Stunden ist abgelaufen.
-            </div>
-          )}
-
-          <form action="/api/deactivate-listing" method="POST">
-            <input type="hidden" name="token" value={token} />
-
-            <button
-              type="submit"
-              className="inline-flex w-fit items-center justify-center rounded-2xl border border-red-200 px-5 py-3 font-medium text-red-700 hover:bg-red-50"
-            >
-              Inserat deaktivieren
-            </button>
-          </form>
-        </div>
       </div>
+      {saved && (
+        <div className="mb-6 rounded-2xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-800">
+          Änderungen wurden gespeichert.
+        </div>
+      )}
+
+      {!editable && (
+        <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          Bearbeitungsfrist abgelaufen. Du kannst dein Inserat nicht mehr bearbeiten, aber weiterhin deaktivieren.
+        </div>
+      )}
+
+      <div className={!editable ? "opacity-60" : ""}>
+        <CreateListingForm
+          mode="edit"
+          initialDraft={initialDraft}
+          readonly={!editable}
+          manageToken={token}
+        />
+      </div>
+
+      <DeactivateListingForm token={token} />
     </main>
   );
 }
