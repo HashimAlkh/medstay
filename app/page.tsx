@@ -44,7 +44,7 @@ export default async function HomePage({
 
             {/* Right: Search Card */}
             <div className="md:justify-self-end w-full">
-              <div className="rounded-3xl border border-slate-200 p-5 md:p-6 shadow-sm hover:shadow-md transition">
+              <div className="rounded-3xl border border-slate-200 bg-white p-5 md:p-6 shadow-sm hover:shadow-md transition">
                 <div className="text-center text-lg font-medium text-slate-900">
                   Finde deine Unterkunft
                 </div>

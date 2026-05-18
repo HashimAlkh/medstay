@@ -27,7 +27,7 @@ export default function HomeSearchForm({
   const [to, setTo] = useState(initialTo);
 
   return (
-    <form action="/results" method="get" className="mt-4 grid gap-3">
+    <form action="/results" method="get" className="mt-4 grid gap-3 bg-white">
       <div>
         <label className="ms-label">Stadt</label>
         <input
@@ -80,7 +80,7 @@ export default function HomeSearchForm({
       </button>
 
       {open && (
-        <div className="grid gap-3 rounded-2xl bg-white p-4 sm:grid-cols-2">
+        <div className="grid gap-3 rounded-2xl bg-slate-50 p-4 sm:grid-cols-2">
           <div>
             <label className="ms-label">Preis bis</label>
             <input
