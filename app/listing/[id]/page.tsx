@@ -73,6 +73,7 @@ export default async function ListingDetailPage({
       ].join(",")
     )
     .eq("id", id)
+    .eq("status", "active")
     .single<ListingRow>();
 
   if (error || !listing) return notFound();

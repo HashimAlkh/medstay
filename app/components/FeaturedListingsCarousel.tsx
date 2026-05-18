@@ -25,6 +25,7 @@ export default async function FeaturedListingsCarousel() {
   const { data, error } = await supabaseAdmin
   .from("listings")
   .select("id,title,city,price,available_from,available_to,image_url,published_at")
+  .eq("status", "active")
   .order("published_at", { ascending: false })
   .limit(10);
 

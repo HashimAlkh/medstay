@@ -108,6 +108,7 @@ const resultsHref = resultsQueryString
     .select(
       "id,title,city,price,rooms,size_sqm,available_from,available_to,housing_type,image_url,equipment"
     )
+    .eq("status", "active")
     .order("published_at", { ascending: false });
 
   const rows: ListingRow[] = Array.isArray(data) ? data.filter(isListingRow) : [];
