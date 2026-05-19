@@ -168,19 +168,8 @@ function syncFileInput(nextImages: LocalImage[]) {
     <section>
   <label className="ms-label">Bild der Unterkunft</label>
 
-{mode === "edit" && (
-  <p className="mt-1 text-sm text-slate-500">
-    Bilder können nach Veröffentlichung nicht direkt geändert werden.
-  </p>
-)}
-
-<label
-  className={`mt-2 flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center transition ${
-    mode === "edit"
-      ? "cursor-not-allowed opacity-70"
-      : "cursor-pointer hover:border-teal-300 hover:bg-teal-50/40"
-  }`}
->
+{mode !== "edit" && (
+  <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center transition hover:border-teal-300 hover:bg-teal-50/40">
     <div className="rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
       Bild auswählen
     </div>
@@ -193,40 +182,40 @@ function syncFileInput(nextImages: LocalImage[]) {
       JPG, PNG oder WebP · maximal 5 MB
     </p>
 
-<input
-  ref={fileInputRef}
-  name="image"
-  type="file"
-  required={
-    mode === "create" &&
-    !initialDraft?.image_url &&
-    !initialDraft?.image_urls?.length
-  }
-  disabled={readonly || mode === "edit"}
-  multiple
-  accept="image/*"
-  className="sr-only"
-  onChange={(e) => {
-  const files = Array.from(e.target.files || []);
+    <input
+      ref={fileInputRef}
+      name="image"
+      type="file"
+      required={
+        mode === "create" &&
+        !initialDraft?.image_url &&
+        !initialDraft?.image_urls?.length
+      }
+      multiple
+      accept="image/*"
+      className="sr-only"
+      onChange={(e) => {
+        const files = Array.from(e.target.files || []);
 
-  const newImages: LocalImage[] = files.map((file) => ({
-    id: `${file.name}-${file.size}-${crypto.randomUUID()}`,
-    url: URL.createObjectURL(file),
-    file,
-    existing: false,
-  }));
+        const newImages: LocalImage[] = files.map((file) => ({
+          id: `${file.name}-${file.size}-${crypto.randomUUID()}`,
+          url: URL.createObjectURL(file),
+          file,
+          existing: false,
+        }));
 
-  const combined = [...images, ...newImages].slice(0, 5);
+        const combined = [...images, ...newImages].slice(0, 5);
 
-  setImages(combined);
-  syncFileInput(combined);
+        setImages(combined);
+        syncFileInput(combined);
 
-  if (!primaryImageId && combined.length > 0) {
-    setPrimaryImageId(combined[0].id);
-  }
-}}
-/>
+        if (!primaryImageId && combined.length > 0) {
+          setPrimaryImageId(combined[0].id);
+        }
+      }}
+    />
   </label>
+)}
 
 {images.length > 0 && (
   <p className="mt-2 text-center text-xs font-medium text-teal-700">
