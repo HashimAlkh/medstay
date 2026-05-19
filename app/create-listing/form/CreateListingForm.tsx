@@ -190,6 +190,7 @@ function syncFileInput(nextImages: LocalImage[]) {
   name="image"
   type="file"
   disabled={readonly}
+  required
   multiple
   accept="image/*"
   className="sr-only"

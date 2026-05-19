@@ -391,12 +391,15 @@ export default async function PreviewPage({
     </button>
   </form>
 ) : (
-  <form action={submitDraft}>
-    <input type="hidden" name="draft_id" value={draft.id} />
-    <button className="w-full rounded-xl bg-slate-900 text-white py-2.5 text-sm font-medium hover:bg-black">
-      Inserat kostenlos einreichen
-    </button>
-  </form>
+<form action={submitDraft}>
+  <input type="hidden" name="draft_id" value={draft.id} />
+  <button
+    type="submit"
+    className="w-full rounded-xl bg-teal-600 py-2.5 text-sm font-medium text-white transition hover:bg-teal-700"
+  >
+    Inserat kostenlos einreichen
+  </button>
+</form>
 )}
     </div>
   </div>
