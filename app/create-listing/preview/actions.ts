@@ -91,7 +91,7 @@ if (
 
   if (error) throw new Error(error.message);
 
-  redirect(`/create-listing/preview?draft=${encodeURIComponent(id)}&submitted=1`);
+  redirect(`/create-listing/success?draft=${encodeURIComponent(id)}`);
 }
 
 /**

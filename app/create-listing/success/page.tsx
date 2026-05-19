@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import Stripe from "stripe";
 import { supabaseAdmin } from "@/app/lib/supabaseAdmin";
-import { LISTING_FEE_EUR } from "@/app/lib/pricing";
+import { LISTING_FEE_ENABLED, LISTING_FEE_EUR } from "@/app/lib/pricing";
 import SiteHeader from "@/app/components/SiteHeader";
 
 type SP = Record<string, string | string[] | undefined>;
@@ -55,7 +55,32 @@ export default async function SuccessPage({
   const draftId = pick(sp, "draft");
   const sessionId = pick(sp, "session_id");
 
-  if (!draftId || !sessionId) {
+  if (!draftId) {
+  return (
+    <main className="min-h-screen bg-slate-50">
+      <SiteHeader mode="flow" rightLink={{ href: "/", label: "Startseite" }} />
+
+      <section className="mx-auto max-w-3xl px-4 py-12">
+        <MessageCard
+          title="Inserat konnte nicht zugeordnet werden"
+          text="Es fehlen technische Angaben zum Inserat. Bitte gehe zurück und versuche es erneut."
+          tone="warning"
+        >
+          <div className="mt-6">
+            <Link
+              href="/"
+              className="inline-flex rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-black"
+            >
+              Zur Startseite
+            </Link>
+          </div>
+        </MessageCard>
+      </section>
+    </main>
+  );
+}
+
+if (LISTING_FEE_ENABLED && !sessionId) {
     return (
       <main className="min-h-screen bg-slate-50">
         <SiteHeader mode="flow" rightLink={{ href: "/", label: "Startseite" }} />
@@ -80,6 +105,9 @@ export default async function SuccessPage({
     );
   }
 
+let stripeSessionId: string | null = null;
+
+if (LISTING_FEE_ENABLED) {
   const session = await stripe.checkout.sessions.retrieve(sessionId);
 
   if (session.payment_status !== "paid") {
@@ -130,13 +158,16 @@ export default async function SuccessPage({
     );
   }
 
-  const { error } = await supabaseAdmin
+  stripeSessionId = session.id;
+}
+
+const { error } = await supabaseAdmin
   .from("listing_drafts")
   .update({
-    payment_status: "paid",
-    paid_at: new Date().toISOString(),
+    payment_status: LISTING_FEE_ENABLED ? "paid" : "not_required",
+    paid_at: LISTING_FEE_ENABLED ? new Date().toISOString() : null,
     status: "submitted",
-    stripe_session_id: session.id,
+    stripe_session_id: stripeSessionId,
   })
   .eq("id", draftId);
 
