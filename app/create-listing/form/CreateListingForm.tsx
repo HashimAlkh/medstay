@@ -185,12 +185,16 @@ function syncFileInput(nextImages: LocalImage[]) {
       JPG, PNG oder WebP · maximal 5 MB
     </p>
 
-    <input
+<input
   ref={fileInputRef}
   name="image"
   type="file"
+  required={
+    mode === "create" &&
+    !initialDraft?.image_url &&
+    !initialDraft?.image_urls?.length
+  }
   disabled={readonly}
-  required
   multiple
   accept="image/*"
   className="sr-only"
@@ -573,12 +577,6 @@ function syncFileInput(nextImages: LocalImage[]) {
 
         {mode === "create" && (
           ""
-)}
-
-{mode === "edit" && !readonly && (
-  <p className="mt-3 text-xs text-slate-500">
-    Deine Änderungen werden direkt am veröffentlichten Inserat gespeichert.
-  </p>
 )}
       </div>
     </form>

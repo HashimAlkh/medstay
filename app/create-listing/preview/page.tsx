@@ -395,7 +395,7 @@ export default async function PreviewPage({
   <input type="hidden" name="draft_id" value={draft.id} />
   <button
     type="submit"
-    className="w-full rounded-xl bg-teal-600 py-2.5 text-sm font-medium text-white transition hover:bg-teal-700"
+    className="w-full rounded-xl cursor-pointer bg-teal-600 py-2.5 text-sm font-medium text-white transition hover:bg-teal-700"
   >
     Inserat kostenlos einreichen
   </button>
