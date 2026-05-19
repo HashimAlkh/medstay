@@ -70,10 +70,10 @@ const updatePayload: Record<string, unknown> = {
     );
   }
 
-return new Response(null, {
+  return new Response(null, {
   status: 303,
   headers: {
-    Location: `/manage-listing?token=${encodeURIComponent(token)}&saved=1`,
+    Location: `/listing/${listing.id}`,
   },
 });
 }
