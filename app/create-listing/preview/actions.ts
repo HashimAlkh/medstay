@@ -83,9 +83,9 @@ if (
   // 2) submitted setzen
   const { error } = await supabase
     .from("listing_drafts")
-    .update({
+.update({
   status: "submitted",
-  payment_status: LISTING_FEE_ENABLED ? "paid" : "not_required",
+  payment_status: "paid",
 })
     .eq("id", id);
 
