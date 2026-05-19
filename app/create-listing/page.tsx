@@ -5,7 +5,7 @@ import ListingFlow from "../components/ListingFlow";
 export default function CreateListingPage() {
   return (
     <main className="min-h-screen bg-slate-50">
-      <SiteHeader />
+      <SiteHeader mode="flow" rightLink={{ href: "/", label: "Zurück" }} />
 
       <section className="mx-auto max-w-6xl px-4 py-10 md:py-14">
         <div className="mx-auto max-w-3xl text-center">
@@ -18,8 +18,7 @@ export default function CreateListingPage() {
           </h1>
 
           <p className="mt-5 text-base leading-7 text-slate-600 md:text-lg">
-            Erstelle dein Inserat in wenigen Minuten und erreiche gezielt
-            Studierende im PJ, in der Famulatur oder im Pflegepraktikum.
+            Erreiche gezielt Medizinstudierende, die für PJ, Famulatur oder Pflegepraktikum eine temporäre Unterkunft suchen.
           </p>
         </div>
 
@@ -35,9 +34,6 @@ export default function CreateListingPage() {
             Jetzt Inserat erstellen
           </Link>
 
-          <p className="mt-3 text-xs text-slate-500">
-            Die Zahlung erfolgt erst nach Vorschau und E-Mail-Bestätigung.
-          </p>
         </div>
       </section>
     </main>

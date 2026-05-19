@@ -571,9 +571,7 @@ function syncFileInput(nextImages: LocalImage[]) {
         <SubmitButton mode={mode} readonly={readonly} />
 
         {mode === "create" && (
-  <p className="mt-3 text-xs text-slate-500">
-    Im nächsten Schritt prüfst du dein Inserat in der Vorschau und gehst danach zur Bezahlung.
-  </p>
+          ""
 )}
 
 {mode === "edit" && !readonly && (

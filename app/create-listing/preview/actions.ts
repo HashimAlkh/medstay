@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import { Resend } from "resend";
 import crypto from "crypto";
+import { LISTING_FEE_ENABLED } from "@/app/lib/pricing";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -71,15 +72,21 @@ export async function submitDraft(formData: FormData) {
     redirect(`/create-listing/preview?draft=${encodeURIComponent(id)}&verify=required`);
   }
 
-  // 1) Zahlung prüfen
-  if (!draft.paid_at || draft.payment_status !== "paid") {
-    redirect(`/pay?draft=${encodeURIComponent(id)}&reason=unpaid`);
-  }
+// 1) Zahlung prüfen (nur wenn Gebühren aktiv sind)
+if (
+  LISTING_FEE_ENABLED &&
+  (!draft.paid_at || draft.payment_status !== "paid")
+) {
+  redirect(`/pay?draft=${encodeURIComponent(id)}&reason=unpaid`);
+}
 
   // 2) submitted setzen
   const { error } = await supabase
     .from("listing_drafts")
-    .update({ status: "submitted" })
+    .update({
+  status: "submitted",
+  payment_status: LISTING_FEE_ENABLED ? "paid" : "not_required",
+})
     .eq("id", id);
 
   if (error) throw new Error(error.message);

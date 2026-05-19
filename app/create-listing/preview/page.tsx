@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import type React from "react";
 import { supabaseAdmin } from "@/app/lib/supabaseAdmin";
-import {LISTING_FEE_LABEL} from "@/app/lib/pricing";
+import { LISTING_FEE_ENABLED, LISTING_FEE_LABEL } from "@/app/lib/pricing";
 import { submitDraft, resendVerification } from "./actions";
 import { equipmentKeys, formatGermanDate, furnishedLabel } from "@/app/lib/listingView";
 import { startCheckout } from "@/app/pay/actions";
@@ -44,16 +44,22 @@ function Banner({
   tone: "success" | "warning" | "danger" | "info";
   children: React.ReactNode;
 }) {
-  const cls =
-    tone === "success"
-      ? "text-green-700"
-      : tone === "warning"
-      ? "text-amber-700"
-      : tone === "danger"
-      ? "text-red-700"
-      : "text-slate-700";
+const cls =
+  tone === "success"
+    ? "border-green-200 bg-green-50 text-green-700"
+    : tone === "warning"
+    ? "border-slate-200 bg-slate-100 text-slate-700"
+    : tone === "danger"
+    ? "border-red-200 bg-red-50 text-red-700"
+    : "border-slate-200 bg-slate-100 text-slate-700";
 
-  return <div className={`mt-4 text-sm font-medium ${cls}`}>{children}</div>;
+  return (
+  <div
+    className={`mt-4 rounded-2xl border px-4 py-3 text-sm font-medium ${cls}`}
+  >
+    {children}
+  </div>
+);
 }
 
 /**
@@ -236,15 +242,16 @@ export default async function PreviewPage({
   } else if (isVerified) {
     topBanner = (
       <Banner tone="success">
-        E-Mail bestätigt! {verifiedParam ? "Du kannst jetzt bezahlen." : "Du kannst jetzt bezahlen."}
+        E-Mail bestätigt! Du kannst dein Inserat jetzt kostenlos einreichen.
       </Banner>
     );
   } else {
     topBanner = (
       <Banner tone="warning">
-        E-Mail noch nicht bestätigt. Wir haben dir einen Bestätigungslink an <b>{draft.email}</b>{" "}
-        geschickt.
-      </Banner>
+  Bitte bestätige deine E-Mail-Adresse. Wir haben dir einen
+  Bestätigungslink an <b>{draft.email}</b> geschickt. Prüfe bitte
+  auch deinen Spam-Ordner.
+</Banner>
     );
   }
 
@@ -376,21 +383,21 @@ export default async function PreviewPage({
           <input type="hidden" name="draft_id" value={draft.id} />
           <ResendButton />
         </form>
-      ) : !isPaid ? (
-        <form action={startCheckout}>
-          <input type="hidden" name="draft_id" value={draft.id} />
-          <button className="w-full rounded-xl bg-teal-600 text-white py-2.5 text-sm font-medium hover:bg-teal-700">
-            Jetzt bezahlen ({LISTING_FEE_LABEL} €)
-          </button>
-        </form>
-      ) : (
-        <form action={submitDraft}>
-          <input type="hidden" name="draft_id" value={draft.id} />
-          <button className="w-full rounded-xl bg-slate-900 text-white py-2.5 text-sm font-medium hover:bg-black">
-            Inserat jetzt einreichen
-          </button>
-        </form>
-      )}
+      ) : LISTING_FEE_ENABLED && !isPaid ? (
+  <form action={startCheckout}>
+    <input type="hidden" name="draft_id" value={draft.id} />
+    <button className="w-full rounded-xl bg-teal-600 text-white py-2.5 text-sm font-medium hover:bg-teal-700">
+      Jetzt bezahlen ({LISTING_FEE_LABEL} €)
+    </button>
+  </form>
+) : (
+  <form action={submitDraft}>
+    <input type="hidden" name="draft_id" value={draft.id} />
+    <button className="w-full rounded-xl bg-slate-900 text-white py-2.5 text-sm font-medium hover:bg-black">
+      Inserat kostenlos einreichen
+    </button>
+  </form>
+)}
     </div>
   </div>
 

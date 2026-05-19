@@ -2,12 +2,9 @@ import {
   ClipboardPenLine,
   Image,
   MailCheck,
-  CreditCard,
   ClipboardCheck,
   House,
-  BadgeEuro,
   ShieldCheck,
-  RotateCcw,
 } from "lucide-react";
 
 const steps = [
@@ -27,14 +24,14 @@ const steps = [
     icon: MailCheck,
   },
   {
-    title: "Zahlung",
-    text: "Einmalig 14,99 € sicher online zahlen.",
-    icon: CreditCard,
+    title: "Inserat einreichen",
+    text: "Reiche dein Inserat kostenlos zur Prüfung ein.",
+    icon: ClipboardCheck,
   },
   {
     title: "Prüfung",
-    text: "Wir prüfen dein Inserat und melden uns bei Fragen.",
-    icon: ClipboardCheck,
+    text: "Wir prüfen dein Inserat manuell.",
+    icon: ShieldCheck,
   },
   {
     title: "Veröffentlichung",
@@ -45,19 +42,14 @@ const steps = [
 
 const trustItems = [
   {
-    title: "Einmalige Gebühr",
-    text: "14,99 € für dein Inserat.",
-    icon: BadgeEuro,
+    title: "Kostenlos inserieren",
+    text: "Du kannst dein Inserat kostenlos veröffentlichen.",
+    icon: ShieldCheck,
   },
   {
     title: "Faire Prüfung",
     text: "Wir achten auf Qualität und Sicherheit.",
-    icon: ShieldCheck,
-  },
-  {
-    title: "Geld-zurück-Garantie",
-    text: "Bei Ablehnung erhältst du die Gebühr zurück.",
-    icon: RotateCcw,
+    icon: ClipboardCheck,
   },
 ];
 
@@ -69,8 +61,8 @@ export default function ListingFlow() {
           So funktioniert’s
         </h2>
         <p className="mt-3 text-sm leading-6 text-slate-600 md:text-base">
-          In 6 einfachen Schritten zu deinem veröffentlichten Inserat auf{" "}
-          <span className="font-semibold text-teal-700">medstay</span>.
+          In wenigen Schritten zu deinem veröffentlichten Inserat auf med
+          <span className="font-semibold text-teal-700">stay</span>.
         </p>
       </div>
 
@@ -134,7 +126,7 @@ export default function ListingFlow() {
   })}
 </div>
 
-      <div className="mt-10 grid gap-4 rounded-3xl bg-slate-50 p-5 md:grid-cols-3 md:p-6">
+      <div className="mt-10 grid gap-4 rounded-3xl bg-slate-50 p-5 md:grid-cols-2 md:p-6">
         {trustItems.map((item) => {
           const Icon = item.icon;
 
