@@ -50,34 +50,31 @@ export async function POST(req: Request) {
 
   const primaryImageUrl = String(formData.get("primary_image_url") || "");
 
-  const updatePayload = {
-    title: String(formData.get("title") || ""),
-    city: String(formData.get("city") || ""),
-    street: String(formData.get("street") || ""),
-    price: Number(formData.get("price") || 0),
-    deposit: formData.get("deposit")
-      ? Number(formData.get("deposit"))
-      : null,
-    rooms: formData.get("rooms")
-      ? Number(formData.get("rooms"))
-      : null,
-    size_sqm: formData.get("size_sqm")
-      ? Number(formData.get("size_sqm"))
-      : null,
-    available_from: String(formData.get("from") || ""),
-    available_to: String(formData.get("to") || ""),
-    description: String(formData.get("description") || ""),
-    email: String(formData.get("email") || ""),
+const updatePayload: Record<string, unknown> = {
+  title: String(formData.get("title") || ""),
+  city: String(formData.get("city") || ""),
+  street: String(formData.get("street") || ""),
+  price: Number(formData.get("price") || 0),
+  deposit: formData.get("deposit") ? Number(formData.get("deposit")) : null,
+  rooms: formData.get("rooms") ? Number(formData.get("rooms")) : null,
+  size_sqm: formData.get("size_sqm") ? Number(formData.get("size_sqm")) : null,
+  available_from: String(formData.get("from") || ""),
+  available_to: String(formData.get("to") || ""),
+  description: String(formData.get("description") || ""),
+  email: String(formData.get("email") || ""),
+  housing_type: housingType,
+  equipment: {
     housing_type: housingType,
-    image_url: primaryImageUrl || imageUrls[0] || null,
-    image_urls: imageUrls.length > 0 ? imageUrls : null,
-    equipment: {
-      housing_type: housingType,
-      wifi: formData.get("wifi") === "on",
-      washing_machine: formData.get("washing_machine") === "on",
-      parking: formData.get("parking") === "on",
-    },
-  };
+    wifi: formData.get("wifi") === "on",
+    washing_machine: formData.get("washing_machine") === "on",
+    parking: formData.get("parking") === "on",
+  },
+};
+
+if (imageUrls.length > 0 || primaryImageUrl) {
+  updatePayload.image_url = primaryImageUrl || imageUrls[0];
+  updatePayload.image_urls = imageUrls.length > 0 ? imageUrls : [primaryImageUrl];
+}
 
   const { error: updateError } = await supabaseAdmin
     .from("listings")
