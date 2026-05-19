@@ -39,21 +39,8 @@ export async function POST(req: Request) {
 
   const housingType = String(formData.get("housing_type") || "apartment");
 
-  const imageUrlsRaw = String(formData.get("existing_image_urls") || "[]");
-  let imageUrls: string[] = [];
-
-  try {
-    imageUrls = JSON.parse(imageUrlsRaw);
-  } catch {
-    imageUrls = [];
-  }
-
-  const primaryImageUrl = String(formData.get("primary_image_url") || "");
-
 const updatePayload: Record<string, unknown> = {
   title: String(formData.get("title") || ""),
-  city: String(formData.get("city") || ""),
-  street: String(formData.get("street") || ""),
   price: Number(formData.get("price") || 0),
   deposit: formData.get("deposit") ? Number(formData.get("deposit")) : null,
   rooms: formData.get("rooms") ? Number(formData.get("rooms")) : null,
@@ -70,11 +57,6 @@ const updatePayload: Record<string, unknown> = {
     parking: formData.get("parking") === "on",
   },
 };
-
-if (imageUrls.length > 0 || primaryImageUrl) {
-  updatePayload.image_url = primaryImageUrl || imageUrls[0];
-  updatePayload.image_urls = imageUrls.length > 0 ? imageUrls : [primaryImageUrl];
-}
 
   const { error: updateError } = await supabaseAdmin
     .from("listings")

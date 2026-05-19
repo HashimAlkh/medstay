@@ -172,7 +172,19 @@ function syncFileInput(nextImages: LocalImage[]) {
     <section>
   <label className="ms-label">Bild der Unterkunft</label>
 
-  <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center transition hover:border-teal-300 hover:bg-teal-50/40">
+{mode === "edit" && (
+  <p className="mt-1 text-sm text-slate-500">
+    Bilder können nach Veröffentlichung nicht direkt geändert werden.
+  </p>
+)}
+
+<label
+  className={`mt-2 flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center transition ${
+    mode === "edit"
+      ? "cursor-not-allowed opacity-70"
+      : "cursor-pointer hover:border-teal-300 hover:bg-teal-50/40"
+  }`}
+>
     <div className="rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
       Bild auswählen
     </div>
@@ -194,7 +206,7 @@ function syncFileInput(nextImages: LocalImage[]) {
     !initialDraft?.image_url &&
     !initialDraft?.image_urls?.length
   }
-  disabled={readonly}
+  disabled={readonly || mode === "edit"}
   multiple
   accept="image/*"
   className="sr-only"
@@ -254,24 +266,26 @@ function syncFileInput(nextImages: LocalImage[]) {
               <img src={img.url} alt="" className="h-full w-full object-cover" />
             </button>
 
-            <button
-              type="button"
-              onClick={() => {
-  const updatedImages = images.filter((i) => i.id !== img.id);
+            {mode !== "edit" && (
+  <button
+    type="button"
+    onClick={() => {
+      const updatedImages = images.filter((i) => i.id !== img.id);
 
-  setImages(updatedImages);
-  syncFileInput(updatedImages);
+      setImages(updatedImages);
+      syncFileInput(updatedImages);
 
-  if (primaryImageId === img.id) {
-    setPrimaryImageId(
-      updatedImages.length > 0 ? updatedImages[0].id : null
-    );
-  }
-}}
-              className="absolute right-1 top-1 z-20 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-sm font-light text-white shadow-md ring-1 ring-white"
-            >
-              ×
-            </button>
+      if (primaryImageId === img.id) {
+        setPrimaryImageId(
+          updatedImages.length > 0 ? updatedImages[0].id : null
+        );
+      }
+    }}
+    className="absolute right-1 top-1 z-20 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-sm font-light text-white shadow-md ring-1 ring-white"
+  >
+    ×
+  </button>
+)}
           </div>
         );
       })}
@@ -330,9 +344,13 @@ function syncFileInput(nextImages: LocalImage[]) {
     <input
       name="city"
       type="text"
-      disabled={readonly}
+      disabled={readonly || mode === "edit"}
       placeholder="z. B. München"
-      className="ms-input mt-1"
+      className={`ms-input mt-1 ${
+  mode === "edit"
+    ? "cursor-not-allowed bg-slate-100 text-slate-400"
+    : ""
+}`}
       required
       defaultValue={initialDraft?.city || ""}
     />
@@ -343,9 +361,13 @@ function syncFileInput(nextImages: LocalImage[]) {
   <input
     name="street"
     type="text"
-    disabled={readonly}
+    disabled={readonly || mode === "edit"}
     placeholder="z. B. Musterstraße 12a"
-    className="ms-input mt-1"
+    className={`ms-input mt-1 ${
+  mode === "edit"
+    ? "cursor-not-allowed bg-slate-100 text-slate-400"
+    : ""
+}`}
     defaultValue={initialDraft?.street || ""}
   />
 

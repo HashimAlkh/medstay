@@ -69,9 +69,17 @@ export default async function ManageListingPage({
           Inserat verwalten
         </h1>
 
-        <p className="mt-2 text-slate-600">
-          Hier kannst du dein veröffentlichtes Inserat bearbeiten oder deaktivieren.
-        </p>
+        <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-600">
+  Bilder und Standortangaben können nach der Veröffentlichung nicht geändert werden.
+  Wenn du diese Angaben anpassen möchtest, kontaktiere uns bitte unter{" "}
+  <a
+    href="mailto:kontakt@med-stay.de"
+    className="font-medium text-teal-700 hover:text-teal-800"
+  >
+    kontakt@med-stay.de
+  </a>
+  .
+</div>
       </div>
       {saved && (
         <div className="mb-6 rounded-2xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-800">
