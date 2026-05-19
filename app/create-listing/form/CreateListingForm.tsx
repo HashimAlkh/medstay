@@ -6,10 +6,6 @@ import { createDraft } from "./actions";
 import { Wifi, WashingMachine, Car } from "lucide-react";
 import { useFormStatus } from "react-dom";
 
-type ToggleOption = {
-  value: string;
-  label: string;
-};
 
 
 function AmenityChip({
@@ -596,10 +592,6 @@ function syncFileInput(nextImages: LocalImage[]) {
 </section>
       <div>
         <SubmitButton mode={mode} readonly={readonly} />
-
-        {mode === "create" && (
-          ""
-)}
       </div>
     </form>
   );
