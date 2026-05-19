@@ -164,7 +164,7 @@ if (LISTING_FEE_ENABLED) {
 const { error } = await supabaseAdmin
   .from("listing_drafts")
   .update({
-    payment_status: LISTING_FEE_ENABLED ? "paid" : "not_required",
+    payment_status: "paid",
     paid_at: LISTING_FEE_ENABLED ? new Date().toISOString() : null,
     status: "submitted",
     stripe_session_id: stripeSessionId,
@@ -185,8 +185,7 @@ const { data: draftData } = await supabaseAdmin
         <section className="mx-auto max-w-3xl px-4 py-12">
           <MessageCard
             title="Dein Inserat wurde erfolgreich eingereicht"
-            text="Deine Zahlung ist eingegangen, aber dein Inserat konnte nicht automatisch eingereicht werden. Bitte melde dich kurz bei uns."
-            tone="warning"
+            text="Dein Inserat konnte nicht automatisch eingereicht werden. Bitte melde dich kurz bei uns."
           >
             <p className="mt-4 text-xs text-slate-500">{error.message}</p>
             <p className="mt-2 text-xs text-slate-500">
