@@ -4,7 +4,6 @@ import { createClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import { Resend } from "resend";
 import crypto from "crypto";
-import { LISTING_FEE_ENABLED } from "@/app/lib/pricing";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -22,7 +21,11 @@ function siteUrl() {
   ).replace(/\/$/, "");
 }
 
-async function sendVerificationEmail(toEmail: string, draftId: string, token: string) {
+async function sendVerificationEmail(
+  toEmail: string,
+  draftId: string,
+  token: string
+) {
   if (!resend) throw new Error("RESEND_API_KEY fehlt");
   if (!process.env.RESEND_FROM) throw new Error("RESEND_FROM fehlt");
 
@@ -37,7 +40,7 @@ async function sendVerificationEmail(toEmail: string, draftId: string, token: st
     html: `
       <div style="font-family: Arial, sans-serif; line-height:1.5">
         <p>Hi,</p>
-        <p>bitte bestätige kurz deine E-Mail-Adresse, damit du dein Inserat einreichen und bezahlen kannst.</p>
+        <p>bitte bestätige kurz deine E-Mail-Adresse, damit du dein Inserat kostenlos einreichen kannst.</p>
         <p>
           <a href="${verifyLink}" target="_self" rel="noopener" style="display:inline-block;padding:10px 14px;border-radius:10px;background:#14b8a6;color:#fff;text-decoration:none;font-weight:600">
             E-Mail bestätigen
@@ -52,88 +55,96 @@ async function sendVerificationEmail(toEmail: string, draftId: string, token: st
   });
 }
 
-/**
- * Submit: nur wenn (1) email_verified true UND (2) bezahlt
- */
 export async function submitDraft(formData: FormData) {
   const id = String(formData.get("draft_id") || "").trim();
-  if (!id) throw new Error("Missing draft_id");
+
+  if (!id) {
+    throw new Error("Missing draft_id");
+  }
 
   const { data: draft, error: fetchErr } = await supabase
     .from("listing_drafts")
-    .select("id,status,paid_at,payment_status,email_verified")
+    .select("id,email_verified")
     .eq("id", id)
     .single();
 
-  if (fetchErr || !draft) throw new Error(fetchErr?.message || "Draft not found");
-
-  // 0) Email muss verifiziert sein
-  if (!draft.email_verified) {
-    redirect(`/create-listing/preview?draft=${encodeURIComponent(id)}&verify=required`);
+  if (fetchErr || !draft) {
+    throw new Error(fetchErr?.message || "Draft not found");
   }
 
-// 1) Zahlung prüfen (nur wenn Gebühren aktiv sind)
-if (
-  LISTING_FEE_ENABLED &&
-  (!draft.paid_at || draft.payment_status !== "paid")
-) {
-  redirect(`/pay?draft=${encodeURIComponent(id)}&reason=unpaid`);
-}
+  if (!draft.email_verified) {
+    redirect(
+      `/create-listing/preview?draft=${encodeURIComponent(id)}&verify=required`
+    );
+  }
 
-  // 2) submitted setzen
   const { error } = await supabase
     .from("listing_drafts")
-.update({
-  status: "submitted",
-  payment_status: "paid",
-})
+    .update({
+      status: "submitted",
+      payment_status: "paid",
+    })
     .eq("id", id);
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    throw new Error(error.message);
+  }
 
   redirect(`/create-listing/success?draft=${encodeURIComponent(id)}`);
 }
 
-/**
- * Bestätigungs-Mail erneut senden (mit 60s Rate Limit)
- */
 export async function resendVerification(formData: FormData) {
   const id = String(formData.get("draft_id") || "").trim();
-  if (!id) throw new Error("Missing draft_id");
+
+  if (!id) {
+    throw new Error("Missing draft_id");
+  }
 
   const { data: draft, error } = await supabase
     .from("listing_drafts")
-    .select("id,email,email_verified,email_verification_token,email_verification_sent_at")
+    .select(
+      "id,email,email_verified,email_verification_token,email_verification_sent_at"
+    )
     .eq("id", id)
     .single();
 
   if (error || !draft) {
-    redirect(`/create-listing/preview?draft=${encodeURIComponent(id)}&resend=error`);
+    redirect(
+      `/create-listing/preview?draft=${encodeURIComponent(id)}&resend=error`
+    );
   }
 
   if (draft.email_verified) {
-    redirect(`/create-listing/preview?draft=${encodeURIComponent(id)}&verified=1`);
+    redirect(
+      `/create-listing/preview?draft=${encodeURIComponent(id)}&verified=1`
+    );
   }
 
-  // Rate limit: 60 Sekunden
   const lastSent = draft.email_verification_sent_at
     ? new Date(draft.email_verification_sent_at).getTime()
     : 0;
+
   if (lastSent && Date.now() - lastSent < 60_000) {
-    redirect(`/create-listing/preview?draft=${encodeURIComponent(id)}&resend=too_fast`);
+    redirect(
+      `/create-listing/preview?draft=${encodeURIComponent(
+        id
+      )}&resend=too_fast`
+    );
   }
 
   const email = String(draft.email || "").trim().toLowerCase();
+
   if (!email) {
-    redirect(`/create-listing/preview?draft=${encodeURIComponent(id)}&resend=no_email`);
+    redirect(
+      `/create-listing/preview?draft=${encodeURIComponent(id)}&resend=no_email`
+    );
   }
 
-  // Token: vorhandenen nehmen, sonst neu
   const token =
-    (draft.email_verification_token && String(draft.email_verification_token)) ||
+    (draft.email_verification_token &&
+      String(draft.email_verification_token)) ||
     crypto.randomBytes(24).toString("hex");
 
-  // Token + sent_at speichern
   const { error: updErr } = await supabase
     .from("listing_drafts")
     .update({
@@ -143,7 +154,9 @@ export async function resendVerification(formData: FormData) {
     .eq("id", id);
 
   if (updErr) {
-    redirect(`/create-listing/preview?draft=${encodeURIComponent(id)}&resend=error`);
+    redirect(
+      `/create-listing/preview?draft=${encodeURIComponent(id)}&resend=error`
+    );
   }
 
   try {
@@ -151,6 +164,10 @@ export async function resendVerification(formData: FormData) {
     redirect(`/create-listing/preview?draft=${encodeURIComponent(id)}&resend=1`);
   } catch (e) {
     console.error("resendVerification failed:", e);
-    redirect(`/create-listing/preview?draft=${encodeURIComponent(id)}&resend=mail_fail`);
+    redirect(
+      `/create-listing/preview?draft=${encodeURIComponent(
+        id
+      )}&resend=mail_fail`
+    );
   }
 }
