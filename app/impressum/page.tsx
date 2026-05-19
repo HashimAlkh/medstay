@@ -33,7 +33,7 @@ export default function ImpressumPage() {
                   href="mailto:Alkhateeb.Hashim@outlook.com"
                   className="font-medium text-teal-700 hover:text-teal-800"
                 >
-                  Alkhateeb.Hashim@outlook.com
+                  kontakt@med-stay.de
                 </a>
               </p>
             </section>

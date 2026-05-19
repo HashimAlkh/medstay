@@ -69,18 +69,34 @@ export default function DatenschutzPage() {
               </p>
             </section>
 
-            <section>
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-                Zahlungsabwicklung
-              </h2>
+           {/*
+<section>
+  <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+    Zahlungsabwicklung
+  </h2>
 
-              <p className="mt-3">
-                Zahlungen werden über Stripe abgewickelt. Bei Nutzung der
-                Zahlungsfunktion werden zahlungsbezogene Daten an Stripe
-                übermittelt. Für die Verarbeitung durch Stripe gelten ergänzend
-                die Datenschutzbestimmungen von Stripe.
-              </p>
-            </section>
+  <p className="mt-3">
+    Zahlungen werden über Stripe abgewickelt. Bei Nutzung der
+    Zahlungsfunktion werden zahlungsbezogene Daten an Stripe
+    übermittelt. Für die Verarbeitung durch Stripe gelten ergänzend
+    die Datenschutzbestimmungen von Stripe.
+  </p>
+</section>
+*/}
+
+            <section>
+  <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+    Webanalyse
+  </h2>
+
+  <p className="mt-3">
+    Zur statistischen Auswertung der Nutzung von medstay kann das datenschutzfreundliche Analysetool Plausible Analytics eingesetzt werden.
+  </p>
+
+  <p className="mt-3">
+    Plausible verarbeitet keine Cookies und keine personenbezogenen Nutzerprofile.
+  </p>
+</section>
 
             <section>
               <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">

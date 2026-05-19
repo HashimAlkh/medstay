@@ -55,8 +55,7 @@ export default function AGBPage() {
 
               <p className="mt-3">
                 Für das Veröffentlichen eines Inserats kann eine Gebühr erhoben
-                werden. Die Veröffentlichung erfolgt erst nach erfolgreicher
-                Zahlung und manueller Freigabe durch medstay.
+                werden. Die Veröffentlichung erfolgt nach Prüfung und Freigabe durch medstay.
               </p>
             </section>
 
