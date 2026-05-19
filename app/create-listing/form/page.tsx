@@ -5,7 +5,26 @@ import { supabaseAdmin } from "@/app/lib/supabaseAdmin";
 export const dynamic = "force-dynamic";
 
 type SP = Record<string, string | string[] | undefined>;
-
+type InitialDraft = {
+  id: string;
+  title: string | null;
+city: string | null;
+street: string | null;
+price: number | null;
+  deposit: number | null;
+  rooms: number | null;
+  size_sqm: number | null;
+  available_from: string | null;
+  available_to: string | null;
+  description: string | null;
+  email: string | null;
+  housing_type: string | null;
+  wifi: boolean | null;
+  washing_machine: boolean | null;
+  parking: boolean | null;
+  image_url: string | null;
+  image_urls: string[] | null;
+} | null;
 function pick(sp: SP, key: string) {
   const v = sp[key];
   return (Array.isArray(v) ? v[0] : v || "").toString().trim();
@@ -19,7 +38,7 @@ export default async function CreateListingFormPage({
   const sp = await Promise.resolve(searchParams);
   const draftId = pick(sp, "draft");
 
-  let initialDraft: any = null;
+let initialDraft: InitialDraft = null;
 
 if (draftId) {
   const { data } = await supabaseAdmin
@@ -29,6 +48,7 @@ if (draftId) {
         "id",
         "title",
         "city",
+        "street",
         "price",
         "deposit",
         "rooms",
@@ -46,7 +66,7 @@ if (draftId) {
       ].join(",")
     )
     .eq("id", draftId)
-    .single();
+    .single<NonNullable<InitialDraft>>();
 
   initialDraft = data ?? null;
 }
