@@ -332,7 +332,6 @@ function syncFileInput(nextImages: LocalImage[]) {
       name="city"
       type="text"
       disabled={readonly || mode === "edit"}
-      placeholder="z. B. München"
       className={`ms-input mt-1 ${
   mode === "edit"
     ? "cursor-not-allowed bg-slate-100 text-slate-400"
@@ -349,7 +348,6 @@ function syncFileInput(nextImages: LocalImage[]) {
     name="street"
     type="text"
     disabled={readonly || mode === "edit"}
-    placeholder="z. B. Musterstraße 12a"
     className={`ms-input mt-1 ${
   mode === "edit"
     ? "cursor-not-allowed bg-slate-100 text-slate-400"
@@ -367,7 +365,6 @@ function syncFileInput(nextImages: LocalImage[]) {
       type="number"
       disabled={readonly}
       min={1}
-      placeholder="z. B. 2"
       className="ms-input mt-1"
       defaultValue={initialDraft?.rooms ?? ""}
     />
@@ -380,7 +377,6 @@ function syncFileInput(nextImages: LocalImage[]) {
       type="number"
       disabled={readonly}
       min={1}
-      placeholder="z. B. 55"
       className="ms-input mt-1"
       defaultValue={initialDraft?.size_sqm ?? ""}
     />
@@ -395,7 +391,6 @@ function syncFileInput(nextImages: LocalImage[]) {
       type="number"
       disabled={readonly}
       min={1}
-      placeholder="z. B. 650"
       className="ms-input mt-1"
       required
       defaultValue={initialDraft?.price ?? ""}
@@ -408,7 +403,6 @@ function syncFileInput(nextImages: LocalImage[]) {
     type="number"
     disabled={readonly}
     min={0}
-    placeholder="z. B. 200"
     className="ms-input mt-1"
     defaultValue={initialDraft?.deposit ?? ""}
   />
@@ -540,7 +534,6 @@ function syncFileInput(nextImages: LocalImage[]) {
       name="first_name"
       type="text"
       disabled={readonly}
-      placeholder="z. B. Hashim"
       className="ms-input mt-1"
       required
       defaultValue={initialDraft?.first_name || ""}
@@ -553,7 +546,6 @@ function syncFileInput(nextImages: LocalImage[]) {
       name="last_name"
       type="text"
       disabled={readonly}
-      placeholder="z. B. Alkhateeb"
       className="ms-input mt-1"
       required
       defaultValue={initialDraft?.last_name || ""}
@@ -567,7 +559,7 @@ function syncFileInput(nextImages: LocalImage[]) {
           name="email"
           type="email"
           disabled={readonly}
-          placeholder="z. B. vermieter@email.de"
+          placeholder="vermieter@email.de"
           autoComplete="email"
           className="ms-input mt-1"
           required

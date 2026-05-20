@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import SiteFooter from "./components/SiteFooter";
+import Script from "next/script";
 
 export const viewport = {
   width: "device-width",
@@ -52,6 +53,11 @@ export default function RootLayout({
       >
         {children}
         <SiteFooter />
+        <Script
+  defer
+  data-domain="med-stay.de"
+  src="https://plausible.io/js/script.js"
+/>
       </body>
     </html>
   );
