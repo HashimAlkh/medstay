@@ -44,6 +44,7 @@ export default function HomeSearchForm({
           <input
   name="from"
   type="date"
+  placeholder="TT.MM.JJJJ"
   className="ms-date-input mt-1"
   value={from}
   max={to || undefined}
@@ -54,19 +55,13 @@ export default function HomeSearchForm({
         <div>
           <label className="ms-label">Bis</label>
           <input
-
   name="to"
-
   type="date"
-
   className="ms-date-input mt-1"
-
+  placeholder="TT.MM.JJJJ"
   value={to}
-
   min={from || undefined}
-
   onChange={(e) => setTo(e.target.value)}
-
 />
         </div>
       </div>

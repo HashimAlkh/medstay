@@ -43,10 +43,10 @@
   }
 
 .ms-date-input {
-  @apply w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900
+  @apply w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-500
   focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500;
 
-  height: 44px;
+  height: 42px;
   min-width: 0;
   max-width: 100%;
 

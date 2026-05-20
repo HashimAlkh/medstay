@@ -99,9 +99,6 @@ if (sort) query.set("sort", sort);
 
 const resultsQueryString = query.toString();
 const searchHref = resultsQueryString ? `/?${resultsQueryString}` : "/";
-const resultsHref = resultsQueryString
-  ? `/results?${resultsQueryString}`
-  : "/results";
 
   const { data, error } = await supabaseAdmin
     .from("listings")
@@ -156,7 +153,7 @@ const resultsHref = resultsQueryString
 </div>
 
         <p className="mt-2 text-sm text-slate-600">
-  Zeitraum: {from || "—"} – {to || "—"}
+Zeitraum: {from ? formatDate(from) : "—"} – {to ? formatDate(to) : "—"}
 </p>
 
 
