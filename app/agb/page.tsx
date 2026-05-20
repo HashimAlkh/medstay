@@ -30,9 +30,18 @@ export default function AGBPage() {
 
               <p className="mt-3">
                 medstay stellt eine Plattform zur Veröffentlichung und Suche von
-                Wohnungs- und Zimmerangeboten bereit. medstay vermittelt
-                lediglich den Kontakt zwischen Nutzern und wird nicht
-                Vertragspartei von Mietverträgen.
+                Wohnungs- und Zimmerangeboten bereit.
+              </p>
+
+              <p className="mt-3">
+                medstay stellt ausschließlich die technische Plattform zur
+                Kontaktvermittlung zwischen Nutzern bereit und wird nicht
+                Vertragspartei von Miet- oder Untermietverträgen.
+              </p>
+
+              <p className="mt-3">
+                Mietverträge kommen ausschließlich zwischen den jeweiligen
+                Nutzern zustande.
               </p>
             </section>
 
@@ -46,6 +55,35 @@ export default function AGBPage() {
                 medstay behält sich das Recht vor, Inserate zu prüfen,
                 abzulehnen, zu bearbeiten oder zu entfernen.
               </p>
+
+              <p className="mt-3">
+                Es besteht kein Anspruch auf Veröffentlichung eines Inserats.
+                medstay kann Inserate insbesondere bei rechtswidrigen,
+                irreführenden oder betrugsverdächtigen Inhalten ablehnen.
+              </p>
+            </section>
+
+            <section className="rounded-2xl bg-slate-50 p-5">
+              <h2 className="font-semibold text-slate-900">
+                Untervermietung und rechtliche Verantwortung
+              </h2>
+
+              <p className="mt-3">
+                Nutzer sind selbst dafür verantwortlich, alle rechtlichen
+                Voraussetzungen für das Anbieten einer Unterkunft zu erfüllen.
+              </p>
+
+              <p className="mt-3">
+                Hierzu zählt insbesondere die gegebenenfalls erforderliche
+                Zustimmung des Vermieters zur Untervermietung. medstay übernimmt
+                hierfür keine Prüfung oder Verantwortung.
+              </p>
+
+              <p className="mt-3">
+                Nutzer sind selbst dafür verantwortlich, Miet- oder
+                Untermietverträge sorgfältig zu prüfen und die jeweiligen
+                rechtlichen Rahmenbedingungen einzuhalten.
+              </p>
             </section>
 
             <section>
@@ -55,19 +93,8 @@ export default function AGBPage() {
 
               <p className="mt-3">
                 Für das Veröffentlichen eines Inserats kann eine Gebühr erhoben
-                werden. Die Veröffentlichung erfolgt nach Prüfung und Freigabe durch medstay.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-                Kein Anspruch auf Veröffentlichung
-              </h2>
-
-              <p className="mt-3">
-                Es besteht kein Anspruch auf Veröffentlichung eines Inserats.
-                medstay kann Inserate insbesondere bei rechtswidrigen,
-                irreführenden oder betrugsverdächtigen Inhalten ablehnen.
+                werden. Die Veröffentlichung erfolgt nach Prüfung und Freigabe
+                durch medstay.
               </p>
             </section>
 
@@ -77,9 +104,29 @@ export default function AGBPage() {
               </h2>
 
               <p className="mt-3">
-                medstay übernimmt keine Gewähr für die Richtigkeit von
-                Inseraten, die Identität der Nutzer oder das Zustandekommen
-                eines Mietverhältnisses.
+                medstay übernimmt keine Gewähr für die Richtigkeit,
+                Vollständigkeit oder Aktualität von Inseraten.
+              </p>
+
+              <p className="mt-3">
+                medstay übernimmt keine Garantie für die Verfügbarkeit, Eignung
+                oder Qualität der angebotenen Unterkünfte.
+              </p>
+
+              <p className="mt-3">
+                medstay überprüft Inserate, Nutzer oder Unterkünfte
+                grundsätzlich nicht auf Echtheit, Identität oder Rechtmäßigkeit.
+              </p>
+
+              <p className="mt-3">
+                Für Schäden, Vertragsverletzungen oder sonstige Streitigkeiten
+                im Zusammenhang mit einem Miet- oder Untermietverhältnis sind
+                ausschließlich die jeweiligen Nutzer verantwortlich.
+              </p>
+
+              <p className="mt-3">
+                medstay haftet nicht für das Zustandekommen oder
+                Nichtzustandekommen eines Miet- oder Untermietverhältnisses.
               </p>
             </section>
 
@@ -94,8 +141,8 @@ export default function AGBPage() {
               </p>
 
               <p className="mt-3">
-                Mietverträge kommen ausschließlich zwischen den jeweiligen
-                Nutzern zustande.
+                Miet- oder Untermietverträge kommen ausschließlich zwischen den
+                jeweiligen Nutzern zustande.
               </p>
             </section>
 
