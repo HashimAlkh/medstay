@@ -1,6 +1,12 @@
 import SiteHeader from "../../components/SiteHeader";
 import CreateListingForm from "../form/CreateListingForm";
 import { supabaseAdmin } from "@/app/lib/supabaseAdmin";
+import { track } from "@vercel/analytics";
+import { useEffect } from "react";
+
+useEffect(() => {
+  track("open_listing_form");
+}, []);
 
 export const dynamic = "force-dynamic";
 

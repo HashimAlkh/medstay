@@ -1,5 +1,7 @@
 import Link from "next/link";
+"use client";
 
+import { track } from "@vercel/analytics";
 type SiteHeaderProps = {
   rightLink?: { href: string; label: string };
   sticky?: boolean;
@@ -31,6 +33,7 @@ export default function SiteHeader({
           {mode !== "flow" && (
             <Link
   href="/create-listing/"
+  onClick={() => track("click_create_listing")}
   className="
     inline-flex items-center gap-2
     text-sm font-semibold
