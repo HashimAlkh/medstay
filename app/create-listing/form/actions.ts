@@ -121,6 +121,8 @@ const isEditing = !!draftId;
   const available_from = String(formData.get("from") || "");
   const available_to = String(formData.get("to") || "");
   const description = String(formData.get("description") || "").trim();
+  const first_name = String(formData.get("first_name") || "").trim();
+  const last_name = String(formData.get("last_name") || "").trim();
   const email = String(formData.get("email") || "").trim().toLowerCase();
 
   const housing_type = String(formData.get("housing_type") || "").trim() || null;
@@ -151,7 +153,9 @@ const payload = {
   available_from,
   available_to,
   description,
-  email,
+first_name,
+last_name,
+email,
   housing_type,
   furnished,
   rooms,

@@ -60,6 +60,8 @@ type InitialDraft = {
   available_from: string | null;
   available_to: string | null;
   description: string | null;
+  first_name: string | null;
+  last_name: string | null;
   email: string | null;
   housing_type: string | null;
   wifi: boolean | null;
@@ -529,6 +531,35 @@ function syncFileInput(nextImages: LocalImage[]) {
           defaultValue={initialDraft?.description || ""}
         />
       </section>
+
+
+      <section className="grid gap-4 md:grid-cols-2">
+  <div>
+    <label className="ms-label">Vorname</label>
+    <input
+      name="first_name"
+      type="text"
+      disabled={readonly}
+      placeholder="z. B. Hashim"
+      className="ms-input mt-1"
+      required
+      defaultValue={initialDraft?.first_name || ""}
+    />
+  </div>
+
+  <div>
+    <label className="ms-label">Nachname</label>
+    <input
+      name="last_name"
+      type="text"
+      disabled={readonly}
+      placeholder="z. B. Alkhateeb"
+      className="ms-input mt-1"
+      required
+      defaultValue={initialDraft?.last_name || ""}
+    />
+  </div>
+</section>
 
       <section>
         <label className="ms-label">Kontakt-E-Mail</label>

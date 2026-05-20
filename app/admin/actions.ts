@@ -89,7 +89,9 @@ type DraftRow = {
   available_to: string | null;
   furnished: string | null;
   description: string | null;
-  email: string | null;
+first_name: string | null;
+last_name: string | null;
+email: string | null;
   image_url: string | null;
   rooms: number | null;
   size_sqm: number | null;
@@ -141,7 +143,9 @@ export async function publishDraft(draftId: string) {
         "available_to",
         "furnished",
         "description",
-        "email",
+"first_name",
+"last_name",
+"email",
         "image_url",
         "housing_type",
         "wifi",
@@ -188,7 +192,9 @@ const editExpiresAt = new Date(
         available_to: draft.available_to,
         furnished: draft.furnished,
         description: draft.description,
-        email: draft.email,
+first_name: draft.first_name,
+last_name: draft.last_name,
+email: draft.email,
         image_url: draft.image_url,
         housing_type: draft.housing_type,
         rooms: draft.rooms,

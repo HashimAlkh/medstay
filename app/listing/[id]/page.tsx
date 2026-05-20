@@ -22,7 +22,9 @@ type ListingRow = {
   housing_type: string | null;
   image_url: string | null;
   image_urls: string[] | null;
-  email: string | null;
+  first_name: string | null;
+last_name: string | null;
+email: string | null;
   rooms: number | null;
   size_sqm: number | null;
 
@@ -66,7 +68,9 @@ export default async function ListingDetailPage({
         "housing_type",
         "image_url",
         "image_urls",
-        "email",
+        "first_name",
+"last_name",
+"email",
         "equipment",
         "rooms",
         "size_sqm",
@@ -77,6 +81,26 @@ export default async function ListingDetailPage({
     .single<ListingRow>();
 
   if (error || !listing) return notFound();
+
+  const hostName =
+  listing.first_name && listing.last_name
+    ? `${listing.first_name} ${listing.last_name.charAt(0)}.`
+    : listing.first_name || "Vermieter";
+
+const mailSubject = encodeURIComponent(
+  "Interesse an deiner Zwischenmiete über Medstay"
+);
+
+const mailBody = encodeURIComponent(`Hallo,
+
+ich interessiere mich für deine Wohnung auf Medstay.
+
+Ich studiere Medizin an der [Universität] und suche für den Zeitraum vom [Datum] bis [Datum] eine Unterkunft im Rahmen von [PJ / Famulatur / Praktikum].
+
+Die Wohnung würde sehr gut passen und ich freue mich über eine Rückmeldung.
+
+Viele Grüße
+[Name]`);
 
   const detailImages =
   listing.image_url && listing.image_urls?.length
@@ -207,12 +231,14 @@ export default async function ListingDetailPage({
   </span>
 </div>
               <div className="my-4 h-px bg-slate-200" />
+              <div className="mb-4 text-sm text-slate-600">
+  Inseriert von{" "}
+  <span className="font-medium text-slate-900">{hostName}</span>
+</div>
 
               {listing.email ? (
                 <a
-                  href={`mailto:${listing.email}?subject=${encodeURIComponent(
-                    `Anfrage zu deinem Medstay-Inserat: ${listing.title || ""}`
-                  )}`}
+                  href={`mailto:${listing.email}?subject=${mailSubject}&body=${mailBody}`}
                   className="mt-1 inline-flex w-full items-center justify-center rounded-2xl bg-teal-600 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700"
                 >
                   Vermieter kontaktieren

@@ -17,6 +17,8 @@ price: number | null;
   available_from: string | null;
   available_to: string | null;
   description: string | null;
+  first_name: string | null;
+last_name: string | null;
   email: string | null;
   housing_type: string | null;
   wifi: boolean | null;
@@ -56,6 +58,8 @@ if (draftId) {
         "available_from",
         "available_to",
         "description",
+        "first_name",
+"last_name",
         "email",
         "housing_type",
         "wifi",
