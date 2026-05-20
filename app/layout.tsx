@@ -25,29 +25,37 @@ export const metadata: Metadata = {
     "Finde passende Wohnungen für dein PJ, deine Famulatur oder dein Pflegepraktikum – speziell für Medizinstudierende.",
 
   icons: {
-  icon: "/medstay-icon.svg",
-  shortcut: "/medstay-icon.svg",
-  apple: "/medstay-icon.svg",
-},
+    icon: "/medstay-icon.svg",
+    shortcut: "/medstay-icon.svg",
+    apple: "/medstay-icon.svg",
+  },
 
-openGraph: {
-  title: "medstay",
-  description:
-    "Wohnungen für PJ, Famulatur & Pflegepraktikum.",
-  url: "https://www.med-stay.de",
-  siteName: "medstay",
-  locale: "de_DE",
-  type: "website",
+  openGraph: {
+    title: "medstay",
+    description:
+      "Wohnungen für PJ, Famulatur & Pflegepraktikum.",
+    url: "https://www.med-stay.de",
+    siteName: "medstay",
+    locale: "de_DE",
+    type: "website",
 
-  images: [
-    {
-      url: "/og-image.png",
-      width: 1200,
-      height: 630,
-      alt: "medstay",
-    },
-  ],
-},
+    images: [
+      {
+        url: "https://www.med-stay.de/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "medstay",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "medstay",
+    description:
+      "Wohnungen für PJ, Famulatur & Pflegepraktikum.",
+    images: ["https://www.med-stay.de/og-image.png"],
+  },
 };
 
 export default function RootLayout({
