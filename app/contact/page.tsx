@@ -11,13 +11,23 @@ export default function ContactPage() {
             Kontakt
           </h1>
 
-          <div className="mt-8 space-y-6 text-base leading-8 text-slate-700">
+          <div className="mt-8 space-y-4 text-base leading-7 text-slate-700">
             <p>
-              Bei Fragen, Problemen oder Feedback kannst du uns jederzeit
-              kontaktieren.
+              Du hast Fragen zu einem Inserat, Probleme bei der Nutzung oder
+              Feedback zu medstay?
             </p>
 
-            <section className="rounded-2xl bg-slate-50 p-5 mt-8">
+            <p>
+              Schreib uns jederzeit — wir versuchen so schnell wie möglich zu
+              antworten.
+            </p>
+
+            <p>
+              medstay wird aktuell von Medizinstudierenden aufgebaut und befindet
+              sich noch in der Early-Access-Phase.
+            </p>
+
+            <section className="mt-8 rounded-2xl bg-slate-50 p-5">
               <h2 className="font-semibold text-slate-900">
                 E-Mail
               </h2>
@@ -29,6 +39,10 @@ export default function ContactPage() {
                 >
                   kontakt@med-stay.de
                 </a>
+              </p>
+
+              <p className="mt-3 text-sm leading-6 text-slate-500">
+                Für Fragen, Feedback oder Probleme rund um medstay.
               </p>
             </section>
           </div>
