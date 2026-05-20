@@ -76,7 +76,9 @@ type DraftRow = {
   available_from: string | null;
   available_to: string | null;
   description: string | null;
-  email: string | null;
+  first_name: string | null;
+last_name: string | null;
+email: string | null;
   status: string | null;
   created_at: string | null;
   rooms: number | null;
@@ -150,7 +152,9 @@ export default async function PreviewPage({
         "available_from",
         "available_to",
         "description",
-        "email",
+        "first_name",
+"last_name",
+"email",
         "status",
         "created_at",
         "housing_type",
@@ -188,6 +192,11 @@ export default async function PreviewPage({
       </main>
     );
   }
+
+  const hostName =
+  draft.first_name && draft.last_name
+    ? `${draft.first_name} ${draft.last_name.charAt(0)}.`
+    : draft.first_name || "Vermieter";
 
   // ✅ Wahrheits-Status aus DB
   const isVerified = !!draft.email_verified;
@@ -376,7 +385,10 @@ export default async function PreviewPage({
 </div>
     <div className="my-4 h-px bg-slate-200" />
  
-
+<div className="mb-4 text-sm text-slate-600">
+  Inseriert von{" "}
+  <span className="font-medium text-slate-900">{hostName}</span>
+</div>
     <div className="mt-5">
       {!isVerified ? (
         <form action={resendVerification}>
