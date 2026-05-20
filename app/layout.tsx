@@ -30,15 +30,24 @@ export const metadata: Metadata = {
   apple: "/medstay-icon.svg",
 },
 
-  openGraph: {
-    title: "medstay",
-    description:
-      "Wohnungen für PJ, Famulatur & Pflegepraktikum.",
-    url: "https://www.med-stay.de",
-    siteName: "medstay",
-    locale: "de_DE",
-    type: "website",
-  },
+openGraph: {
+  title: "medstay",
+  description:
+    "Wohnungen für PJ, Famulatur & Pflegepraktikum.",
+  url: "https://www.med-stay.de",
+  siteName: "medstay",
+  locale: "de_DE",
+  type: "website",
+
+  images: [
+    {
+      url: "/og-image.png",
+      width: 1200,
+      height: 630,
+      alt: "medstay",
+    },
+  ],
+},
 };
 
 export default function RootLayout({
