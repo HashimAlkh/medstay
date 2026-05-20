@@ -386,10 +386,7 @@ export default async function PreviewPage({
 </div>
     <div className="my-4 h-px bg-slate-200" />
  
-<div className="mb-4 text-sm text-slate-600">
-  Inseriert von{" "}
-  <span className="font-medium text-slate-900">{hostName}</span>
-</div>
+
     <div className="mt-5">
       {!isVerified ? (
         <form action={resendVerification}>
@@ -415,6 +412,12 @@ export default async function PreviewPage({
 </form>
 )}
     </div>
+    <div className="mt-4 text-xs text-slate-500">
+  Inseriert von{" "}
+  <span className="font-medium text-slate-700">
+    {hostName}
+  </span>
+</div>
   </div>
 
 </div>
@@ -446,13 +449,6 @@ export default async function PreviewPage({
 
     <div className="my-4 h-px bg-slate-200" />
 
-    <div className="mb-4 text-sm text-slate-600">
-      Inseriert von{" "}
-      <span className="font-medium text-slate-900">
-        {hostName}
-      </span>
-    </div>
-
     {!isVerified ? (
       <form action={resendVerification}>
         <input type="hidden" name="draft_id" value={draft.id} />
@@ -476,6 +472,12 @@ export default async function PreviewPage({
         </button>
       </form>
     )}
+    <div className="mt-4 text-xs text-slate-500">
+  Inseriert von{" "}
+  <span className="font-medium text-slate-700">
+    {hostName}
+  </span>
+</div>
   </div>
 </div>
           </div>

@@ -412,8 +412,9 @@ function syncFileInput(nextImages: LocalImage[]) {
   <input
     name="from"
     type="date"
+    placeholder="TT.MM.JJJJ"
     disabled={readonly}
-    className="ms-input mt-1"
+    className="ms-input mt-1 min-h-[52px] appearance-none text-slate-900"
     required
     value={from}
     max={to || undefined}
@@ -426,8 +427,9 @@ function syncFileInput(nextImages: LocalImage[]) {
   <input
     name="to"
     type="date"
+    placeholder="TT.MM.JJJJ"
     disabled={readonly}
-    className="ms-input mt-1"
+    className="ms-input mt-1 min-h-[52px] appearance-none text-slate-900"
     required
     value={to}
     min={from || undefined}
@@ -519,7 +521,7 @@ function syncFileInput(nextImages: LocalImage[]) {
           name="description"
           disabled={readonly}
           rows={5}
-          placeholder="z. B. ruhige Lage, möbliert, gute Anbindung, Nebenkosten inklusive ..."
+          placeholder="Beschreibe Lage, Ausstattung und Besonderheiten der Unterkunft."
           className="ms-input mt-1 min-h-[130px]"
           required
           defaultValue={initialDraft?.description || ""}

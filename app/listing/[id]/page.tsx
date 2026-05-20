@@ -23,8 +23,8 @@ type ListingRow = {
   image_url: string | null;
   image_urls: string[] | null;
   first_name: string | null;
-last_name: string | null;
-email: string | null;
+  last_name: string | null;
+  email: string | null;
   rooms: number | null;
   size_sqm: number | null;
 
@@ -69,8 +69,8 @@ export default async function ListingDetailPage({
         "image_url",
         "image_urls",
         "first_name",
-"last_name",
-"email",
+        "last_name",
+        "email",
         "equipment",
         "rooms",
         "size_sqm",
@@ -231,10 +231,7 @@ Viele Grüße
   </span>
 </div>
               <div className="my-4 h-px bg-slate-200" />
-              <div className="mb-4 text-sm text-slate-600">
-  Inseriert von{" "}
-  <span className="font-medium text-slate-900">{hostName}</span>
-</div>
+
 
               {listing.email ? (
                 <a
@@ -251,6 +248,12 @@ Viele Grüße
                   Kontakt nicht verfügbar
                 </button>
               )}
+              <div className="mt-4 text-xs text-slate-500">
+                Inseriert von{" "}
+                <span className="font-medium text-slate-700">
+                  {hostName}
+                </span>
+              </div>
             </aside>
           </div>
         </div>

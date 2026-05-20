@@ -60,10 +60,6 @@ export default function ListingFlow() {
         <h2 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
           So funktioniert’s
         </h2>
-        <p className="mt-3 text-sm leading-6 text-slate-600 md:text-base">
-          In wenigen Schritten zu deinem veröffentlichten Inserat auf med
-          <span className="font-semibold text-teal-700">stay</span>.
-        </p>
       </div>
 
       {/* Mobile */}

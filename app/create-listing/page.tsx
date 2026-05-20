@@ -14,12 +14,9 @@ export default function CreateListingPage() {
           </div>
 
           <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 md:text-5xl">
-            Vermiete deine Unterkunft an Medizinstudierende.
+            Inseriere deine Unterkunft in wenigen Schritten.
           </h1>
 
-          <p className="mt-5 text-base leading-7 text-slate-600 md:text-lg">
-            Erreiche gezielt Medizinstudierende, die für PJ, Famulatur oder Pflegepraktikum eine temporäre Unterkunft suchen.
-          </p>
         </div>
 
         <div className="mt-12">
