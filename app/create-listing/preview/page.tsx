@@ -372,7 +372,8 @@ export default async function PreviewPage({
   </div>
 
   {/* RECHTS */}
-<div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm h-fit sm:basis-[32%] sm:shrink-0">    <div className="text-sm text-slate-500">Preis</div>
+<div className="hidden rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm h-fit sm:block sm:basis-[32%] sm:shrink-0">
+  <div className="text-sm text-slate-500">Preis</div>
     <div className="mt-1 text-3xl font-semibold text-slate-900">
       {draft.price} €
     </div>
@@ -426,6 +427,57 @@ export default async function PreviewPage({
                 </p>
               </div>
             ) : null}
+            <div className="mt-6 sm:hidden">
+  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
+    <div className="text-sm text-slate-500">Preis</div>
+
+    <div className="mt-1 text-3xl font-semibold text-slate-900">
+      {draft.price} €
+    </div>
+
+    <div className="text-sm text-slate-500">pro Monat</div>
+
+    <div className="mt-2 text-sm text-slate-600">
+      Kaution:{" "}
+      <span className="font-semibold text-slate-900">
+        {draft.deposit ? `${draft.deposit} €` : "—"}
+      </span>
+    </div>
+
+    <div className="my-4 h-px bg-slate-200" />
+
+    <div className="mb-4 text-sm text-slate-600">
+      Inseriert von{" "}
+      <span className="font-medium text-slate-900">
+        {hostName}
+      </span>
+    </div>
+
+    {!isVerified ? (
+      <form action={resendVerification}>
+        <input type="hidden" name="draft_id" value={draft.id} />
+        <ResendButton />
+      </form>
+    ) : LISTING_FEE_ENABLED && !isPaid ? (
+      <form action={startCheckout}>
+        <input type="hidden" name="draft_id" value={draft.id} />
+        <button className="w-full rounded-xl bg-teal-600 py-2.5 text-sm font-medium text-white hover:bg-teal-700">
+          Jetzt bezahlen ({LISTING_FEE_LABEL} €)
+        </button>
+      </form>
+    ) : (
+      <form action={submitDraft}>
+        <input type="hidden" name="draft_id" value={draft.id} />
+        <button
+          type="submit"
+          className="w-full rounded-xl cursor-pointer bg-teal-600 py-2.5 text-sm font-medium text-white transition hover:bg-teal-700"
+        >
+          Inserat kostenlos einreichen
+        </button>
+      </form>
+    )}
+  </div>
+</div>
           </div>
 
           
