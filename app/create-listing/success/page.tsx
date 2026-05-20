@@ -5,12 +5,6 @@ import Stripe from "stripe";
 import { supabaseAdmin } from "@/app/lib/supabaseAdmin";
 import { LISTING_FEE_ENABLED, LISTING_FEE_EUR } from "@/app/lib/pricing";
 import SiteHeader from "@/app/components/SiteHeader";
-import { track } from "@vercel/analytics";
-import { useEffect } from "react";
-
-useEffect(() => {
-  track("listing_submitted");
-}, []);
 
 type SP = Record<string, string | string[] | undefined>;
 

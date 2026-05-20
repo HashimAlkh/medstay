@@ -1,7 +1,9 @@
-import Link from "next/link";
+
 "use client";
 
+import Link from "next/link";
 import { track } from "@vercel/analytics";
+
 type SiteHeaderProps = {
   rightLink?: { href: string; label: string };
   sticky?: boolean;
