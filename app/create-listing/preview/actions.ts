@@ -55,6 +55,33 @@ async function sendVerificationEmail(
   });
 }
 
+async function sendAdminNotification(draftId: string) {
+  if (!resend) return;
+  if (!process.env.RESEND_FROM) return;
+  if (!process.env.ADMIN_EMAIL) return;
+
+  const adminUrl = `${siteUrl()}/admin?key=${encodeURIComponent(
+    process.env.ADMIN_KEY || ""
+  )}`;
+
+  await resend.emails.send({
+    from: process.env.RESEND_FROM,
+    to: [process.env.ADMIN_EMAIL],
+    subject: "Neues Medstay-Inserat wartet auf Prüfung",
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height:1.5">
+        <p>Ein neues Inserat wurde eingereicht und wartet auf Prüfung.</p>
+        <p><b>Draft-ID:</b> ${draftId}</p>
+        <p>
+          <a href="${adminUrl}" target="_blank" rel="noopener">
+            Zum Adminbereich
+          </a>
+        </p>
+      </div>
+    `,
+  });
+}
+
 export async function submitDraft(formData: FormData) {
   const id = String(formData.get("draft_id") || "").trim();
 
@@ -78,6 +105,8 @@ export async function submitDraft(formData: FormData) {
     );
   }
 
+
+
   const { error } = await supabase
     .from("listing_drafts")
     .update({
@@ -86,11 +115,17 @@ export async function submitDraft(formData: FormData) {
     })
     .eq("id", id);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+if (error) {
+  throw new Error(error.message);
+}
 
-  redirect(`/create-listing/success?draft=${encodeURIComponent(id)}`);
+try {
+  await sendAdminNotification(id);
+} catch (e) {
+  console.error("Admin notification failed:", e);
+}
+
+redirect(`/create-listing/success?draft=${encodeURIComponent(id)}`);
 }
 
 export async function resendVerification(formData: FormData) {
